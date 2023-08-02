@@ -1,0 +1,188 @@
+
+<html>
+<head>
+   
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   
+   <TITLE>CREDIT SCORING APP - Eswatini Bank</TITLE>
+   
+   <link href="assets/css/main_menu.css" rel="stylesheet" type="text/css">
+   <link rel="stylesheet" href="assets\font-awesome-4.7.0\css\font-awesome.css"">
+   <script type="text/javascript" src="jquery-3.5.1.js"></script>
+   
+   <!-- Calling jquery.number.js script file for As-You-Type number formating with Comma separator for thousands -->
+   <script type="text/javascript" src="jquery.number.js"></script>
+   	 
+   <!-- <script src = "easy-number-separator"></script> -->
+    
+   <script type="text/javascript">
+      
+	    //<!-- Document.Ready to set up jquery.number.js -->
+	    $(function()
+		    {
+				
+				//alert ("The previous page is " + document.referrer);
+				
+				//check if running a a local file:
+				//if (document.location.host == "") {    
+                   // local file rather than localhost etc
+                //} 
+				//or document.location.protocol == "file:" rather than "http:"
+				
+				document.MainMenuForm.application_ref.value = localStorage.application_ref;
+				document.MainMenuForm.company_reg_no.value = localStorage.company_reg_no;
+				document.MainMenuForm.loan_number.value = localStorage.loan_number;
+				document.MainMenuForm.legal_name.value = localStorage.legal_name  + " " + localStorage.customer_type;
+				// Set up the number formatting.
+				
+				$('#number_container').slideDown('fast');
+				
+				$('.price').on('change',function(){
+					console.log('Change event.');
+					var val = $('.price').val();
+					$('#the_number').text( val !== '' ? val : '(empty)' );
+				});
+				
+				$('.price').change(function(){
+					console.log('Second change event...');
+					
+				});
+				
+				$('.price').number( true, 0 );
+				
+				// Get the value of the number for the demo.
+				$('#get_number').on('click',function(){
+					
+					var val = $('.price').val();
+					
+					$('#the_number').text( val !== '' ? val : '(empty)' );
+				});
+			});
+	    
+
+	    function ToNumber(nStr) 
+		{
+	       if   (typeof(nStr) == "undefined")
+		      {  return 0;}
+		   else  
+		      {
+		        if (nStr == "") {return 0};
+		        if (nStr != "") {return parseFloat(nStr.replace(/,/g,''))};
+		      } 
+	    }   
+   </script 
+</head>
+
+
+				
+				
+<body style="background-color:white;" >
+   <!--<label for="number">How much would you like to pay?</label><br />-->
+   
+   <form name="MainMenuForm" action="#" onsubmit="return validateForm()" method="post">    
+  
+   <!--- Main Menu Definations --->
+   <nav>
+     <menu>
+		<menuitem><a href = "#">Dashboard </a> 
+			 <menu>
+				<menuitem><a href = "#">Statistics - Current Month</a></menuitem>
+				<menuitem><a href = "#">Statistics - Month on Month Trend</a></menuitem>
+				<menuitem><a href = "#">Graphs - Current Month</a></menuitem>
+				<menuitem><a href = "#">Graphs - Month On Month Trend</a></menuitem>
+			 </menu>
+		</menuitem>
+		<menuitem><a href = "#">Reports</a>
+	         <menu>
+                 <menuitem><a href = "table_dump/table_dump.php">Table Dump</a></menuitem>
+ 			 </menu>
+	   </menuitem>
+       <menuitem><a href = "#">Score New Customer </a>
+             <menu>  
+	            <menuitem><a href = "#"><i class="fa fa-database" aria-hidden="true" size = 30></i>Individual</a>
+	                   <menu>	
+	 	 	               <menuitem><a href = "">Agri business</a></menuitem>
+						   <menuitem><a href = "">Auto Easy</a></menuitem>
+						   <menuitem><a href = "">Housing Loan</a></menuitem>
+	                       <menuitem><a href = "">Personal Loan</a></menuitem>
+                    </menu>					   
+				</menuitem>
+	            <menuitem><a href = "#"><i class="fa fa-database" aria-hidden="true" size = 30></i>Organisation</a>
+	                   <menu>	
+	 	 	               <menuitem><a href = "">Agribusiness</a></menuitem>
+						   <menuitem><a href = "">Auto Easy</a></menuitem>
+						   <menuitem><a href = "">Housing Loan</a></menuitem>
+	                       <menuitem><a href = "">SMME</a></menuitem>
+                    </menu>					   
+				</menuitem>
+ 				
+		     </menu>    
+	  </menuitem>
+      <menuitem><a href = "#">Scored Customers</a>
+	         <menu>
+                 <menuitem><a href = "">Edit</a></menuitem>
+                 <menuitem><a href = "">Approve</a></menuitem>
+	 	 	     <menuitem><a href = "">Delete</a></menuitem>
+	 	 	     <menuitem><a href = "">View Score Card</a></menuitem>
+		 </menu>
+	   </menuitem>
+      
+	  <menuitem><a href = "#" ><i class="fa fa-cogs" aria-hidden="true"></i>Model Definitions</a>
+             <menu>
+                 <menuitem><a href = "InternalGradesDefinitions.htm">Scoring Criteria</a></menuitem>
+     	 </menu>			 
+
+	  </menuitem>
+ 	  <menuitem><a href = "#">Maintenance</a>
+            <menu>
+                <menuitem><a href = "#">Close Current Period</a></menuitem>
+                <menuitem><a href = "maintenance/reporting_periods/reporting_periods.php">Reporting Periods Register</a></menuitem>
+	            <menuitem><a href = "#">Reset My Password</a></menuitem>
+                <menuitem><a href = "maintenance/collateral_type_master_update.php">User Acces Matrix</a></menuitem>
+			</menu>			 	  
+	  </menuitem>
+	  <menuitem><a href = "#">Audit Logs</a>
+	        <menu>
+	            <menuitem><a href = "#"><i class="fa fa-user-edit" aria-hidden="true"></i>Users Added & Deleted</a></menuitem>
+	            <menuitem><a href = "#">Period Changers</a></menuitem>
+                <menuitem><a href = "#">Progress Tracker</a></menuitem>
+                <menuitem><a href = "audit/generated_columns/generated_columns.php">Data Dictionary</a></menuitem>
+ 	        </menu>
+	  </menuitem>
+	  <menuitem><a href = "#">Attachments</a>
+	        <menu>
+	             <menuitem><a href = "#"><i class="fa fa-file-upload"   aria-hidden="true"></i>Upload</a></menuitem>
+	             <menuitem><a href = "#"><i class="fa fa-file-download" aria-hidden="true"></i>Download</a></menuitem>		
+			</menu>
+	  </menuitem>
+	  <menuitem><a href = "#">Model Documentation</a>
+	         <menu>
+	             <menuitem><a href = "DevelopmentUpdate.htm"><i class="fa fa-question=circle" aria-hidden="true"></i>Model Development Update</a></menuitem>
+				 <menuitem><a href = "#"><i class="fa fa-question=circle" aria-hidden="true"></i>User Manual</a></menuitem>
+	             <menuitem><a href = "#">Credit Policy</a></menuitem>
+	             <menuitem><a href = "#">System Requirements</a></menuitem>
+	             <menuitem><a href = "#">System Changes (Version History)</a></menuitem>
+	             <menuitem><a href = "#">System Developer Contacts</a></menuitem>
+			 </menu> 
+	  </menuitem>
+     
+
+      </menu>
+	</nav>
+  	 
+   <script>
+	 
+	  function Thousands_Separators(num)
+      {
+         numStr = num+= "";
+		// var num_parts = num.toString().split(".");
+         //num_parts[0] = num_parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        return numStr.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+		//return num_parts.join(".");
+	
+      }
+    </script>
+   </Form>
+</body>
+
+</html>
