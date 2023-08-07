@@ -112,8 +112,8 @@ if($result)
     <td colspan="6" class="s_text"><table width="100%" border="0" cellspacing="0" cellpadding="0" >
       <tr>
         <td width="1286"><table width="770" height="165">
-<td><img src="img1.gif" alt="nknk" name="g" width="385" height="208"/>&nbsp;</td>
-<td><font color="#FFFFFF" size="16" face="Arial Narrow"><img src="img2.JPG" alt="nknk" name="g" width="385" height="208"/></font></td>
+<td><img src="../assets/images/corporate_logo1.jpg alt="nknk" name="g" width="385" height="208"/>&nbsp;</td>
+<td><font color="#FFFFFF" size="16" face="Arial Narrow"><img src="../assets/images/corporate_logo2.png" alt="nknk" name="g" width="385" height="208"/></font></td>
 </table></td>
 
 

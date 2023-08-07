@@ -219,7 +219,7 @@ else
 }
 
 ?>
-<table><tr><td><img src="assets/images/fdh_logo.png" width="385" height="208" border="0" ></td><td><img src="assets/images/fdh_logo.jpg" width="375" height="208" border="0" ></td></tr>
+<table><tr><td><img src="../assets/images/corporate_logo1.jpg" width="385" height="208" border="0" ></td><td><img src="../assets/images/corporate_logo2.png" width="375" height="208" border="0" ></td></tr>
 </table>
 <form  action="" method="post" name="mainmenu" >
 <input type="submit" name="submit" class="btn"  style ="width:320px;text-align:left" value="SCORE A NEW CUSTOMER " onclick="form.action='GetNewCompanyRegNo.php';"><br><br>

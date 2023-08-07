@@ -95,7 +95,7 @@ else
 
 ?>
 
-<table><tr><td><img src="fdh_logo.png" width="385" height="208" border="0" ></td><td><img src="fdh_logo.jpg" width="375" height="208" border="0" ></td></tr>
+<table><tr><td><img src="../assets/images/corporate_logo1.jpg" width="385" height="208" border="0" ></td><td><img src="../assets/images/corporate_logo2.png" width="375" height="208" border="0" ></td></tr>
 </table>
 <form  action="../bbscomplaints/complaint.php" method="post" name="mainmenu" >
 
