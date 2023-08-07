@@ -5,7 +5,7 @@ html, body{
    font-family: 'Karla', sans-serif;
    width:100vw;
 
-   background-image:url(images/fdh_logo.jpg);
+   background-image:url(../images/);
    background-size :cover;
     
 }
@@ -54,13 +54,13 @@ nav {
 }
 
 nav a {
-   background:#75F;
+   background:darkblue;
    text-decoration:none;
    font-size:12px;
-   color:#FFF;
+   color:red;
    min-width:100px;
    transition: background 0.5s, color 0.5s, transform 0.5s;
-   margin:0px 6px 6px 0px;
+   margin:0px 6px 10px 0px;
    padding:10px 10px 10px 10px;
    box-sizing:border-box;
    border-radius:3px;
@@ -68,6 +68,16 @@ nav a {
    text-align:center;
    position:relative;
 }
+nav a:link{
+    color: white;
+}
+nav a:active{
+    color: yellow;
+}
+nav a:visited{
+    color: white;
+}
+
 
 nav a:hover:before {
    content: '';
