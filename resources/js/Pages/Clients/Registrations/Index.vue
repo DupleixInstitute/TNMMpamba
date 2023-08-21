@@ -2,9 +2,9 @@
     <app-layout>
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                <inertia-link class="text-indigo-400 hover:text-indigo-600" :href="route('members.index')">Members
+                <inertia-link class="text-indigo-400 hover:text-indigo-600" :href="route('clients.index')">Clients
                 </inertia-link>
-                <span class="text-indigo-400 font-medium">/</span> {{ member.id }}
+                <span class="text-indigo-400 font-medium">/</span> {{ client.id }}
             </h2>
         </template>
         <div class="mx-auto">
@@ -12,7 +12,7 @@
                 <div class="bg-white relative shadow-xl mb-4 w-full md:w-3/12">
                     <div class="col-span-12 lg:col-span-4 xxl:col-span-3 flex lg:block flex-col-reverse">
                         <div class="intro-y box sm:mt-4 lg:mt-0">
-                            <member-menu :member="member"></member-menu>
+                            <client-menu :client="client"></client-menu>
                         </div>
                     </div>
 
@@ -20,7 +20,7 @@
                 <div class="w-full md:w-9/12 p-4 md:ml-4 bg-white">
                     <div class="flex justify-between ">
                         <h2 class="font-semibold text-xl text-gray-800 leading-tight">Registrations</h2>
-                        <inertia-link class="btn btn-blue" v-if="can('members.registrations.create')" :href="route('registrations.create',{member_id:member.id})">
+                        <inertia-link class="btn btn-blue" v-if="can('clients.registrations.create')" :href="route('registrations.create',{client_id:client.id})">
 
                         <span>Create </span>
                             <span class="hidden md:inline">Registration</span>
@@ -31,7 +31,7 @@
                             <thead class="bg-gray-50">
                             <tr class="text-left font-bold">
                                 <th class="px-6 pt-4 pb-4 font-medium text-gray-500">ID</th>
-                                <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Member</th>
+                                <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Client</th>
                                 <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Status</th>
                                 <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Date</th>
                                 <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Action</th>
@@ -53,10 +53,10 @@
                                 </td>
                                 <td class="border-t">
                                     <inertia-link class="px-6 py-4 flex items-center focus:text-indigo-500"
-                                                  :href="route('members.show', registration.member_id)" v-if="registration.member">
-                                        <img v-if="registration.member.profile_photo_url" class="block w-5 h-5 rounded-full mr-2 -my-2"
-                                             :src="registration.member.profile_photo_url">
-                                        {{ registration.member.name }}
+                                                  :href="route('clients.show', registration.client_id)" v-if="registration.client">
+                                        <img v-if="registration.client.profile_photo_url" class="block w-5 h-5 rounded-full mr-2 -my-2"
+                                             :src="registration.client.profile_photo_url">
+                                        {{ registration.client.name }}
                                     </inertia-link>
                                 </td>
                                 <td class="border-t">
@@ -99,12 +99,12 @@
                                                       tabindex="-1" class="text-green-600 hover:text-green-900" title="View">
                                             <font-awesome-icon icon="search"/>
                                         </inertia-link>
-                                        <inertia-link v-if="can('members.registrations.update')"
+                                        <inertia-link v-if="can('clients.registrations.update')"
                                                       :href="route('registrations.edit', registration.id)"
                                                       tabindex="-1" class="text-indigo-600 hover:text-indigo-900" title="Edit">
                                             <font-awesome-icon icon="edit"/>
                                         </inertia-link>
-                                        <a href="#" v-if="can('members.registrations.destroy')" @click="deleteAction(registration.id)"
+                                        <a href="#" v-if="can('clients.registrations.destroy')" @click="deleteAction(registration.id)"
                                            class="text-red-600 hover:text-red-900" title="Delete">
                                             <font-awesome-icon icon="trash"/>
                                         </a>
@@ -161,7 +161,7 @@ import SelectInput from '@/Jetstream/SelectInput.vue'
 import JetConfirmationModal from '@/Jetstream/ConfirmationModal.vue'
 import JetDangerButton from '@/Jetstream/DangerButton.vue'
 import JetSecondaryButton from '@/Jetstream/SecondaryButton.vue'
-import MemberMenu from '@/Pages/Members/MemberMenu.vue'
+import ClientMenu from '@/Pages/Clients/ClientMenu.vue'
 
 export default {
     components: {
@@ -175,10 +175,10 @@ export default {
         JetConfirmationModal,
         JetDangerButton,
         JetSecondaryButton,
-        MemberMenu,
+        ClientMenu,
     },
     props: {
-        member: Object,
+        client: Object,
         registrations: Object,
 
     },
@@ -189,8 +189,8 @@ export default {
             },
             confirmingDeletion: false,
             selectedRecord: null,
-            pageTitle: "Member Registrations",
-            pageDescription: "Member Registrations",
+            pageTitle: "Client Registrations",
+            pageDescription: "Client Registrations",
 
         }
     },

@@ -198,7 +198,7 @@ export default {
     data() {
         return {
             form: this.$inertia.form({
-                member_id: null,
+                client_id: null,
                 amount: null,
                 description: null,
 

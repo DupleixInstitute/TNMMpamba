@@ -14,18 +14,19 @@
                     <form @submit.prevent="submit" enctype="multipart/form-data">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2">
                             <div>
-                                <jet-label for="first_name" value="First Name"/>
-                                <jet-input id="first_name" type="text" class="block w-full"
-                                           v-model="form.first_name"
+                                <jet-label for="name" value="Name"/>
+                                <jet-input id="name" type="text" class=" block w-full"
+                                           v-model="form.name"
                                            required
-                                           autofocus autocomplete="first_name"/>
-                                <jet-input-error :message="form.errors.first_name" class="mt-2"/>
+                                           autofocus autocomplete="name"/>
+                                <jet-input-error :message="form.errors.name" class="mt-2"/>
                             </div>
-                            <div class="">
-                                <jet-label for="last_name" value="Last Name"/>
-                                <jet-input id="last_name" type="text" class=" block w-full" v-model="form.last_name"
-                                           required autocomplete="last_name"/>
-                                <jet-input-error :message="form.errors.last_name" class="mt-2"/>
+                            <div>
+                                <jet-label for="external_id" value="External ID"/>
+                                <jet-input id="external_id" type="text" class="block w-full"
+                                           v-model="form.external_id"/>
+                                <jet-input-error :message="form.errors.external_id" class="mt-2"/>
+
                             </div>
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2">
@@ -58,29 +59,6 @@
                                 <jet-label for="zip" value="Zip"/>
                                 <jet-input id="zip" type="text" class="block w-full" v-model="form.zip"/>
                                 <jet-input-error :message="form.errors.zip" class="mt-2"/>
-
-                            </div>
-                        </div>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-2 mt-2">
-                            <div>
-                                <jet-label for="practice_number" value="Practice Number"/>
-                                <jet-input id="practice_number" type="text" class="block w-full"
-                                           v-model="form.practice_number"/>
-                                <jet-input-error :message="form.errors.practice_number" class="mt-2"/>
-
-                            </div>
-                            <div>
-                                <jet-label for="qualifications" value="Qualifications"/>
-                                <jet-input id="qualifications" type="text" class="block w-full"
-                                           v-model="form.qualifications"/>
-                                <jet-input-error :message="form.errors.qualifications" class="mt-2"/>
-
-                            </div>
-                            <div>
-                                <jet-label for="external_id" value="External ID"/>
-                                <jet-input id="external_id" type="text" class=" block w-full"
-                                           v-model="form.external_id"/>
-                                <jet-input-error :message="form.errors.external_id" class="mt-2"/>
 
                             </div>
                         </div>
@@ -204,8 +182,7 @@ export default {
         return {
             form: this.$inertia.form({
                 branch_id: this.profile.branch_id,
-                first_name: this.profile.first_name,
-                last_name: this.profile.last_name,
+                name: this.profile.name,
                 gender: this.profile.gender,
                 email: this.profile.email,
                 password: null,
@@ -214,8 +191,6 @@ export default {
                 tel: this.profile.tel,
                 zip: this.profile.zip,
                 external_id: this.profile.external_id,
-                practice_number: this.profile.practice_number,
-                qualifications: this.profile.qualifications,
                 address: this.profile.address,
                 photo: this.profile.photo,
                 active: this.profile.active,

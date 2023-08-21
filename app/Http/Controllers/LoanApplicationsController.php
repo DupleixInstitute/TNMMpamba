@@ -8,6 +8,7 @@ use App\Models\LoanApplication;
 use App\Models\Currency;
 use App\Models\Invoice;
 use App\Models\InvoiceItem;
+use App\Models\LoanProduct;
 use App\Models\LoanProductCategory;
 use App\Models\Client;
 use App\Models\Setting;
@@ -24,11 +25,11 @@ class LoanApplicationsController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
-        $this->middleware(['permission:loans.index'])->only(['index', 'show']);
-        $this->middleware(['permission:loans.create'])->only(['create', 'store']);
-        $this->middleware(['permission:loans.update'])->only(['edit', 'update']);
-        $this->middleware(['permission:loans.destroy'])->only(['destroy']);
-        $this->middleware(['permission:loans.approve'])->only(['changeStatus']);
+        $this->middleware(['permission:applications.applications.index'])->only(['index', 'show']);
+        $this->middleware(['permission:applications.applications.create'])->only(['create', 'store']);
+        $this->middleware(['permission:applications.applications.update'])->only(['edit', 'update']);
+        $this->middleware(['permission:applications.applications.destroy'])->only(['destroy']);
+        $this->middleware(['permission:applications.applications.approve'])->only(['changeStatus']);
     }
 
     /**
@@ -41,18 +42,14 @@ class LoanApplicationsController extends Controller
         $staffID = null;
         $nurseID = null;
         $receptionistID = null;
-        if (Auth::user()->hasRole('employee') && Auth::user()->hasPermissionTo('loans.view_assigned_loans_only')) {
-            $staffID = Auth::id();
-        }
-        $loans = LoanApplication::with(['staff', 'member', 'category'])
-            ->filter(\request()->only('search', 'member_id', 'loan_category_id', 'province_id', 'branch_id', 'district_id', 'ward_id', 'date_range', 'village_id', 'staff_id', 'status'))
-            ->staff($staffID)
+        $applications = LoanApplication::with(['staff', 'client', 'category'])
+            ->filter(\request()->only('search', 'client_id', 'loan_product_id', 'province_id', 'branch_id', 'district_id', 'ward_id', 'date_range', 'village_id', 'staff_id', 'status'))
             ->orderBy('created_at', 'desc')
             ->paginate(20);
-        return Inertia::render('Loans/Index', [
-            'filters' => \request()->all('search', 'member_id', 'loan_category_id', 'province_id', 'branch_id', 'district_id', 'ward_id', 'date_range', 'village_id', 'staff_id', 'status'),
-            'loans' => $loans,
-            'categories' => LoanProductCategory::get()->map(function ($item) {
+        return Inertia::render('LoanApplications/Index', [
+            'filters' => \request()->all('search', 'client_id', 'loan_product_id', 'province_id', 'branch_id', 'district_id', 'ward_id', 'date_range', 'village_id', 'staff_id', 'status'),
+            'applications' => $applications,
+            'products' => LoanProduct::get()->map(function ($item) {
                 return [
                     'value' => $item->id,
                     'label' => $item->name
@@ -70,8 +67,8 @@ class LoanApplicationsController extends Controller
      */
     public function create()
     {
-        return Inertia::render('Loans/Create', [
-            'categories' => LoanProductCategory::get()->map(function ($item) {
+        return Inertia::render('LoanApplications/Create', [
+            'products' => LoanProductCategory::get()->map(function ($item) {
                 return [
                     'value' => $item->id,
                     'label' => $item->name
@@ -89,58 +86,58 @@ class LoanApplicationsController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'member_id' => ['required'],
+            'client_id' => ['required'],
             'amount' => ['required'],
             'date' => ['required'],
         ]);
-        $member = Client::find($request->member_id);
-        $loan = new LoanApplication();
-        $loan->created_by_id = Auth::id();
-        $loan->loan_category_id = $request->loan_category_id;
-        $loan->currency_id = Setting::where('setting_key', 'currency')->first()->setting_value;
-        $loan->member_id = $member->id;
-        $loan->province_id = $member->province_id;
-        $loan->branch_id = $member->branch_id;
-        $loan->district_id = $member->district_id;
-        $loan->ward_id = $member->ward_id;
-        $loan->village_id = $member->village_id;
-        $loan->staff_id = $request->staff_id;
-        $loan->date = $request->date;
-        $loan->amount = $request->amount;
-        $loan->applied_amount = $request->amount;
-        $loan->description = $request->description;
-        $loan->save();
-        event(new LoanCreated($loan));
+        $client = Client::find($request->client_id);
+        $application = new LoanApplication();
+        $application->created_by_id = Auth::id();
+        $application->application_category_id = $request->application_category_id;
+        $application->currency_id = Setting::where('setting_key', 'currency')->first()->setting_value;
+        $application->client_id = $client->id;
+        $application->province_id = $client->province_id;
+        $application->branch_id = $client->branch_id;
+        $application->district_id = $client->district_id;
+        $application->ward_id = $client->ward_id;
+        $application->village_id = $client->village_id;
+        $application->staff_id = $request->staff_id;
+        $application->date = $request->date;
+        $application->amount = $request->amount;
+        $application->applied_amount = $request->amount;
+        $application->description = $request->description;
+        $application->save();
+        event(new LoanCreated($application));
         activity()
-            ->performedOn($loan)
+            ->performedOn($application)
             ->log('Create Loan');
-        return redirect()->route('loans.show', $loan->id)->with('success', 'Loan created successfully.');
+        return redirect()->route('applications.show', $application->id)->with('success', 'Loan created successfully.');
     }
 
     /**
      * Display the specified resource.
      *
-     * @param LoanApplication $loan
+     * @param LoanApplication $application
      * @return \Inertia\Response
      */
-    public function show(LoanApplication $loan)
+    public function show(LoanApplication $application)
     {
-        $loan->load(['member','member.province', 'member.branch','member.district','member.ward','member.village','category','staff']);
-        return Inertia::render('Loans/Show', [
-            'loan' => $loan,
+        $application->load(['client','client.province', 'client.branch','client.district','client.ward','client.village','category','staff']);
+        return Inertia::render('LoanApplications/Show', [
+            'application' => $application,
         ]);
     }
 
     /**
      * Show the form for editing the specified resource.
      *
-     * @param LoanApplication $loan
+     * @param LoanApplication $application
      * @return \Inertia\Response
      */
-    public function edit(LoanApplication $loan)
+    public function edit(LoanApplication $application)
     {
-        return Inertia::render('Loans/Edit', [
-            'loan' => $loan,
+        return Inertia::render('LoanApplications/Edit', [
+            'application' => $application,
             'categories' => LoanProductCategory::get()->map(function ($item) {
                 return [
                     'value' => $item->id,
@@ -154,59 +151,59 @@ class LoanApplicationsController extends Controller
      * Update the specified resource in storage.
      *
      * @param \Illuminate\Http\Request $request
-     * @param LoanApplication $loan
+     * @param LoanApplication $application
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function update(Request $request, LoanApplication $loan)
+    public function update(Request $request, LoanApplication $application)
     {
         $request->validate([
             'amount' => ['required'],
             'date' => ['required'],
         ]);
-        $loan->loan_category_id = $request->loan_category_id;
-        $loan->staff_id = $request->staff_id;
-        $loan->date = $request->date;
-        $loan->amount = $request->amount;
-        $loan->description = $request->description;
-        $loan->save();
-        return redirect()->route('loans.show', $loan->id)->with('success', 'Loan updated successfully.');
+        $application->application_category_id = $request->application_category_id;
+        $application->staff_id = $request->staff_id;
+        $application->date = $request->date;
+        $application->amount = $request->amount;
+        $application->description = $request->description;
+        $application->save();
+        return redirect()->route('applications.show', $application->id)->with('success', 'Loan updated successfully.');
     }
 
-    public function changeStatus(Request $request, LoanApplication $loan)
+    public function changeStatus(Request $request, LoanApplication $application)
     {
-        $loan->status = $request->status;
-        $loan->approved_by_id = Auth::id();
-        if ($loan->isDirty('status')) {
-            if($loan->status=='approved'){
-                $loan->approved_date=$request->approved_date??date('Y-m-d');
-                $loan->amount=$request->amount??$loan->applied_amount;
+        $application->status = $request->status;
+        $application->approved_by_id = Auth::id();
+        if ($application->isDirty('status')) {
+            if($application->status=='approved'){
+                $application->approved_date=$request->approved_date??date('Y-m-d');
+                $application->amount=$request->amount??$application->applied_amount;
             }
-            if($loan->status=='rejected'){
-                $loan->approved_date=$request->approved_date??date('Y-m-d');
+            if($application->status=='rejected'){
+                $application->approved_date=$request->approved_date??date('Y-m-d');
             }
         }
-        $loan->save();
+        $application->save();
         activity()
-            ->performedOn($loan)
+            ->performedOn($application)
             ->log('Change Loan status');
-        if ($loan->wasChanged('status')) {
-            event(new LoanStatusChanged($loan));
+        if ($application->wasChanged('status')) {
+            event(new LoanStatusChanged($application));
         }
-        return redirect()->route('loans.show', $loan->id)->with('success', 'Loan updated successfully.');
+        return redirect()->route('applications.show', $application->id)->with('success', 'Loan updated successfully.');
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param LoanApplication $loan
+     * @param LoanApplication $application
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function destroy(LoanApplication $loan)
+    public function destroy(LoanApplication $application)
     {
-        $loan->delete();
+        $application->delete();
         activity()
-            ->performedOn($loan)
+            ->performedOn($application)
             ->log('Delete Loan');
-        return redirect()->route('loans.index')->with('success', 'Loan deleted successfully.');
+        return redirect()->route('applications.index')->with('success', 'Loan deleted successfully.');
     }
 }

@@ -1,29 +1,26 @@
 <template>
     <div>
         <div class="flex justify-center">
-            <img v-if="member.profile_photo_url" :src="member.profile_photo_url" alt=""
+            <img v-if="client.profile_photo_url" :src="client.profile_photo_url" alt=""
                  class="rounded-full mx-auto absolute -top-20 w-32 h-32 shadow-2xl border-4 border-white">
         </div>
         <div class="mt-16">
-            <h1 class="font-bold text-center text-3xl text-gray-900">{{ member.name }}</h1>
+            <h1 class="font-bold text-center text-3xl text-gray-900">{{ client.name }}</h1>
             <p class="text-center text-sm text-gray-400 font-medium">
-                {{ member.gender }}
+                {{ client.type }}
             </p>
             <p class="text-center text-sm text-gray-400 font-medium">
-                {{ member.age }}
+                {{ client.mobile }}
             </p>
             <p class="text-center text-sm text-gray-400 font-medium">
-                {{ member.mobile }}
-            </p>
-            <p class="text-center text-sm text-gray-400 font-medium">
-                {{ member.email }}
+                {{ client.email }}
             </p>
             <div class="flex justify-center">
-                <inertia-link v-if="can('communication.campaigns.create')" :href="route('communication.campaigns.create',{member_id:member.id,campaign_type:'sms'})"
+                <inertia-link v-if="can('communication.campaigns.create')" :href="route('communication.campaigns.create',{client_id:client.id,campaign_type:'sms'})"
                               class="btn btn-success  mr-2" title="SMS">
                     <font-awesome-icon icon="sms" class="w-4 h-4"></font-awesome-icon>
                 </inertia-link>
-                <inertia-link v-if="can('communication.campaigns.create')" :href="route('communication.campaigns.create',{member_id:member.id,campaign_type:'email'})"
+                <inertia-link v-if="can('communication.campaigns.create')" :href="route('communication.campaigns.create',{client_id:client.id,campaign_type:'email'})"
                               class="btn btn-success" title="Email">
                     <font-awesome-icon icon="envelope" class="w-4 h-4"></font-awesome-icon>
                 </inertia-link>
@@ -32,55 +29,49 @@
         <div class="w-full mt-5">
             <inertia-link
                 class="w-full border-t border-gray-100 font-medium text-gray-600 py-2 px-4 w-full block hover:bg-gray-100 transition duration-150"
-                :class="{'bg-gray-100': route().current('members.show')}"
-                :href="route('members.show',member.id)">
+                :class="{'bg-gray-100': route().current('clients.show')}"
+                :href="route('clients.show',client.id)">
                 <font-awesome-icon icon="user" class="w-4 h-4 mr-2"></font-awesome-icon>
                 Basic Profile
             </inertia-link>
-            <inertia-link v-if="can('loans.index')"
+            <inertia-link v-if="can('loans.applications.index')"
                           class="w-full border-t border-gray-100 font-medium text-gray-600 py-2 px-4 w-full block hover:bg-gray-100 transition duration-150"
-                          :class="{'bg-gray-100': route().current('members.loans.index')}"
-                          :href="route('members.loans.index',member.id)">
+                          :class="{'bg-gray-100': route().current('clients.loan_applications.index')}"
+                          :href="route('clients.loan_applications.index',client.id)">
                 <font-awesome-icon icon="database" class="w-4 h-4 mr-2"></font-awesome-icon>
-                Loans
+                Loan Applications
             </inertia-link>
-            <inertia-link v-if="can('courses.registrations.index')"
+            <inertia-link v-if="can('clients.notes')"
                           class="w-full border-t border-gray-100 font-medium text-gray-600 py-2 px-4 w-full block hover:bg-gray-100 transition duration-150"
-                          :class="{'bg-gray-100': route().current('members.courses.index')}"
-                          :href="route('members.courses.index',member.id)">
-                <font-awesome-icon icon="graduation-cap" class="w-4 h-4 mr-2"></font-awesome-icon>Courses
-            </inertia-link>
-            <inertia-link v-if="can('members.notes')"
-                          class="w-full border-t border-gray-100 font-medium text-gray-600 py-2 px-4 w-full block hover:bg-gray-100 transition duration-150"
-                          :class="{'bg-gray-100': route().current('members.notes.index')}"
-                          :href="route('members.notes.index',member.id)">
+                          :class="{'bg-gray-100': route().current('clients.notes.index')}"
+                          :href="route('clients.notes.index',client.id)">
                 <font-awesome-icon icon="bookmark" class="w-4 h-4 mr-2"></font-awesome-icon>
                 Notes
             </inertia-link>
-            <inertia-link v-if="can('members.files.index')"
+            <inertia-link v-if="can('clients.files.index')"
                           class="w-full border-t border-gray-100 font-medium text-gray-600 py-2 px-4 w-full block hover:bg-gray-100 transition duration-150"
-                          :class="{'bg-gray-100': route().current('members.files.*')}"
-                          :href="route('members.files.index',member.id)">
+                          :class="{'bg-gray-100': route().current('clients.files.*')}"
+                          :href="route('clients.files.index',client.id)">
                 <font-awesome-icon icon="folder" class="w-4 h-4 mr-2"></font-awesome-icon>
                 Files
             </inertia-link>
-            <inertia-link v-if="can('members.create')"
+            <inertia-link v-if="can('clients.create')"
                           class="w-full border-t border-gray-100 font-medium text-gray-600 py-2 px-4 w-full block hover:bg-gray-100 transition duration-150"
-                          :class="{'bg-gray-100': route().current('members.login_details.*')}"
-                          :href="route('members.login_details.index',member.id)">
+                          :class="{'bg-gray-100': route().current('clients.login_details.*')}"
+                          :href="route('clients.login_details.index',client.id)">
                 <font-awesome-icon icon="user-lock" class="w-4 h-4 mr-2"></font-awesome-icon>
                 Login Details
             </inertia-link>
         </div>
         <div class="p-5 border-t flex">
-            <inertia-link v-if="can('members.update')" :href="route('members.edit',member.id)"
+            <inertia-link v-if="can('clients.update')" :href="route('clients.edit',client.id)"
                           class="btn btn-primary py-1 px-2">Edit
             </inertia-link>
-            <button type="button" v-if="can('members.destroy')" @click="deleteAction" class="btn btn-danger py-1 px-2 ml-auto">Delete
+            <button type="button" v-if="can('clients.destroy')" @click="deleteAction" class="btn btn-danger py-1 px-2 ml-auto">Delete
             </button>
         </div>
     </div>
-    <jet-confirmation-modal :show="confirmingMemberDeletion" @close="confirmingMemberDeletion = false">
+    <jet-confirmation-modal :show="confirmingClientDeletion" @close="confirmingClientDeletion = false">
         <template #title>
             Delete Record
         </template>
@@ -91,7 +82,7 @@
         </template>
 
         <template #footer>
-            <jet-secondary-button @click.native="confirmingMemberDeletion = false">
+            <jet-secondary-button @click.native="confirmingClientDeletion = false">
                 Nevermind
             </jet-secondary-button>
 
@@ -121,23 +112,23 @@ export default {
         JetSecondaryButton,
     },
     props: {
-        member: Object,
+        client: Object,
     },
     data() {
         return {
             processing: false,
-            confirmingMemberDeletion: false,
+            confirmingClientDeletion: false,
 
         }
     },
     methods: {
         deleteAction() {
-            this.confirmingMemberDeletion = true
+            this.confirmingClientDeletion = true
         },
         destroy() {
 
-            this.$inertia.delete(this.route('members.destroy', this.member.id))
-            this.confirmingMemberDeletion = false
+            this.$inertia.delete(this.route('clients.destroy', this.client.id))
+            this.confirmingClientDeletion = false
         },
     },
 }

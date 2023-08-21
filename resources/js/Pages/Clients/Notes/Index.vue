@@ -2,9 +2,9 @@
     <app-layout>
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                <inertia-link class="text-indigo-400 hover:text-indigo-600" :href="route('members.index')">Members
+                <inertia-link class="text-indigo-400 hover:text-indigo-600" :href="route('clients.index')">Clients
                 </inertia-link>
-                <span class="text-indigo-400 font-medium">/</span> {{ member.name }}
+                <span class="text-indigo-400 font-medium">/</span> {{ client.name }}
             </h2>
         </template>
         <div class="mx-auto">
@@ -12,7 +12,7 @@
                 <div class="bg-white relative shadow-xl mb-4 mt-20 w-full md:w-3/12">
                     <div class="col-span-12 lg:col-span-4 xxl:col-span-3 flex lg:block flex-col-reverse">
                         <div class="intro-y box mt-5 lg:mt-0">
-                            <member-menu :member="member"></member-menu>
+                            <client-menu :client="client"></client-menu>
                         </div>
                     </div>
 
@@ -20,8 +20,8 @@
                 <div class="w-full md:w-9/12 p-4 md:ml-4 bg-white sm:mt-4">
                     <div class="flex justify-between ">
                         <h2 class="font-semibold text-xl text-gray-800 leading-tight">Notes</h2>
-                        <inertia-link class="btn btn-blue" v-if="can('members.notes.create')"
-                                      :href="route('members.notes.create',member.id)">
+                        <inertia-link class="btn btn-blue" v-if="can('clients.notes.create')"
+                                      :href="route('clients.notes.create',client.id)">
                             <span>Create </span>
                             <span class="hidden md:inline">Notes</span>
                         </inertia-link>
@@ -42,33 +42,33 @@
                                     No Notes Yet
                                 </td>
                             </tr>
-                            <tr v-for="memberNote in notes.data" :key="memberNote.id"
+                            <tr v-for="clientNote in notes.data" :key="clientNote.id"
                                 class="hover:bg-gray-100 focus-within:bg-gray-100">
                                 <td class="border-t">
                                     <span class="px-6 py-4 flex items-center">
-                                    {{ memberNote.description }}
+                                    {{ clientNote.description }}
                                     </span>
                                 </td>
                                 <td class="border-t">
-                                    <span class="px-6 py-4 flex items-center" v-if="memberNote.created_by">
-                                    {{ memberNote.created_by.name }}
+                                    <span class="px-6 py-4 flex items-center" v-if="clientNote.created_by">
+                                    {{ clientNote.created_by.name }}
                                     </span>
                                 </td>
 
                                 <td class="border-t">
                                     <span class="px-6 py-4 flex items-center">
-                                    {{ memberNote.time_ago }}
+                                    {{ clientNote.time_ago }}
                                     </span>
                                 </td>
                                 <td class="border-t w-px pr-2">
                                     <div class=" flex items-center space-x-2">
-                                        <inertia-link v-if="can('members.notes.update')"
-                                                      :href="route('members.notes.edit', memberNote.id)"
+                                        <inertia-link v-if="can('clients.notes.update')"
+                                                      :href="route('clients.notes.edit', clientNote.id)"
                                                       tabindex="-1" class="text-indigo-600 hover:text-indigo-900">
                                             Edit
                                         </inertia-link>
-                                        <a href="#" v-if="can('members.notes.destroy')"
-                                           @click="deleteAction(memberNote.id)"
+                                        <a href="#" v-if="can('clients.notes.destroy')"
+                                           @click="deleteAction(clientNote.id)"
                                            class="text-red-600 hover:text-red-900">Delete</a>
                                     </div>
                                 </td>
@@ -123,7 +123,7 @@ import SelectInput from '@/Jetstream/SelectInput.vue'
 import JetConfirmationModal from '@/Jetstream/ConfirmationModal.vue'
 import JetDangerButton from '@/Jetstream/DangerButton.vue'
 import JetSecondaryButton from '@/Jetstream/SecondaryButton.vue'
-import MemberMenu from '@/Pages/Members/MemberMenu.vue'
+import ClientMenu from '@/Pages/Clients/ClientMenu.vue'
 
 export default {
     components: {
@@ -137,10 +137,10 @@ export default {
         JetConfirmationModal,
         JetDangerButton,
         JetSecondaryButton,
-        MemberMenu,
+        ClientMenu,
     },
     props: {
-        member: Object,
+        client: Object,
         notes: Object,
 
     },
@@ -151,8 +151,8 @@ export default {
             },
             confirmingDeletion: false,
             selectedRecord: null,
-            pageTitle: "Member Notes",
-            pageDescription: "Member Notes",
+            pageTitle: "Client Notes",
+            pageDescription: "Client Notes",
 
         }
     },
@@ -163,7 +163,7 @@ export default {
         },
         destroy() {
 
-            this.$inertia.delete(this.route('members.notes.destroy', this.selectedRecord))
+            this.$inertia.delete(this.route('clients.notes.destroy', this.selectedRecord))
             this.confirmingDeletion = false
         },
     },

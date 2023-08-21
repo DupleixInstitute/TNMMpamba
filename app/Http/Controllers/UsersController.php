@@ -143,8 +143,7 @@ class UsersController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'first_name' => ['required', 'string', 'max:255'],
-            'last_name' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:255'],
             'gender' => ['required'],
             'active' => ['required'],
             'roles' => ['required'],
@@ -153,9 +152,7 @@ class UsersController extends Controller
             'photo' => ['nullable', 'image', 'max:1024'],
         ]);
         $user = User::create([
-            'first_name' => $request->first_name,
-            'middle_name' => $request->middle_name,
-            'last_name' => $request->last_name,
+            'name' => $request->name,
             'branch_id' => $request->branch_id,
             'country_id' => $request->country_id,
             'title_id' => $request->title_id,
@@ -165,8 +162,6 @@ class UsersController extends Controller
             'tel' => $request->tel,
             'zip' => $request->zip,
             'external_id' => $request->external_id,
-            'practice_number' => $request->practice_number,
-            'qualifications' => $request->qualifications,
             'description' => $request->description,
             'address' => $request->address,
             'active' => $request->active,
@@ -275,8 +270,7 @@ class UsersController extends Controller
             return redirect()->back()->with('error', 'Updating the demo user is not allowed.');
         }
         $request->validate([
-            'first_name' => ['required', 'string', 'max:255'],
-            'last_name' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:255'],
             'gender' => ['required'],
             'roles' => ['required'],
             'active' => ['required'],
@@ -285,9 +279,7 @@ class UsersController extends Controller
             'photo' => ['nullable', 'image', 'max:1024'],
         ]);
         $user->update([
-            'first_name' => $request->first_name,
-            'middle_name' => $request->middle_name,
-            'last_name' => $request->last_name,
+            'name' => $request->name,
             'branch_id' => $request->branch_id,
             'country_id' => $request->country_id,
             'title_id' => $request->title_id,
@@ -297,8 +289,6 @@ class UsersController extends Controller
             'tel' => $request->tel,
             'zip' => $request->zip,
             'external_id' => $request->external_id,
-            'practice_number' => $request->practice_number,
-            'qualifications' => $request->qualifications,
             'description' => $request->description,
             'address' => $request->address,
             'active' => $request->active,
@@ -315,9 +305,7 @@ class UsersController extends Controller
 
     public function destroy(User $user)
     {
-        if (App::environment('demo') && $user->isDemoUser()) {
-            return redirect()->back()->with('error', 'Deleting the demo user is not allowed.');
-        }
+
         $user->delete();
         return redirect()->route('users.index')->with('success', 'User deleted successfully.');
     }
@@ -328,9 +316,7 @@ class UsersController extends Controller
         $type = $request->type;
         $id = $request->id;
         $data = User::where(function ($query) use ($search) {
-            $query->where('first_name', 'like', "%$search%");
-            $query->orWhere('last_name', 'like', "%$search%");
-            $query->orWhere('middle_name', 'like', "%$search%");
+            $query->where('name', 'like', "%$search%");
             $query->orWhere('id', 'like', "%$search%");
             $query->orWhere('email', 'like', "%$search%");
             $query->orWhere('external_id', 'like', "%$search%");

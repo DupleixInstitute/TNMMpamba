@@ -16,7 +16,6 @@ class Client extends Model
     use SoftDeletes;
 
     protected $appends = [
-        'name',
         'profile_photo_url',
         'age',
         'join_date',
@@ -89,10 +88,6 @@ class Client extends Model
     }
 
 
-    public function getNameAttribute()
-    {
-        return $this->first_name . ' ' . $this->middle_name . ' ' . $this->last_name;
-    }
 
     public function getJoinDateAttribute()
     {

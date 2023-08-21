@@ -2,9 +2,9 @@
     <app-layout>
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                <inertia-link class="text-indigo-400 hover:text-indigo-600" :href="route('members.index')">Members
+                <inertia-link class="text-indigo-400 hover:text-indigo-600" :href="route('clients.index')">Clients
                 </inertia-link>
-                <span class="text-indigo-400 font-medium">/</span> {{ member.name }}
+                <span class="text-indigo-400 font-medium">/</span> {{ client.name }}
             </h2>
         </template>
         <div class="mx-auto">
@@ -12,7 +12,7 @@
                 <div class="bg-white relative shadow-xl mb-4 mt-20 w-full md:w-3/12">
                     <div class="col-span-12 lg:col-span-4 xxl:col-span-3 flex lg:block flex-col-reverse">
                         <div class="intro-y box mt-5 lg:mt-0">
-                            <member-menu :member="member"></member-menu>
+                            <client-menu :client="client"></client-menu>
                         </div>
                     </div>
 
@@ -20,8 +20,8 @@
                 <div class="w-full md:w-9/12 p-4 md:ml-4 bg-white sm:mt-4">
                     <div class="flex justify-between ">
                         <h2 class="font-semibold text-xl text-gray-800 leading-tight">Files</h2>
-                        <inertia-link class="btn btn-blue" v-if="can('members.files.create')"
-                                      :href="route('members.files.create',member.id)">
+                        <inertia-link class="btn btn-blue" v-if="can('clients.files.create')"
+                                      :href="route('clients.files.create',client.id)">
                             <span>Create </span>
                             <span class="hidden md:inline">File</span>
                         </inertia-link>
@@ -75,12 +75,12 @@
                                            tabindex="-1" class="text-indigo-600 hover:text-indigo-900">
                                             <font-awesome-icon icon="download"/>
                                         </a>
-                                        <inertia-link v-if="can('members.files.update')"
-                                                      :href="route('members.files.edit', file.id)"
+                                        <inertia-link v-if="can('clients.files.update')"
+                                                      :href="route('clients.files.edit', file.id)"
                                                       tabindex="-1" class="text-indigo-600 hover:text-indigo-900">
                                             Edit
                                         </inertia-link>
-                                        <a href="#" v-if="can('members.files.destroy')" @click="deleteAction(file.id)"
+                                        <a href="#" v-if="can('clients.files.destroy')" @click="deleteAction(file.id)"
                                            class="text-red-600 hover:text-red-900">Delete</a>
                                     </div>
                                 </td>
@@ -135,7 +135,7 @@ import SelectInput from '@/Jetstream/SelectInput.vue'
 import JetConfirmationModal from '@/Jetstream/ConfirmationModal.vue'
 import JetDangerButton from '@/Jetstream/DangerButton.vue'
 import JetSecondaryButton from '@/Jetstream/SecondaryButton.vue'
-import MemberMenu from '@/Pages/Members/MemberMenu.vue'
+import ClientMenu from '@/Pages/Clients/ClientMenu.vue'
 
 export default {
     components: {
@@ -149,10 +149,10 @@ export default {
         JetConfirmationModal,
         JetDangerButton,
         JetSecondaryButton,
-        MemberMenu,
+        ClientMenu,
     },
     props: {
-        member: Object,
+        client: Object,
         files: Object,
 
     },
@@ -163,8 +163,8 @@ export default {
             },
             confirmingDeletion: false,
             selectedRecord: null,
-            pageTitle: "Member Files",
-            pageDescription: "Member Files",
+            pageTitle: "Client Files",
+            pageDescription: "Client Files",
 
         }
     },
@@ -175,7 +175,7 @@ export default {
         },
         destroy() {
 
-            this.$inertia.delete(this.route('members.files.destroy', this.selectedRecord))
+            this.$inertia.delete(this.route('clients.files.destroy', this.selectedRecord))
             this.confirmingDeletion = false
         },
     },

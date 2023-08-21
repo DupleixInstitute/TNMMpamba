@@ -2,36 +2,33 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\CourseMaterial;
 use App\Models\File;
 use App\Models\Client;
-use App\Models\LoanProductScoringAttribute;
-use App\Models\MemberRelationship;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
-class MemberFilesController extends Controller
+class ClientFilesController extends Controller
 {
     public function __construct()
     {
         $this->middleware('auth');
-        $this->middleware(['permission:members.files.index'])->only(['index', 'show']);
-        $this->middleware(['permission:members.files.create'])->only(['create', 'store']);
-        $this->middleware(['permission:members.files.update'])->only(['edit', 'update']);
-        $this->middleware(['permission:members.files.destroy'])->only(['destroy']);
+        $this->middleware(['permission:clients.files.index'])->only(['index', 'show']);
+        $this->middleware(['permission:clients.files.create'])->only(['create', 'store']);
+        $this->middleware(['permission:clients.files.update'])->only(['edit', 'update']);
+        $this->middleware(['permission:clients.files.destroy'])->only(['destroy']);
     }
-    public function index(Client $member)
+    public function index(Client $client)
     {
 
-        $files = File::where('record_id', $member->id)
-            ->where('category', 'members')
+        $files = File::where('record_id', $client->id)
+            ->where('category', 'clients')
             ->orderBy('created_at', 'desc')
             ->paginate(20);
-        return Inertia::render('Members/Files/Index', [
-            'member' => $member,
+        return Inertia::render('Clients/Files/Index', [
+            'client' => $client,
             'files' => $files,
         ]);
     }
@@ -41,10 +38,10 @@ class MemberFilesController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create(Client $member)
+    public function create(Client $client)
     {
-        return Inertia::render('Members/Files/Create', [
-            'member' => $member,
+        return Inertia::render('Clients/Files/Create', [
+            'client' => $client,
         ]);
     }
 
@@ -54,23 +51,21 @@ class MemberFilesController extends Controller
      * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request, Client $member)
+    public function store(Request $request, Client $client)
     {
-        if (App::environment('demo')) {
-            return redirect()->back()->with('error', 'Creating member files is not allowed in demo.');
-        }
+
         $fileController = new FilesController();
         $file = $fileController->store([
             'file' => $request->file('file'),
             'name' => $request->name,
             'description' => $request->description,
-            'category' => 'members',
-            'record_id' => $member->id,
+            'category' => 'clients',
+            'record_id' => $client->id,
         ]);
         activity()
-            ->performedOn($member)
-            ->log('Create Member File');
-        return redirect()->route('members.files.index', [$member->id])->with('success', 'Member File created successfully.');
+            ->performedOn($client)
+            ->log('Create Client File');
+        return redirect()->route('clients.files.index', [$client->id])->with('success', 'Client File created successfully.');
 
     }
 
@@ -93,10 +88,10 @@ class MemberFilesController extends Controller
      */
     public function edit(File $file)
     {
-        $member = Client::find($file->record_id);
+        $client = Client::find($file->record_id);
 
-        return Inertia::render('Members/Files/Edit', [
-            'member' => $member,
+        return Inertia::render('Clients/Files/Edit', [
+            'client' => $client,
             'file' => $file,
         ]);
     }
@@ -110,10 +105,8 @@ class MemberFilesController extends Controller
      */
     public function update(Request $request, File $file)
     {
-        if (App::environment('demo')) {
-            return redirect()->back()->with('error', 'Updating the demo member files is not allowed.');
-        }
-        $member = Client::find($file->record_id);
+
+        $client = Client::find($file->record_id);
         $fileController = new FilesController();
         $file = $fileController->update($file->id,[
             'file' => $request->file('file'),
@@ -121,9 +114,9 @@ class MemberFilesController extends Controller
             'description' => $request->description,
         ]);
         activity()
-            ->performedOn($member)
-            ->log('Update Member File');
-        return redirect()->route('members.files.index', [$member->id])->with('success', 'Updated File successfully.');
+            ->performedOn($client)
+            ->log('Update Client File');
+        return redirect()->route('clients.files.index', [$client->id])->with('success', 'Updated File successfully.');
 
     }
 
@@ -135,15 +128,13 @@ class MemberFilesController extends Controller
      */
     public function destroy(File $file)
     {
-        if (App::environment('demo')) {
-            return redirect()->back()->with('error', 'Deleting the demo member files is not allowed.');
-        }
+
         $fileController = new FilesController();
         $fileController->destroy($file->id);
         activity()
             ->performedOn($file)
-            ->log('Delete Member File');
-        return redirect()->route('members.files.index', [$file->record_id])->with('success', 'File deleted successfully.');
+            ->log('Delete Client File');
+        return redirect()->route('clients.files.index', [$file->record_id])->with('success', 'File deleted successfully.');
 
     }
 }

@@ -2,10 +2,10 @@
     <app-layout>
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                <inertia-link class="text-indigo-400 hover:text-indigo-600" :href="route('members.index')">
-                    Members
+                <inertia-link class="text-indigo-400 hover:text-indigo-600" :href="route('clients.index')">
+                    Clients
                 </inertia-link>
-                <span class="text-indigo-400 font-medium">/</span> {{ member.name }}
+                <span class="text-indigo-400 font-medium">/</span> {{ client.name }}
             </h2>
         </template>
         <div class="mx-auto">
@@ -13,7 +13,7 @@
                 <div class="bg-white relative shadow-xl mb-4 mt-20 w-full md:w-3/12">
                     <div class="col-span-12 lg:col-span-4 xxl:col-span-3 flex lg:block flex-col-reverse">
                         <div class="intro-y box mt-5 lg:mt-0">
-                            <member-menu :member="member"></member-menu>
+                            <client-menu :client="client"></client-menu>
                         </div>
                     </div>
 
@@ -21,8 +21,8 @@
                 <div class="w-full md:w-9/12 p-4 md:ml-4 bg-white sm:mt-4">
                     <div class="flex justify-between ">
                         <h2 class="font-semibold text-xl text-gray-800 leading-tight">Login Details</h2>
-                        <inertia-link class="btn btn-blue" v-if="can('members.create')"
-                                      :href="route('members.login_details.create',member.id)">
+                        <inertia-link class="btn btn-blue" v-if="can('clients.create')"
+                                      :href="route('clients.login_details.create',client.id)">
                             <span>Add </span>
                             <span class="hidden md:inline">User</span>
                         </inertia-link>
@@ -37,7 +37,7 @@
                             </tr>
                             </thead>
                             <tbody>
-                            <tr v-if="!member.user">
+                            <tr v-if="!client.user">
                                 <td colspan="3" class="px-6 py-4 text-center">
                                     No Users Yet
                                 </td>
@@ -45,24 +45,24 @@
                             <tr v-else
                                 class="hover:bg-gray-100 focus-within:bg-gray-100">
                                 <td class="border-t">
-                                    <inertia-link v-if="member.user"
-                                                  :href="route('users.show', member.user.id)"
+                                    <inertia-link v-if="client.user"
+                                                  :href="route('users.show', client.user.id)"
                                                   tabindex="-1"
                                                   class="px-6 py-4 flex items-center text-indigo-600 hover:text-indigo-900">
-                                        {{ member.user.name }}
+                                        {{ client.user.name }}
                                     </inertia-link>
                                 </td>
                                 <td class="border-t">
                                     <inertia-link
-                                                  :href="route('users.show', member.user.id)"
+                                                  :href="route('users.show', client.user.id)"
                                                   tabindex="-1"
                                                   class="px-6 py-4 flex items-center text-indigo-600 hover:text-indigo-900">
-                                        {{ member.user.email }}
+                                        {{ client.user.email }}
                                     </inertia-link>
                                 </td>
                                 <td class="border-t">
                                     <inertia-link v-if="can('users.update')"
-                                                  :href="route('users.edit', member.user.id)"
+                                                  :href="route('users.edit', client.user.id)"
                                                   tabindex="-1"
                                                   class="px-6 py-4 flex items-center text-indigo-600 hover:text-indigo-900">
                                         Edit
@@ -118,7 +118,7 @@ import SelectInput from '@/Jetstream/SelectInput.vue'
 import JetConfirmationModal from '@/Jetstream/ConfirmationModal.vue'
 import JetDangerButton from '@/Jetstream/DangerButton.vue'
 import JetSecondaryButton from '@/Jetstream/SecondaryButton.vue'
-import MemberMenu from '@/Pages/Members/MemberMenu.vue'
+import ClientMenu from '@/Pages/Clients/ClientMenu.vue'
 
 export default {
     components: {
@@ -132,10 +132,10 @@ export default {
         JetConfirmationModal,
         JetDangerButton,
         JetSecondaryButton,
-        MemberMenu,
+        ClientMenu,
     },
     props: {
-        member: Object,
+        client: Object,
         files: Object,
 
     },
@@ -146,8 +146,8 @@ export default {
             },
             confirmingDeletion: false,
             selectedRecord: null,
-            pageTitle: "Member Login Details",
-            pageDescription: "Member Login Details",
+            pageTitle: "Client Login Details",
+            pageDescription: "Client Login Details",
 
         }
     },
@@ -158,7 +158,7 @@ export default {
         },
         destroy() {
 
-            this.$inertia.delete(this.route('members.login_details.destroy', this.selectedRecord))
+            this.$inertia.delete(this.route('clients.login_details.destroy', this.selectedRecord))
             this.confirmingDeletion = false
         },
     },

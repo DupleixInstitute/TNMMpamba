@@ -19,6 +19,16 @@
                                            required/>
                                 <jet-input-error :message="form.errors.name" class="mt-2"/>
                             </div>
+                            <div>
+                                <jet-label for="country_id" value="Country"/>
+                                <Multiselect
+                                    v-model="form.country_id"
+                                    mode="single"
+                                    :required="true"
+                                    :options="countries"
+                                />
+                                <jet-input-error :message="form.errors.country_id" class="mt-2"/>
+                            </div>
                         </div>
                         <div class="flex items-center justify-end mt-4">
 
@@ -52,7 +62,7 @@ import TextareaInput from "@/Jetstream/TextareaInput.vue";
 
 export default {
     props: {
-
+        countries:Object
     },
     components: {
         Select,
@@ -71,7 +81,7 @@ export default {
             form: this.$inertia.form({
                 parent_id: null,
                 name: null,
-                open_date: null,
+                country_id: null,
                 description: null,
                 active: false,
             }),

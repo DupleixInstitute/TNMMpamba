@@ -22,6 +22,7 @@ return new class extends Migration
             $table->unsignedBigInteger('staff_id')->nullable();
             $table->decimal('amount')->nullable();
             $table->decimal('applied_amount')->nullable();
+            $table->decimal('score')->nullable();
             $table->date('date')->nullable();
             $table->timestamp('approved_at')->nullable();
             $table->string('status')->default('pending');

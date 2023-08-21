@@ -2,9 +2,9 @@
     <app-layout>
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                <inertia-link class="text-indigo-400 hover:text-indigo-600" :href="route('members.index')">Members
+                <inertia-link class="text-indigo-400 hover:text-indigo-600" :href="route('clients.index')">Clients
                 </inertia-link>
-                <span class="text-indigo-400 font-medium">/</span> {{ member.name }}
+                <span class="text-indigo-400 font-medium">/</span> {{ client.name }}
             </h2>
         </template>
         <div class="mx-auto">
@@ -12,7 +12,7 @@
                 <div class="bg-white relative shadow-xl mb-4 mt-20 w-full md:w-3/12">
                     <div class="col-span-12 lg:col-span-4 xxl:col-span-3 flex lg:block flex-col-reverse">
                         <div class="intro-y box mt-5 lg:mt-0">
-                            <member-menu :member="member"></member-menu>
+                            <client-menu :client="client"></client-menu>
                         </div>
                     </div>
 
@@ -35,7 +35,7 @@
                             <tbody>
                             <tr>
                                 <td class="border-t">
-                                    <span class="px-6 py-4 flex items-center">Member</span>
+                                    <span class="px-6 py-4 flex items-center">Client</span>
                                 </td>
                                 <td class="border-t">
                                     <span
@@ -133,7 +133,7 @@
                     <div class="flex justify-between mt-2 ">
                         <h2 class="font-semibold text-xl text-gray-800 leading-tight">Invoices</h2>
                         <inertia-link class="btn btn-blue" v-if="can('billing.invoices.create')"
-                                      :href="route('members.invoices.create',member.id)">
+                                      :href="route('clients.invoices.create',client.id)">
                             <span>Create </span>
                             <span class="hidden md:inline">Invoice</span>
                         </inertia-link>
@@ -272,7 +272,7 @@ import SelectInput from '@/Jetstream/SelectInput.vue'
 import JetConfirmationModal from '@/Jetstream/ConfirmationModal.vue'
 import JetDangerButton from '@/Jetstream/DangerButton.vue'
 import JetSecondaryButton from '@/Jetstream/SecondaryButton.vue'
-import MemberMenu from '@/Pages/Members/MemberMenu.vue'
+import ClientMenu from '@/Pages/Clients/ClientMenu.vue'
 
 export default {
     components: {
@@ -286,10 +286,10 @@ export default {
         JetConfirmationModal,
         JetDangerButton,
         JetSecondaryButton,
-        MemberMenu,
+        ClientMenu,
     },
     props: {
-        member: Object,
+        client: Object,
         invoices: Object,
         balancesData: Object,
 
@@ -301,8 +301,8 @@ export default {
             },
             confirmingDeletion: false,
             selectedRecord: null,
-            pageTitle: "Members",
-            pageDescription: "Manage Members",
+            pageTitle: "Clients",
+            pageDescription: "Manage Clients",
 
         }
     },
@@ -313,7 +313,7 @@ export default {
         },
         destroy() {
 
-            this.$inertia.delete(this.route('members.invoices.destroy', this.selectedRecord))
+            this.$inertia.delete(this.route('clients.invoices.destroy', this.selectedRecord))
             this.confirmingDeletion = false
         },
     },

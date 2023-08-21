@@ -20,6 +20,10 @@ class Province extends Model
         });
     }
 
+    public function country()
+    {
+        return $this->belongsTo(Country::class);
+    }
     public function districts()
     {
         return $this->hasMany(District::class);

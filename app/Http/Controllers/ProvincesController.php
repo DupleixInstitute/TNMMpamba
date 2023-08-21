@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Country;
 use App\Models\Province;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
@@ -23,6 +24,7 @@ class ProvincesController extends Controller
     public function index()
     {
         $provinces = Province::filter(\request()->only('search'))
+            ->with(['country'])
             ->paginate(20);
         return Inertia::render('Provinces/Index', [
             'filters' => \request()->all('search'),
@@ -34,7 +36,12 @@ class ProvincesController extends Controller
     {
 
         return Inertia::render('Provinces/Create', [
-
+            'countries' => Country::get()->map(function ($item) {
+                return [
+                    'value' => $item->id,
+                    'label' => $item->name
+                ];
+            }),
         ]);
     }
 
@@ -42,8 +49,10 @@ class ProvincesController extends Controller
     {
         $request->validate([
             'name' => ['required'],
+            'country_id' => ['required'],
         ]);
         $province = new Province();
+        $province->country_id = $request->country_id;
         $province->name = $request->name;
         $province->save();
         activity()
@@ -64,6 +73,12 @@ class ProvincesController extends Controller
     {
         return Inertia::render('Provinces/Edit', [
             'province' => $province,
+            'countries' => Country::get()->map(function ($item) {
+                return [
+                    'value' => $item->id,
+                    'label' => $item->name
+                ];
+            }),
         ]);
     }
 
@@ -72,7 +87,9 @@ class ProvincesController extends Controller
 
         $request->validate([
             'name' => ['required'],
+            'country_id' => ['required'],
         ]);
+        $province->country_id = $request->country_id;
         $province->name = $request->name;
         $province->save();
         activity()

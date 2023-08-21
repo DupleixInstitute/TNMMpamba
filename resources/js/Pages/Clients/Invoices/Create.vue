@@ -2,9 +2,9 @@
     <app-layout>
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                <inertia-link class="text-indigo-400 hover:text-indigo-600" :href="route('members.index')">Members
+                <inertia-link class="text-indigo-400 hover:text-indigo-600" :href="route('clients.index')">Clients
                 </inertia-link>
-                <span class="text-indigo-400 font-medium">/</span> {{ member.name }}
+                <span class="text-indigo-400 font-medium">/</span> {{ client.name }}
             </h2>
         </template>
         <div class=" mx-auto">
@@ -12,7 +12,7 @@
                 <div class="bg-white relative shadow-xl mt-20 w-3/12 ">
                     <div class="col-span-12 lg:col-span-4 xxl:col-span-3 flex lg:block flex-col-reverse">
                         <div class="intro-y box mt-5 lg:mt-0">
-                            <member-menu :member="member"></member-menu>
+                            <client-menu :client="client"></client-menu>
                         </div>
                     </div>
 
@@ -20,7 +20,7 @@
                 <div class="w-9/12 ml-2 bg-white p-5">
                     <div class="flex justify-between ">
                         <h2 class="font-semibold text-xl text-gray-800 leading-tight">Create Invoice</h2>
-                        <inertia-link class="btn btn-blue" :href="route('members.copayers.index',member.id)">
+                        <inertia-link class="btn btn-blue" :href="route('clients.copayers.index',client.id)">
                             <span>Back </span>
                         </inertia-link>
                     </div>
@@ -210,7 +210,7 @@ import SelectInput from '@/Jetstream/SelectInput.vue'
 import JetConfirmationModal from '@/Jetstream/ConfirmationModal.vue'
 import JetDangerButton from '@/Jetstream/DangerButton.vue'
 import JetSecondaryButton from '@/Jetstream/SecondaryButton.vue'
-import MemberMenu from '@/Pages/Members/MemberMenu.vue'
+import ClientMenu from '@/Pages/Clients/ClientMenu.vue'
 import JetInput from "@/Jetstream/Input.vue";
 import JetInputError from "@/Jetstream/InputError.vue";
 import JetButton from "@/Jetstream/Button.vue";
@@ -237,7 +237,7 @@ const fetchTariffs = async (query) => {
     })
 }
 export default {
-    metaInfo: {title: 'Members'},
+    metaInfo: {title: 'Clients'},
     components: {
         AppLayout,
         Icon,
@@ -251,13 +251,13 @@ export default {
         JetConfirmationModal,
         JetDangerButton,
         JetSecondaryButton,
-        MemberMenu,
+        ClientMenu,
         JetButton,
         JetCheckbox,
         TextareaInput,
     },
     props: {
-        member: Object,
+        client: Object,
         taxRates: Object,
         doctors: Object,
 
@@ -293,14 +293,14 @@ export default {
                 }
             },
             pageTitle: "Create Invoice",
-            pageDescription: "Manage Member Invoices",
+            pageDescription: "Manage Client Invoices",
 
         }
     },
 
     methods: {
         submit() {
-            this.form.post(this.route('members.invoices.store', this.member.id), {})
+            this.form.post(this.route('clients.invoices.store', this.client.id), {})
         },
         addService() {
             this.form.invoice_items.push({

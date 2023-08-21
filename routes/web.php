@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ArticleCategoriesController;
+use App\Http\Controllers\ClientNotesController;
 use App\Http\Controllers\LoanProductsController;
 use App\Http\Controllers\BranchesController;
 use App\Http\Controllers\ChartOfAccountController;
@@ -29,8 +30,8 @@ use App\Http\Controllers\FormsController;
 use App\Http\Controllers\JournalEntryController;
 use App\Http\Controllers\LicenseController;
 use App\Http\Controllers\LoanProductCategoriesController;
-use App\Http\Controllers\MemberFilesController;
-use App\Http\Controllers\MemberLoginDetailsController;
+use App\Http\Controllers\ClientFilesController;
+use App\Http\Controllers\ClientLoginDetailsController;
 
 use App\Http\Controllers\MemberPortal\MemberPortalArticlesController;
 use App\Http\Controllers\MemberPortal\MemberPortalCourseMaterialsController;
@@ -136,30 +137,30 @@ Route::group(['prefix' => 'client','as'=>'clients.'], function () {
     Route::put('/{client}/update', [ClientsController::class, 'update'])->name('update');
     Route::delete('/{client}/destroy', [ClientsController::class, 'destroy'])->name('destroy');
     //loans
-    Route::get('{client}/loan', [ClientsController::class, 'loans'])->name('loans.index');
+    Route::get('{client}/loan_application', [ClientsController::class, 'loanApplication'])->name('loan_applications.index');
     Route::get('{client}/course', [ClientsController::class, 'courses'])->name('courses.index');
 
     //login details
-    Route::get('{client}/login_detail', [MemberLoginDetailsController::class, 'index'])->name('login_details.index');
-    Route::get('{client}/login_detail/create', [MemberLoginDetailsController::class, 'create'])->name('login_details.create');
-    Route::post('{client}/login_detail/store', [MemberLoginDetailsController::class, 'store'])->name('login_details.store');
-    Route::delete('login_detail/{clientUser}/destroy', [MemberLoginDetailsController::class, 'destroy'])->name('login_details.destroy');
+    Route::get('{client}/login_detail', [ClientLoginDetailsController::class, 'index'])->name('login_details.index');
+    Route::get('{client}/login_detail/create', [ClientLoginDetailsController::class, 'create'])->name('login_details.create');
+    Route::post('{client}/login_detail/store', [ClientLoginDetailsController::class, 'store'])->name('login_details.store');
+    Route::delete('login_detail/{clientUser}/destroy', [ClientLoginDetailsController::class, 'destroy'])->name('login_details.destroy');
     //files
-    Route::get('{client}/file', [MemberFilesController::class, 'index'])->name('files.index');
-    Route::get('{client}/file/create', [MemberFilesController::class, 'create'])->name('files.create');
-    Route::post('{client}/file/store', [MemberFilesController::class, 'store'])->name('files.store');
-    Route::get('file/{file}/show', [MemberFilesController::class, 'show'])->name('files.show');
-    Route::get('file/{file}/edit', [MemberFilesController::class, 'edit'])->name('files.edit');
-    Route::put('file/{file}/update', [MemberFilesController::class, 'update'])->name('files.update');
-    Route::delete('file/{file}/destroy', [MemberFilesController::class, 'destroy'])->name('files.destroy');
+    Route::get('{client}/file', [ClientFilesController::class, 'index'])->name('files.index');
+    Route::get('{client}/file/create', [ClientFilesController::class, 'create'])->name('files.create');
+    Route::post('{client}/file/store', [ClientFilesController::class, 'store'])->name('files.store');
+    Route::get('file/{file}/show', [ClientFilesController::class, 'show'])->name('files.show');
+    Route::get('file/{file}/edit', [ClientFilesController::class, 'edit'])->name('files.edit');
+    Route::put('file/{file}/update', [ClientFilesController::class, 'update'])->name('files.update');
+    Route::delete('file/{file}/destroy', [ClientFilesController::class, 'destroy'])->name('files.destroy');
     //notes
-    Route::get('{client}/note', [PatientNotesController::class, 'index'])->name('notes.index');
-    Route::get('{client}/note/create', [PatientNotesController::class, 'create'])->name('notes.create');
-    Route::post('{client}/note/store', [PatientNotesController::class, 'store'])->name('notes.store');
-    Route::get('note/{clientNote}/show', [PatientNotesController::class, 'show'])->name('notes.show');
-    Route::get('note/{clientNote}/edit', [PatientNotesController::class, 'edit'])->name('notes.edit');
-    Route::put('note/{clientNote}/update', [PatientNotesController::class, 'update'])->name('notes.update');
-    Route::delete('note/{clientNote}/destroy', [PatientNotesController::class, 'destroy'])->name('notes.destroy');
+    Route::get('{client}/note', [ClientNotesController::class, 'index'])->name('notes.index');
+    Route::get('{client}/note/create', [ClientNotesController::class, 'create'])->name('notes.create');
+    Route::post('{client}/note/store', [ClientNotesController::class, 'store'])->name('notes.store');
+    Route::get('note/{clientNote}/show', [ClientNotesController::class, 'show'])->name('notes.show');
+    Route::get('note/{clientNote}/edit', [ClientNotesController::class, 'edit'])->name('notes.edit');
+    Route::put('note/{clientNote}/update', [ClientNotesController::class, 'update'])->name('notes.update');
+    Route::delete('note/{clientNote}/destroy', [ClientNotesController::class, 'destroy'])->name('notes.destroy');
 
 });
 

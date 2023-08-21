@@ -2,9 +2,9 @@
     <app-layout>
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                <inertia-link class="text-indigo-400 hover:text-indigo-600" :href="route('members.index')">Members
+                <inertia-link class="text-indigo-400 hover:text-indigo-600" :href="route('clients.index')">Clients
                 </inertia-link>
-                <span class="text-indigo-400 font-medium">/</span> {{ member.name }}
+                <span class="text-indigo-400 font-medium">/</span> {{ client.name }}
             </h2>
         </template>
         <div class="mx-auto">
@@ -12,7 +12,7 @@
                 <div class="bg-white relative shadow-xl mb-4 mt-20 w-full md:w-3/12">
                     <div class="col-span-12 lg:col-span-4 xxl:col-span-3 flex lg:block flex-col-reverse">
                         <div class="intro-y box mt-5 lg:mt-0">
-                            <member-menu :member="member"></member-menu>
+                            <client-menu :client="client"></client-menu>
                         </div>
                     </div>
 
@@ -20,7 +20,7 @@
                 <div class="w-full md:w-9/12 p-4 md:ml-4 bg-white sm:mt-4">
                     <div class="flex justify-between ">
                         <h2 class="font-semibold text-xl text-gray-800 leading-tight">Edit Note</h2>
-                        <inertia-link class="btn btn-blue" :href="route('members.notes.index',member.id)">
+                        <inertia-link class="btn btn-blue" :href="route('clients.notes.index',client.id)">
                             <span>Back </span>
                         </inertia-link>
                     </div>
@@ -36,11 +36,11 @@
 
                                 </div>
                                 <div>
-                                    <jet-label for="visible_to_member">
+                                    <jet-label for="visible_to_client">
                                         <div class="flex items-center">
-                                            <jet-checkbox name="visible_to_member" :value="form.visible_to_member" id="visible_to_member"  v-model:checked="form.visible_to_member" />
+                                            <jet-checkbox name="visible_to_client" :value="form.visible_to_client" id="visible_to_client"  v-model:checked="form.visible_to_client" />
                                             <div class="ml-2">
-                                                Visible to Member
+                                                Visible to Client
                                             </div>
                                         </div>
                                     </jet-label>
@@ -79,7 +79,7 @@ import SelectInput from '@/Jetstream/SelectInput.vue'
 import JetConfirmationModal from '@/Jetstream/ConfirmationModal.vue'
 import JetDangerButton from '@/Jetstream/DangerButton.vue'
 import JetSecondaryButton from '@/Jetstream/SecondaryButton.vue'
-import MemberMenu from '@/Pages/Members/MemberMenu.vue'
+import ClientMenu from '@/Pages/Clients/ClientMenu.vue'
 import JetInput from "@/Jetstream/Input.vue";
 import JetInputError from "@/Jetstream/InputError.vue";
 import JetButton from "@/Jetstream/Button.vue";
@@ -100,31 +100,31 @@ export default {
         JetConfirmationModal,
         JetDangerButton,
         JetSecondaryButton,
-        MemberMenu,
+        ClientMenu,
         JetButton,
         JetCheckbox,
         TextareaInput
     },
     props: {
-        member: Object,
-        memberNote: Object,
+        client: Object,
+        clientNote: Object,
 
     },
     data() {
         return {
             form: this.$inertia.form({
-                visible_to_member: this.memberNote.visible_to_member,
-                description: this.memberNote.description,
+                visible_to_client: this.clientNote.visible_to_client,
+                description: this.clientNote.description,
             }),
-            pageTitle: "Edit Member Notes",
-            pageDescription: "Edit Member Notes",
+            pageTitle: "Edit Client Notes",
+            pageDescription: "Edit Client Notes",
 
         }
     },
 
     methods: {
         submit() {
-            this.form.put(this.route('members.notes.update', this.memberNote.id), {})
+            this.form.put(this.route('clients.notes.update', this.clientNote.id), {})
         },
     },
 }

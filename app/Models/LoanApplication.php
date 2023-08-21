@@ -14,13 +14,13 @@ class LoanApplication extends Model
     ];
 
 
-    public function member()
+    public function client()
     {
         return $this->belongsTo(Client::class);
     }
-    public function category()
+    public function product()
     {
-        return $this->belongsTo(LoanProductCategory::class,'loan_category_id');
+        return $this->belongsTo(LoanProduct::class,'loan_product_id');
     }
     public function staff()
     {
@@ -34,8 +34,8 @@ class LoanApplication extends Model
                     ->orWhere('description', 'like', '%' . $search . '%');
             });
         });
-        $query->when($filters['loan_category_id'] ?? null, function ($query, $loan_category_id) {
-            $query->where('loan_category_id', $loan_category_id);
+        $query->when($filters['loan_product_id'] ?? null, function ($query, $loan_category_id) {
+            $query->where('loan_product_id', $loan_category_id);
         });
         $query->when($filters['status'] ?? null, function ($query, $status) {
             $query->where('status', $status);

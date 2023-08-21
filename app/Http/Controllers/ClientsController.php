@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Branch;
 use App\Models\Country;
-use App\Models\CourseRegistration;
 use App\Models\District;
 use App\Models\LoanApplication;
 use App\Models\Client;
@@ -30,14 +29,19 @@ class ClientsController extends Controller
     public function index()
     {
 
-        $clients = Client::with(['province', 'district', 'ward', 'village', 'branch'])
+        $clients = Client::with(['country','province', 'district', 'ward', 'village', 'branch'])
         ->filter(\request()->only('search', 'province_id', 'gender', 'branch_id', 'district_id', 'ward_id', 'village_id'))
             ->orderBy('created_at', 'desc')
             ->paginate(20);
         return Inertia::render('Clients/Index', [
             'filters' => \request()->all('search', 'province_id', 'gender', 'branch_id', 'district_id', 'ward_id', 'village_id'),
             'clients' => $clients,
-            'roles' => Role::all(),
+            'countries' => Country::get()->map(function ($item) {
+                return [
+                    'value' => $item->id,
+                    'label' => $item->name
+                ];
+            }),
         ]);
     }
 
@@ -90,9 +94,8 @@ class ClientsController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'first_name' => ['required', 'string', 'max:255'],
-            'last_name' => ['required', 'string', 'max:255'],
-            'gender' => ['required'],
+            'name' => ['required', 'string'],
+            'type' => ['required', 'string', 'max:255'],
             //'dob' => ['required'],
             'photo' => ['nullable', 'image', 'max:1024'],
         ]);
@@ -103,9 +106,8 @@ class ClientsController extends Controller
         $client->ward_id = $request->ward_id;
         $client->village_id = $request->village_id;
         $client->branch_id = $request->branch_id;
-        $client->first_name = $request->first_name;
-        $client->middle_name = $request->middle_name;
-        $client->last_name = $request->last_name;
+        $client->name = $request->name;
+        $client->type = $request->type;
         $client->country_id = $request->country_id;
         $client->title_id = $request->title_id;
         $client->nationality_id = $request->nationality_id;
@@ -115,7 +117,6 @@ class ClientsController extends Controller
         $client->tel = $request->tel;
         $client->zip = $request->zip;
         $client->external_id = $request->external_id;
-        $client->shares = $request->shares;
         $client->address = $request->address;
         $client->postal_address = $request->postal_address;
         $client->id_type = $request->id_type;
@@ -139,7 +140,7 @@ class ClientsController extends Controller
 
     public function show(Client $client)
     {
-        $client->load(['province', 'district', 'ward', 'village', 'branch']);
+        $client->load(['country','province', 'district', 'ward', 'village', 'branch']);
         return Inertia::render('Clients/Show', [
             'client' => $client
         ]);
@@ -196,9 +197,8 @@ class ClientsController extends Controller
     {
 
         $request->validate([
-            'first_name' => ['required', 'string', 'max:255'],
-            'last_name' => ['required', 'string', 'max:255'],
-            'gender' => ['required'],
+            'name' => ['required', 'string'],
+            'type' => ['required', 'string', 'max:255'],
             'photo' => ['nullable', 'image', 'max:1024'],
         ]);
         $client->province_id = $request->province_id;
@@ -206,9 +206,8 @@ class ClientsController extends Controller
         $client->ward_id = $request->ward_id;
         $client->village_id = $request->village_id;
         $client->branch_id = $request->branch_id;
-        $client->first_name = $request->first_name;
-        $client->middle_name = $request->middle_name;
-        $client->last_name = $request->last_name;
+        $client->name = $request->name;
+        $client->type = $request->type;
         $client->country_id = $request->country_id;
         $client->title_id = $request->title_id;
         $client->nationality_id = $request->nationality_id;
@@ -218,7 +217,6 @@ class ClientsController extends Controller
         $client->tel = $request->tel;
         $client->zip = $request->zip;
         $client->external_id = $request->external_id;
-        $client->shares = $request->shares;
         $client->address = $request->address;
         $client->postal_address = $request->postal_address;
         $client->id_type = $request->id_type;
@@ -255,10 +253,9 @@ class ClientsController extends Controller
         $search = $request->s;
         $id = $request->id;
         $branchID = $request->branch_id;
-        $data = Client::with(['province', 'branch', 'district', 'ward', 'village'])->where(function ($query) use ($search) {
-            $query->where('first_name', 'like', "%$search%");
-            $query->orWhere('last_name', 'like', "%$search%");
-            $query->orWhere('middle_name', 'like', "%$search%");
+        $data = Client::with(['country','province', 'branch', 'district', 'ward', 'village'])->where(function ($query) use ($search) {
+            $query->where('name', 'like', "%$search%");
+            $query->orWhere('email', 'like', "%$search%");
             $query->orWhere('id', 'like', "%$search%");
             $query->orWhere('id_number', 'like', "%$search%");
             $query->orWhere('external_id', 'like', "%$search%");
@@ -270,16 +267,16 @@ class ClientsController extends Controller
         return response()->json($data);
     }
 
-    public function loans(Client $client)
+    public function loanApplication(Client $client)
     {
 
-        $loans = LoanApplication::with(['staff', 'client', 'category'])
+        $applications = LoanApplication::with(['product'])
             ->where('client_id', $client->id)
             ->orderBy('created_at', 'desc')
             ->paginate(20);
-        return Inertia::render('Clients/Loans/Index', [
+        return Inertia::render('Clients/LoanApplications/Index', [
             'client' => $client,
-            'loans' => $loans,
+            'applications' => $applications,
         ]);
     }
 

@@ -2,7 +2,7 @@
     <app-layout>
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                <inertia-link class="text-indigo-400 hover:text-indigo-600" :href="route('members.index')">Members
+                <inertia-link class="text-indigo-400 hover:text-indigo-600" :href="route('clients.index')">Clients
                 </inertia-link>
                 <span class="text-indigo-400 font-medium">/</span> Create
             </h2>
@@ -19,30 +19,27 @@
                         />
                         <jet-input-error :message="form.errors.branch_id" class="mt-2"/>
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
                         <div>
-                            <jet-label for="first_name" value="First Name"/>
-                            <jet-input id="first_name" type="text" class="block w-full"
-                                       v-model="form.first_name"
+                            <jet-label for="type" value="Type"/>
+                            <select
+                                class="border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 rounded-md shadow-sm w-full"
+                                name="type" v-model="form.type" id="type" required>
+                                <option value="individual">Individual</option>
+                                <option value="corporate">Corporate</option>
+                            </select>
+                            <jet-input-error :message="form.errors.type" class="mt-2"/>
+                        </div>
+                        <div>
+                            <jet-label for="name" value="Name"/>
+                            <jet-input id="name" type="text" class="block w-full"
+                                       v-model="form.name"
                                        required
-                                       autofocus autocomplete="first_name"/>
-                            <jet-input-error :message="form.errors.first_name" class="mt-2"/>
-                        </div>
-                        <div class="">
-                            <jet-label for="middle_name" value="Middle Name"/>
-                            <jet-input id="middle_name" type="text" class=" block w-full"
-                                       v-model="form.middle_name"
-                                       autocomplete="middle_name"/>
-                            <jet-input-error :message="form.errors.middle_name" class="mt-2"/>
-                        </div>
-                        <div class="">
-                            <jet-label for="last_name" value="Last Name"/>
-                            <jet-input id="last_name" type="text" class="block w-full" v-model="form.last_name"
-                                       required autocomplete="last_name"/>
-                            <jet-input-error :message="form.errors.last_name" class="mt-2"/>
+                                       autofocus autocomplete="name"/>
+                            <jet-input-error :message="form.errors.name" class="mt-2"/>
                         </div>
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-3 mt-4 gap-2">
+                    <div class="grid grid-cols-1 md:grid-cols-3 mt-4 gap-2" v-if="form.type==='individual'">
                         <div>
                             <jet-label for="dob" value="Date of Birth"/>
                             <flat-pickr
@@ -68,10 +65,18 @@
                             <jet-input-error :message="form.errors.gender" class="mt-2"/>
                         </div>
                         <div>
-                            <jet-label for="shares" value="Shares"/>
-                            <jet-input id="shares" type="text" class="block w-full" v-model="form.shares"/>
-                            <jet-input-error :message="form.errors.shares" class="mt-2"/>
-
+                            <jet-label for="marital_status" value="Marital Status"/>
+                            <select
+                                class="border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 rounded-md shadow-sm w-full"
+                                name="marital_status" v-model="form.marital_status" id="marital_status">
+                                <option :value="null"/>
+                                <option value="married">Married</option>
+                                <option value="single">Single</option>
+                                <option value="divorced">Divorced</option>
+                                <option value="widowed">Widowed</option>
+                                <option value="other">Other</option>
+                            </select>
+                            <jet-input-error :message="form.errors.marital_status" class="mt-2"/>
                         </div>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-3 mt-4 gap-2">
@@ -94,26 +99,12 @@
 
                         </div>
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-3 mt-4 gap-2">
+                    <div class="grid grid-cols-1 md:grid-cols-2 mt-4 gap-2">
                         <div>
                             <jet-label for="email" value="Email"/>
                             <jet-input id="email" type="email" class="block w-full" v-model="form.email"/>
                             <jet-input-error :message="form.errors.email" class="mt-2"/>
 
-                        </div>
-                        <div>
-                            <jet-label for="marital_status" value="Marital Status"/>
-                            <select
-                                class="border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 rounded-md shadow-sm w-full"
-                                name="marital_status" v-model="form.marital_status" id="marital_status">
-                                <option :value="null"/>
-                                <option value="married">Married</option>
-                                <option value="single">Single</option>
-                                <option value="divorced">Divorced</option>
-                                <option value="widowed">Widowed</option>
-                                <option value="other">Other</option>
-                            </select>
-                            <jet-input-error :message="form.errors.marital_status" class="mt-2"/>
                         </div>
                         <div>
                             <jet-label for="external_id" value="External ID"/>
@@ -145,13 +136,22 @@
 
                         </div>
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-4 mt-4 gap-2">
+                    <div class="grid grid-cols-1 md:grid-cols-5 mt-4 gap-2">
+                        <div>
+                            <jet-label for="country_id" value="Country"/>
+                            <Multiselect
+                                id="country_id"
+                                v-model="form.country_id"
+                                :options="countries"
+                            />
+                            <jet-input-error :message="form.errors.country_id" class="mt-2"/>
+                        </div>
                         <div>
                             <jet-label for="province_id" value="Province"/>
                             <Multiselect
                                 id="province_id"
                                 v-model="form.province_id"
-                                :options="provinces"
+                                :options="availableProvinces"
                             />
                             <jet-input-error :message="form.errors.province_id" class="mt-2"/>
                         </div>
@@ -272,10 +272,8 @@ export default {
     data() {
         return {
             form: this.$inertia.form({
-                first_name: null,
-                middle_name: null,
-                last_name: null,
-                shares: null,
+                name: null,
+                type: 'individual',
                 gender: null,
                 email: null,
                 country_id: null,
@@ -307,18 +305,24 @@ export default {
                 status: 'active',
                 photo: null,
             }),
-            pageTitle: "Create Member",
-            pageDescription: "Create Member",
+            pageTitle: "Create Client",
+            pageDescription: "Create Client",
         }
 
     },
     methods: {
         submit() {
-            this.form.post(this.route('members.store'), {})
+            this.form.post(this.route('clients.store'), {})
 
         },
     },
     computed: {
+        availableProvinces: function () {
+            return this.provinces.filter(item => {
+                return item.country_id === this.form.country_id;
+
+            })
+        },
         availableDistricts: function () {
             return this.districts.filter(item => {
                 return item.province_id === this.form.province_id;

@@ -2,9 +2,9 @@
     <app-layout>
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                <inertia-link class="text-indigo-400 hover:text-indigo-600" :href="route('members.index')">Members
+                <inertia-link class="text-indigo-400 hover:text-indigo-600" :href="route('clients.index')">Clients
                 </inertia-link>
-                <span class="text-indigo-400 font-medium">/</span> {{ member.name }}
+                <span class="text-indigo-400 font-medium">/</span> {{ client.name }}
             </h2>
         </template>
         <div class="mx-auto">
@@ -12,7 +12,7 @@
                 <div class="bg-white relative shadow-xl mb-4 mt-20 w-full md:w-3/12">
                     <div class="col-span-12 lg:col-span-4 xxl:col-span-3 flex lg:block flex-col-reverse">
                         <div class="intro-y box mt-5 lg:mt-0">
-                            <member-menu :member="member"></member-menu>
+                            <client-menu :client="client"></client-menu>
                         </div>
                     </div>
 
@@ -20,7 +20,7 @@
                 <div class="w-full md:w-9/12 p-4 md:ml-4 bg-white sm:mt-4">
                     <div class="flex justify-between ">
                         <h2 class="font-semibold text-xl text-gray-800 leading-tight">Edit File</h2>
-                        <inertia-link class="btn btn-blue" :href="route('members.files.index',member.id)">
+                        <inertia-link class="btn btn-blue" :href="route('clients.files.index',client.id)">
                             <span>Back </span>
                         </inertia-link>
                     </div>
@@ -80,7 +80,7 @@ import SelectInput from '@/Jetstream/SelectInput.vue'
 import JetConfirmationModal from '@/Jetstream/ConfirmationModal.vue'
 import JetDangerButton from '@/Jetstream/DangerButton.vue'
 import JetSecondaryButton from '@/Jetstream/SecondaryButton.vue'
-import MemberMenu from '@/Pages/Members/MemberMenu.vue'
+import ClientMenu from '@/Pages/Clients/ClientMenu.vue'
 import JetInput from "@/Jetstream/Input.vue";
 import JetInputError from "@/Jetstream/InputError.vue";
 import JetButton from "@/Jetstream/Button.vue";
@@ -100,13 +100,13 @@ export default {
         JetConfirmationModal,
         JetDangerButton,
         JetSecondaryButton,
-        MemberMenu,
+        ClientMenu,
         JetButton,
         JetCheckbox,
         FileInput,
     },
     props: {
-        member: Object,
+        client: Object,
         file: Object,
 
     },
@@ -118,15 +118,15 @@ export default {
                 description: this.file.description,
                 file: null,
             }),
-            pageTitle: "Edit Member File",
-            pageDescription: "Edit Member File",
+            pageTitle: "Edit Client File",
+            pageDescription: "Edit Client File",
 
         }
     },
 
     methods: {
         submit() {
-            this.form.post(this.route('members.files.update', this.file.id), {})
+            this.form.post(this.route('clients.files.update', this.file.id), {})
         },
     },
 }

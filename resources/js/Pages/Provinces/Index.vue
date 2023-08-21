@@ -21,6 +21,7 @@
                     <thead class="bg-gray-50">
                     <tr class="text-left font-bold">
                         <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Name</th>
+                        <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Country</th>
                         <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Action</th>
                     </tr>
                     </thead>
@@ -30,6 +31,11 @@
                         <td class="border-t">
                              <span class="px-6 py-4 flex items-center">
                                 {{ province.name }}
+                            </span>
+                        </td>
+                        <td class="border-t">
+                             <span class="px-6 py-4 flex items-center" v-if="province.country">
+                                {{ province.country.name }}
                             </span>
                         </td>
                         <td class="border-t w-px pr-2">
@@ -48,7 +54,7 @@
                         </td>
                     </tr>
                     <tr v-if="provinces.data.length === 0">
-                        <td class="border-t px-6 py-4 text-center" colspan="2">No provinces found.</td>
+                        <td class="border-t px-6 py-4 text-center" colspan="3">No provinces found.</td>
                     </tr>
                     </tbody>
                 </table>

@@ -2,9 +2,9 @@
     <app-layout>
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                <inertia-link class="text-indigo-400 hover:text-indigo-600" :href="route('members.index')">Members
+                <inertia-link class="text-indigo-400 hover:text-indigo-600" :href="route('clients.index')">Clients
                 </inertia-link>
-                <span class="text-indigo-400 font-medium">/</span> {{ member.name }}
+                <span class="text-indigo-400 font-medium">/</span> {{ client.name }}
             </h2>
         </template>
         <div class="mx-auto">
@@ -12,7 +12,7 @@
                 <div class="bg-white relative shadow-xl mb-4 mt-20 w-full md:w-3/12">
                     <div class="col-span-12 lg:col-span-4 xxl:col-span-3 flex lg:block flex-col-reverse">
                         <div class="intro-y box mt-5 lg:mt-0">
-                            <member-menu :member="member"></member-menu>
+                            <client-menu :client="client"></client-menu>
                         </div>
                     </div>
 
@@ -20,7 +20,7 @@
                 <div class="w-full md:w-9/12 p-4 md:ml-4 bg-white sm:mt-4">
                     <div class="flex justify-between ">
                         <h2 class="font-semibold text-xl text-gray-800 leading-tight">Add User</h2>
-                        <inertia-link class="btn btn-blue" :href="route('members.login_details.index',member.id)">
+                        <inertia-link class="btn btn-blue" :href="route('clients.login_details.index',client.id)">
                             <span>Back </span>
                         </inertia-link>
                     </div>
@@ -124,7 +124,7 @@ const fetchUsers = async (query) => {
 
     }
     const response = await fetch(
-        route('users.search') + '?type=member&s=' + query,
+        route('users.search') + '?type=client&s=' + query,
         {}
     );
 
@@ -146,7 +146,7 @@ import SelectInput from '@/Jetstream/SelectInput.vue'
 import JetConfirmationModal from '@/Jetstream/ConfirmationModal.vue'
 import JetDangerButton from '@/Jetstream/DangerButton.vue'
 import JetSecondaryButton from '@/Jetstream/SecondaryButton.vue'
-import MemberMenu from '@/Pages/Members/MemberMenu.vue'
+import ClientMenu from '@/Pages/Clients/ClientMenu.vue'
 import JetInput from "@/Jetstream/Input.vue";
 import JetInputError from "@/Jetstream/InputError.vue";
 import JetButton from "@/Jetstream/Button.vue";
@@ -166,24 +166,24 @@ export default {
         JetConfirmationModal,
         JetDangerButton,
         JetSecondaryButton,
-        MemberMenu,
+        ClientMenu,
         JetButton,
         JetCheckbox,
         FileInput,
     },
     props: {
-        member: Object,
+        client: Object,
 
     },
     data() {
         return {
             form: this.$inertia.form({
                 existing_user: false,
-                member_id: null,
+                client_id: null,
                 user_id: null,
-                first_name: this.member.first_name,
-                last_name: this.member.last_name,
-                email: this.member.email,
+                first_name: this.client.first_name,
+                last_name: this.client.last_name,
+                email: this.client.email,
                 password: null,
                 password_confirmation: null,
             }),
@@ -200,15 +200,15 @@ export default {
                     return await fetchUsers(query)
                 }
             },
-            pageTitle: "Create Member Login Details",
-            pageDescription: "Create Member Login Details",
+            pageTitle: "Create Client Login Details",
+            pageDescription: "Create Client Login Details",
 
         }
     },
 
     methods: {
         submit() {
-            this.form.post(this.route('members.login_details.store', this.member.id), {})
+            this.form.post(this.route('clients.login_details.store', this.client.id), {})
         },
     },
 }
