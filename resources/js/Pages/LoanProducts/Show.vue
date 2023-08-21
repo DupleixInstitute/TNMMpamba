@@ -56,6 +56,10 @@
                         </div>
                         <div class="p-5 border-t border-gray-200 dark:border-dark-5">
                             <div class="flex justify-between">
+                                <span class="font-medium">Grand Score</span>
+                                <span>{{ product.score }}</span>
+                            </div>
+                            <div class="flex justify-between">
                                 <span class="font-medium">Active</span>
                                 <span v-if="product.active" class="text-green-400">Yes</span>
                                 <span v-if="!product.active" class="text-green-400">No</span>
@@ -80,7 +84,7 @@
                     <div class="mb-4 relative" v-for="(attribute,parent_index) in form.attributes">
                         <div class="bg-gray-50 border p-4 flex justify-between">
                             <h4>{{ attribute.name }}</h4>
-                            <div class="flex justify-end gap-4">
+                            <div class="flex justify-end items-center gap-4">
                                 <div>
                                     <span class="mr-2">Weight</span>
                                     <jet-input type="text" class="w-16" v-model="attribute.weight" @blur="updateItems"/>
@@ -88,7 +92,7 @@
                                 </div>
                                 <div>
                                     <span class="mr-2">Score</span>
-                                    <jet-input type="text" class="w-16" v-model="attribute.score" @blur="updateItems"/>
+                                    <span class="ml-2">{{ attribute.score }}</span>
                                 </div>
                                 <button href="#" v-if="can('loans.products.destroy')"
                                         @click="deleteItem('group',parent_index)"
@@ -442,10 +446,11 @@ export default {
             this.attributePercentagesTotal = 0
             Object.keys(this.form.attributes).forEach(key => {
                 let item=this.form.attributes[key]
+                item.score = parseFloat(this.product.score||0) * parseFloat(item.weight) / 100
                 this.groupPercentagesTotal += parseFloat(item.weight || 0)
                 Object.keys(item.attributes).forEach(k => {
                     let attr=item.attributes[k]
-                    attr.score = parseFloat(item.score) * parseFloat(attr.weight) / 100
+                    attr.score = parseFloat(this.product.score||0) * parseFloat(attr.weight) / 100
                     this.attributePercentagesTotal += parseFloat(attr.weight || 0)
                     if (attr.attribute.options && attr.attribute.options.length) {
                         attr.attribute.options.forEach(opt => {

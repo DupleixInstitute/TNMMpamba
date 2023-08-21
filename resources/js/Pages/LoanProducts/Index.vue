@@ -31,13 +31,14 @@
                         <th class="px-6 pt-4 pb-4 font-medium text-gray-500">ID</th>
                         <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Name</th>
                         <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Category</th>
+                        <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Grand Score</th>
                         <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Active</th>
                         <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Action</th>
                     </tr>
                     </thead>
                     <tbody>
                     <tr v-if="!products.data.length">
-                        <td colspan="5" class="px-6 py-4 text-center">
+                        <td colspan="6" class="px-6 py-4 text-center">
                             No Products yet
                         </td>
                     </tr>
@@ -58,6 +59,11 @@
                         <td class="border-t">
                             <span class="px-6 py-4 flex items-center" v-if="product.category">
                                 {{ product.category.name }}
+                            </span>
+                        </td>
+                        <td class="border-t">
+                            <span class="px-6 py-4 flex items-center" >
+                                {{ product.score }}
                             </span>
                         </td>
                         <td class="border-t">

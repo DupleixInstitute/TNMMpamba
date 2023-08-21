@@ -18,6 +18,13 @@
                         <jet-input-error :message="form.errors.name" class="mt-2"/>
                     </div>
                     <div class="mt-4">
+                        <jet-label for="name" value="Grand Score"/>
+                        <jet-input id="name" type="text" class="block w-full"
+                                   v-model="form.score"
+                                   required/>
+                        <jet-input-error :message="form.errors.score" class="mt-2"/>
+                    </div>
+                    <div class="mt-4">
                         <jet-label for="loan_product_category_id" value="Category"/>
                         <Multiselect
                             id="loan_product_category_id"
@@ -98,6 +105,7 @@ export default {
             form: this.$inertia.form({
                 loan_product_category_id: null,
                 name: null,
+                score: null,
                 description: null,
                 active: true,
             }),

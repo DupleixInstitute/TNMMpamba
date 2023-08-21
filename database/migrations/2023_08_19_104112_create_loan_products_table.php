@@ -16,6 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('created_by_id')->nullable();
             $table->unsignedBigInteger('loan_product_category_id')->nullable();
             $table->text('name');
+            $table->decimal('score')->nullable();
             $table->text('description')->nullable();
             $table->tinyInteger('active')->default(1);
             $table->timestamps();

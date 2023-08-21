@@ -68,6 +68,7 @@ class LoanProductsController extends Controller
         $product->created_by_id = Auth::id();
         $product->loan_product_category_id = $request->loan_product_category_id;
         $product->name = $request->name;
+        $product->score = $request->score;
         $product->active = $request->active ? 1 : 0;
         $product->description = $request->description;
         $product->save();
@@ -184,6 +185,7 @@ class LoanProductsController extends Controller
         ]);
         $product->loan_product_category_id = $request->loan_product_category_id;
         $product->name = $request->name;
+        $product->score = $request->score;
         $product->active = $request->active ? 1 : 0;
         $product->description = $request->description;
         $product->save();
