@@ -9,9 +9,12 @@
 <script src="assets/js/jquery.min.js" type="text/javascript"></script>
 <script src="assets/js/sweetalert.min.js" type="text/javascript"></script>
 <?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 	include("assets/includes/authenticate.php");
 	include("assets/includes/database_connection.php");
-	
+
 	$database_mode      = isset($_POST['omang_no_to_edit'])?'Add':'Edit';
 	$omang_no_to_edit   = isset($_POST['omang_no_to_edit'])?$_POST['omang_no_to_edit']:'N/A';
 	$loan_no_to_edit    = isset($_POST['omang_no_to_edit'])?$_POST['loan_no_to_edit']:'N/A';
@@ -19,28 +22,28 @@
 	echo '<input type = text name = "loan_no_to_edit"  id = "loan_no_to_edit"  value = "'.$loan_no_to_edit.'" >';
 
 ?>
- <script> 
+ <script>
 	//document. ready function - get the list of table names
 	var customer_record = [];
 	$(function(){
- 		    
+
 	   if ($('#omang_no_to_edit').val() != 'N/A') {
-           
+
 			$.ajax({
 				url:"ajaxScripts/get_customer_record.php",
 				type: "POST",
 				data: {
 					omang: $('#omang_no_to_edit').val(),
-					loan_number: $('#loan_no_to_edit').val() 
+					loan_number: $('#loan_no_to_edit').val()
 				},
 				dataType : 'json',
 				success: function(result){
 					customer_record = result;
 					if (result.errorStatus == 'Error') {
 						//alert (result.errorText);
-						swal ('',result.errorText,'error'); 
+						swal ('',result.errorText,'error');
 					} else {
-						document.total_revenue_for_Affordability.affordability_policy.value  = result.data.affordability_policy		 
+						document.total_revenue_for_Affordability.affordability_policy.value  = result.data.affordability_policy
 						document.total_revenue_for_Affordability.affordability_ratio.value  = result.data.affordability_ratio
 						document.total_revenue_for_Affordability.relationship.value  = result.data.age_of_relationship
 						document.total_revenue_for_Affordability.annual_sal.value  = result.data.annual_salary
@@ -99,8 +102,8 @@
 						if (typeof(result.data.street_name_and_number) == "undefined") {
 							document.total_revenue_for_Affordability.street_add.value  = result.data.Street_name_and_number
 						} else {
-  						    document.total_revenue_for_Affordability.street_add.value  = result.data.street_name_and_number	
-						}						
+  						    document.total_revenue_for_Affordability.street_add.value  = result.data.street_name_and_number
+						}
 						document.total_revenue_for_Affordability.surname.value  = result.data.surname
 						document.total_revenue_for_Affordability.tax.value  = result.data.tax
 						document.total_revenue_for_Affordability.thirdbank.value  = result.data.third_bank
@@ -110,7 +113,7 @@
 						document.total_revenue_for_Affordability.loans_outstanding.value  = result.data.number_of_loans_outstanding
 						document.total_revenue_for_Affordability.trace_alerts.value  = result.data.trace_alerts
 						document.total_revenue_for_Affordability.why_renogotiation.value  = result.data.why_renegotiated
-						document.total_revenue_for_Affordability.years_at_address.value  = result.data.years_at_present_address		   
+						document.total_revenue_for_Affordability.years_at_address.value  = result.data.years_at_present_address
 
                         //call a function to populate the loan installments for previous loans
 						populate_loan_instalments();//
@@ -124,12 +127,12 @@
 						document.total_revenue_for_Affordability.no_of_children.value  = result.data.total_number_of_children
 						document.total_revenue_for_Affordability.rev4afford.value  = result.data.total_revenue_for_affordability
 						document.total_revenue_for_Affordability.total_rev_for_afford.value  = result.data.total_revenue_for_affordability
-						
+
 						document.total_revenue_for_Affordability.borrower_birth.value = result.data.borrower_birth
 						document.total_revenue_for_Affordability.spouse_birth.value   = result.data.spouse_birth
 						document.total_revenue_for_Affordability.wedding.value        = result.data.wedding
 						document.total_revenue_for_Affordability.divorce.value        = result.data.divorce
-						
+
 						//special marital dates
 						if (result.data.spouse_birth  == '0000-00-00' ) {
 						    localStorage.spouse_birth_checkbox_disabled = "true"
@@ -142,17 +145,17 @@
  						    localStorage.divorce_checkbox_disabled = "true"
 						}
 						 ReCalculateForm();
-					}	   
+					}
 				}
 			}); // end ajax call
 	   } // end if
 	   ReCalculateForm();
 	   read_dates_disabled_property();
-	   if ($('#omang_no_to_edit').val() != 'N/A') {	   					
+	   if ($('#omang_no_to_edit').val() != 'N/A') {
 			$("#one").attr("readonly", true);
 			$("#loan_number").attr("readonly", true);
        }
-	}); 
+	});
 function check_record_exist() {
     var omang_entered       = document.total_revenue_for_Affordability.one.value;
 	var loan_number_entered = document.total_revenue_for_Affordability.loan_number.value;
@@ -164,25 +167,25 @@ function check_record_exist() {
 				type: "POST",
 				data: {
 					omang: omang_entered,
-					loan_number: loan_number_entered 
+					loan_number: loan_number_entered
 				},
 				dataType : 'json',
 				success: function(result){
 					if (result.errorStatus != 'Error') {
 						//alert (result.errorText);
-						swal ('Record Exist','Customer record for omang/passport no '+omang_entered+' and loan number '+loan_number_entered+' already scored','error'); 
+						swal ('Record Exist','Customer record for omang/passport no '+omang_entered+' and loan number '+loan_number_entered+' already scored','error');
 						document.total_revenue_for_Affordability.one.value         = '';
 						document.total_revenue_for_Affordability.loan_number.value = '';
 						//document.total_revenue_for_Affordability.one.focus();
 						//document.getElementById("one").focus()
-					}    
+					}
 				}
 			});
-		    if ($('#omang_no_to_edit').val() != 'N/A') {	   					
+		    if ($('#omang_no_to_edit').val() != 'N/A') {
 				$("#loan_number").val(customer_record.data.loan_number);
 			}
 	}
-}	
+}
 function populate_loan_instalments(){
    if (customer_record.data.number_of_loans_outstanding == '1') {
 		document.total_revenue_for_Affordability.installment1.value  = customer_record.data.loan_instalment1;
@@ -206,59 +209,59 @@ function populate_loan_instalments(){
 	   document.total_revenue_for_Affordability.cinstallment4.value  = customer_record.data.loan_instalment4;
    }
 	   //5 loans outstanding
-   if (customer_record.data.number_of_loans_outstanding == '5') {	   
+   if (customer_record.data.number_of_loans_outstanding == '5') {
 	   document.total_revenue_for_Affordability.dinstallment1.value  = customer_record.data.loan_instalment1;
 	   document.total_revenue_for_Affordability.dinstallment2.value  = customer_record.data.loan_instalment2;
 	   document.total_revenue_for_Affordability.dinstallment3.value  = customer_record.data.loan_instalment3;
 	   document.total_revenue_for_Affordability.dinstallment4.value  = customer_record.data.loan_instalment4;
-	   document.total_revenue_for_Affordability.dinstallment5.value  = customer_record.data.loan_instalment5;  
+	   document.total_revenue_for_Affordability.dinstallment5.value  = customer_record.data.loan_instalment5;
    }
    //6 loans outstanding
-  if (customer_record.data.number_of_loans_outstanding == '6') {	      
+  if (customer_record.data.number_of_loans_outstanding == '6') {
 	   document.total_revenue_for_Affordability.einstallment1.value  = customer_record.data.loan_instalment1;
 	   document.total_revenue_for_Affordability.einstallment2.value  = customer_record.data.loan_instalment2;
 	   document.total_revenue_for_Affordability.einstallment3.value  = customer_record.data.loan_instalment3;
 	   document.total_revenue_for_Affordability.einstallment4.value  = customer_record.data.loan_instalment4;
-	   document.total_revenue_for_Affordability.einstallment5.value  = customer_record.data.loan_instalment5;  
-	   document.total_revenue_for_Affordability.einstallment6.value  = customer_record.data.loan_instalment6;  
+	   document.total_revenue_for_Affordability.einstallment5.value  = customer_record.data.loan_instalment5;
+	   document.total_revenue_for_Affordability.einstallment6.value  = customer_record.data.loan_instalment6;
   }
-  if (customer_record.data.number_of_loans_outstanding == '7') {	   
+  if (customer_record.data.number_of_loans_outstanding == '7') {
    //7 loans outstanding
 	   document.total_revenue_for_Affordability.finstallment1.value  = customer_record.data.loan_instalment1;
 	   document.total_revenue_for_Affordability.finstallment2.value  = customer_record.data.loan_instalment2;
 	   document.total_revenue_for_Affordability.finstallment3.value  = customer_record.data.loan_instalment3;
 	   document.total_revenue_for_Affordability.finstallment4.value  = customer_record.data.loan_instalment4;
-	   document.total_revenue_for_Affordability.finstallment5.value  = customer_record.data.loan_instalment5;  
-	   document.total_revenue_for_Affordability.finstallment6.value  = customer_record.data.loan_instalment6;  
-	   document.total_revenue_for_Affordability.finstallment7.value  = customer_record.data.loan_instalment7; 
+	   document.total_revenue_for_Affordability.finstallment5.value  = customer_record.data.loan_instalment5;
+	   document.total_revenue_for_Affordability.finstallment6.value  = customer_record.data.loan_instalment6;
+	   document.total_revenue_for_Affordability.finstallment7.value  = customer_record.data.loan_instalment7;
   }
    //8 loans outstanding
-   if (customer_record.data.number_of_loans_outstanding == '8') {	     
+   if (customer_record.data.number_of_loans_outstanding == '8') {
 	   document.total_revenue_for_Affordability.ginstallment1.value  = customer_record.data.loan_instalment1;
 	   document.total_revenue_for_Affordability.ginstallment2.value  = customer_record.data.loan_instalment2;
 	   document.total_revenue_for_Affordability.ginstallment3.value  = customer_record.data.loan_instalment3;
 	   document.total_revenue_for_Affordability.ginstallment4.value  = customer_record.data.loan_instalment4;
-	   document.total_revenue_for_Affordability.ginstallment5.value  = customer_record.data.loan_instalment5;  
-	   document.total_revenue_for_Affordability.ginstallment6.value  = customer_record.data.loan_instalment6;  
-	   document.total_revenue_for_Affordability.ginstallment7.value  = customer_record.data.loan_instalment7;    
-	   document.total_revenue_for_Affordability.ginstallment8.value  = customer_record.data.loan_instalment8;  
+	   document.total_revenue_for_Affordability.ginstallment5.value  = customer_record.data.loan_instalment5;
+	   document.total_revenue_for_Affordability.ginstallment6.value  = customer_record.data.loan_instalment6;
+	   document.total_revenue_for_Affordability.ginstallment7.value  = customer_record.data.loan_instalment7;
+	   document.total_revenue_for_Affordability.ginstallment8.value  = customer_record.data.loan_instalment8;
    }
    //9 loans outstanding
-   if (customer_record.data.number_of_loans_outstanding == '9') {	        
+   if (customer_record.data.number_of_loans_outstanding == '9') {
 	   document.total_revenue_for_Affordability.hinstallment1.value  = customer_record.data.loan_instalment1;
 	   document.total_revenue_for_Affordability.hinstallment2.value  = customer_record.data.loan_instalment2;
 	   document.total_revenue_for_Affordability.hinstallment3.value  = customer_record.data.loan_instalment3;
 	   document.total_revenue_for_Affordability.hinstallment4.value  = customer_record.data.loan_instalment4;
-	   document.total_revenue_for_Affordability.hinstallment5.value  = customer_record.data.loan_instalment5;  
-	   document.total_revenue_for_Affordability.hinstallment6.value  = customer_record.data.loan_instalment6;  
-	   document.total_revenue_for_Affordability.hinstallment7.value  = customer_record.data.loan_instalment7;    
-	   document.total_revenue_for_Affordability.hinstallment8.value  = customer_record.data.loan_instalment8;    
-	   document.total_revenue_for_Affordability.hinstallment9.value  = customer_record.data.loan_instalment9;       
+	   document.total_revenue_for_Affordability.hinstallment5.value  = customer_record.data.loan_instalment5;
+	   document.total_revenue_for_Affordability.hinstallment6.value  = customer_record.data.loan_instalment6;
+	   document.total_revenue_for_Affordability.hinstallment7.value  = customer_record.data.loan_instalment7;
+	   document.total_revenue_for_Affordability.hinstallment8.value  = customer_record.data.loan_instalment8;
+	   document.total_revenue_for_Affordability.hinstallment9.value  = customer_record.data.loan_instalment9;
    }
 }
 
 function read_dates_disabled_property() {
-   
+
    //read the disable state from local storage
    var spouse_birth_checked = (localStorage.spouse_birth_checkbox_disabled == "false")?false:true;
    var divorce_checked      = (localStorage.divorce_checkbox_disabled      == "false")?false:true;
@@ -268,13 +271,13 @@ function read_dates_disabled_property() {
    document.total_revenue_for_Affordability.spouse_birth_checkbox.checked  = spouse_birth_checked
    document.total_revenue_for_Affordability.wedding_checkbox.checked       = wedding_checked
    document.total_revenue_for_Affordability.divorce_checkbox.checked       = divorce_checked
-   
+
 
    //disable the actual date
    document.total_revenue_for_Affordability.spouse_birth.disabled  = spouse_birth_checked
    document.total_revenue_for_Affordability.wedding.disabled       = wedding_checked
    document.total_revenue_for_Affordability.divorce.disabled       = divorce_checked
-  
+
 }
 function total_kids()
 {
@@ -323,7 +326,7 @@ function total_dependents()
   var total_dependents= aunts1 + others1 + grandparents1;
 
   document.total_revenue_for_Affordability.dependants_at_home.value=total_dependents;
-  
+
 return true;
 }
 
@@ -339,26 +342,26 @@ function displ()
 	  if(savings !== "NA") {
 	  x=x + 1;
 	  }
-	 
-	 
+
+
 	 if(Deposit !== "NA") {
 	  x=x + 1;
 	  }
- 	  
+
 	  if(Share !== "NA") {
 	  x=x + 1;
 	  }
-	  
-	  
+
+
 	  if(ST !== "NA") {
 	  x=x + 1;
-	  }  
-	  
+	  }
+
 	  if(Mortgages !== "NA") {
 	  x=x + 1;
 	  }
 	  document.total_revenue_for_Affordability.total_bbs_products.value =x;
-	  
+
 	   return true;
 
 }
@@ -371,12 +374,12 @@ var insure=document.total_revenue_for_Affordability.insurance_premium.value;
 var oloan=document.total_revenue_for_Affordability.o_loan_type.value;
  var add2 = parseFloat(instal);
  var add1 = parseFloat(insure);
- 
+
 var finalinstal= add1 + add2;
 
  if(oloan == "Fixed") {
 var finalinstal= add2;
-  }  
+  }
 var finalinstalment= finalinstal.toFixed(2)
 document.total_revenue_for_Affordability.loanandinsurance.value = finalinstalment;
 	return true;
@@ -400,10 +403,10 @@ function premium()
 	} else if (loan_maturity_months >= 24) {
 		   premiumpercent=1.642;
 
-	} else if (loan_maturity_months < 24) {	
+	} else if (loan_maturity_months < 24) {
 		   premiumpercent=0.833;
 	}
-	var mypremium= (life_cover_amount * premiumpercent/12)/100;	
+	var mypremium= (life_cover_amount * premiumpercent/12)/100;
 
 	var finalpremium= mypremium.toFixed(2);
 	document.total_revenue_for_Affordability.insurance_premium.value = finalpremium;
@@ -420,7 +423,7 @@ function instal()
 	var maturity =document.total_revenue_for_Affordability.loan_maturity.value;
 
 	if (isNaN(rate) || isNaN(amount) || isNaN(maturity)) {
-			alert("You can only enter numbers in the Loan Amout and Rate fields!");	
+			alert("You can only enter numbers in the Loan Amout and Rate fields!");
 	}
 	maturity=maturity*12;
 	rate=rate / 12;
@@ -431,14 +434,14 @@ function instal()
 	var y =Math.pow(x, maturity);
 	var b =Math.pow(x, maturity);
 
-	var val = rate * b; 
+	var val = rate * b;
 	//var valaa= val.toFixed(2);
 
 
-	var valb =  y - 1; 
+	var valb =  y - 1;
 	//var valbb = val.toFixed(2);
 
-	var pmt = amount * (val / valb); 
+	var pmt = amount * (val / valb);
 
 	var dd= pmt.toFixed(2);
 	document.total_revenue_for_Affordability.loan_installment.value = dd;
@@ -462,7 +465,7 @@ newstring= papi.concat(numString);
 newstring2= papi.concat(numString2);
 newstring3= papi.concat(numString3);
 
-if(newstring.length == 6 || newstring2.length == 6 || newstring3.length == 6 ) 
+if(newstring.length == 6 || newstring2.length == 6 || newstring3.length == 6 )
    {
       alert("Ensure that the loan amount, loan maturity and interest are all filled to get a correct installment amount");
 	     return false;
@@ -476,42 +479,42 @@ var installment=document.total_revenue_for_Affordability.loanandinsurance.value;
 var addaa = document.total_revenue_for_Affordability.tax.value
     var addaa = parseFloat(addaa, 10)
     addaa = (isNaN(addaa))?0:addaa;
-	
-		
+
+
 var add1 = document.total_revenue_for_Affordability.annual_sal.value
     var add1 = parseFloat(add1, 10)
     add1 = (isNaN(add1))?0:add1;
-    
+
     //ADD SECOND INPUT VALUE
     var add2 = document.total_revenue_for_Affordability.fixed_perm_allowances.value
     var add2 = parseFloat(add2, 10)
     add2 = (isNaN(add2))?0:add2;
-    
+
 	var firstItem = add1 + add2 - addaa ;
-	
-	
+
+
 	var forafford1=add1 + add2;
-	
-	
+
+
 	if (isNaN(firstItem)) {
 		alert("You can only enter numbers in the  Rate fields!");
 		return false;
 	}
 	else {
 		document.total_revenue_for_Affordability.total_rev_for_afford.value = firstItem;
-		
-		
+
+
 		/*document.forms[0].amount6.value = sixthItem;*/
 		var grandTotal = firstItem;
 		var tt=grandTotal/12;
 		var tt2= tt.toFixed(2);
 			document.total_revenue_for_Affordability.rev4afford.value = tt2;
-		
+
 var ratio= installment/tt2;
-		
+
 var ratio2=ratio*100;
 var finalratio= ratio2.toFixed(2);
-document.total_revenue_for_Affordability.affordability_ratio.value=finalratio;	
+document.total_revenue_for_Affordability.affordability_ratio.value=finalratio;
 		return true;
 	}
 }
@@ -519,10 +522,10 @@ function new_loan(){
 var installment=document.total_revenue_for_Affordability.o_bal.value;
  var installment = parseFloat(installment, 10)
     installment = (isNaN(installment))?0:installment;
-var monthsal =document.total_revenue_for_Affordability.newloan.value;    
+var monthsal =document.total_revenue_for_Affordability.newloan.value;
  var monthsal = parseFloat(monthsal, 10)
     monthsal = (isNaN(monthsal))?0:monthsal;
-	
+
 
 
 var newtotalloan= installment + monthsal;
@@ -546,14 +549,14 @@ var strfield3 = document.total_revenue_for_Affordability.loan_type.value;
     return false;
     }
 
-  //url field 
+  //url field
     if (strfield2 == "" || strfield2 == null )
     {
     alert("Please enter value for the roperty type.")
     return false;
     }
 
-  //title field 
+  //title field
     if (strfield3 == "" || strfield3 == null )
     {
     alert("Please enter value for the Loan type.")
@@ -566,10 +569,10 @@ function check(total_revenue_for_Affordability){
 if (isEmpty(total_revenue_for_Affordability.loan_amount)){
   if (isEmpty(total_revenue_for_Affordability.property_type)){
     if (isEmpty(total_revenue_for_Affordability.loan_type)){
-	
+
 		  return true;
 		}
-	
+
   }
 }
 return false;
@@ -610,12 +613,12 @@ var strfield30 = document.total_revenue_for_Affordability.Professional.value;
   //name field
 
 if(strfield0 == "" || strfield0 == null)
-{ 
+{
 alert("Please enter value omang/passport number")
 return false;
-} 
+}
 if(strfield1 == "" || strfield1 == null)
-{ 
+{
 alert("Please enter value for_loan amount requested.")
 return false;
 }
@@ -631,121 +634,121 @@ if(strfield5 == "" || strfield5 == null)
   return false;
 }
 if(strfield6 == "" || strfield6 == null)
-{ 
-alert("Please enter value for_Rate Type Requested.")  
+{
+alert("Please enter value for_Rate Type Requested.")
   return false;
 }
 if(strfield7 == "" || strfield7 == null)
-{ 
-alert("Please enter value for_Estimated Loan Current (Offered) Interest Rate pa.") 
+{
+alert("Please enter value for_Estimated Loan Current (Offered) Interest Rate pa.")
    return false;
 }
 if(strfield8 == "" || strfield8 == null)
-{ 
-alert("Please enter value for Life Cover Amount.") 
+{
+alert("Please enter value for Life Cover Amount.")
    return false;
 }
 if(strfield9 == "" || strfield9 == null)
-{ 
+{
 alert("Please enter value for_Annual Salary Amount (Gross)." )
    return false;
 }
 if(strfield10 == "" || strfield10 == null)
-{ 
-alert("Please enter value for_Fixed Permanent allowances (pa).") 
+{
+alert("Please enter value for_Fixed Permanent allowances (pa).")
    return false;
 }
 if(strfield13 == "" || strfield13 == null)
-{ 
-alert("Please enter value for_Affordability Policy.")  
+{
+alert("Please enter value for_Affordability Policy.")
  return false;
 }
 if(strfield14 == "" || strfield14 == null)
-{ 
-alert("Please enter value for_Customer Type.")   
+{
+alert("Please enter value for_Customer Type.")
  return false;
 }
 if(strfield15 == "" || strfield15 == null)
 {
- alert("Please enter value for_Nationality.")   
+ alert("Please enter value for_Nationality.")
  return false;
 }
 if(strfield16 == "" || strfield16 == null)
-{ 
+{
 alert("Please enter value for_Borrower Name.")
    return false;
 }
 //if(strfield17 == "" || strfield17 == null)
-//{ 
-//alert("Please enter value for_Other Names.")   
+//{
+//alert("Please enter value for_Other Names.")
  //return false;
 //}
 if(strfield18 == "" || strfield18 == null)
-{ 
-alert("Please enter value for_Surname.")   
+{
+alert("Please enter value for_Surname.")
  return false;
 }
 
 if(strfield21 == "" || strfield21 == null)
-{ 
+{
 alert("Please enter value for_borrower present address.")
    return false;
 }
 if(strfield22 == "" || strfield22 == null)
-{ 
+{
 alert("Please enter value for_street name and number.")
     return false;
 }
 if(strfield23 == "" || strfield23 == null)
-{ 
-alert("Please enter value for_town.") 
+{
+alert("Please enter value for_town.")
  return false;
 }
 if(strfield24 == "" || strfield24 == null)
-{ 
-alert("Please enter value for_Country.") 
+{
+alert("Please enter value for_Country.")
   return false;
 }
 if(strfield25 == "" || strfield25 == null)
 {
- alert("Please enter value for_Permanent Country of Residence.") 
+ alert("Please enter value for_Permanent Country of Residence.")
    return false;
 }
 
 if(strfield27 == "" || strfield27 == null)
 {
- alert("Please enter value for gender")  
+ alert("Please enter value for gender")
  return false;
 }
 if(strfield28 == "" || strfield28 == null)
 {
- alert("Please enter value for borrower education")  
+ alert("Please enter value for borrower education")
  return false;
 }
 if(strfield29 == "" || strfield29 == null)
 {
- alert("Please enter value for employment contract")  
+ alert("Please enter value for employment contract")
  return false;
 }
 if(strfield30 == "" || strfield30 == null)
 {
- alert("Please enter value for proffessional category")  
+ alert("Please enter value for proffessional category")
  return false;
 }
 
     return true;
 }
- 
+
 
 function enable_text(status)
 {
-status=!status; 
+status=!status;
 document.total_revenue_for_Affordability.one.disabled = status;
 }
 
 function enable_text2(status)
 {
-status=!status; 
+status=!status;
 document.total_revenue_for_Affordability.pone.disabled = status;
 }
 // <![CDATA[
@@ -824,40 +827,40 @@ function ReCalculateForm() {
 <BODY BGCOLOR=#FFFFFF >
 <font class="s_text">
 <?php
-function calc_payment($pv, $payno, $int, $accuracy) 
-{ 
-// check that required values have been supplied 
-if (empty($pv)) { 
-   echo "<p class='error'>a value for PRINCIPAL is required</p>"; 
-   exit; 
-} // if 
-if (empty($payno)) { 
-   echo "<p class='error'>a value for NUMBER of PAYMENTS is required</p>"; 
-   exit; 
-} // if 
-if (empty($int)) { 
-   echo "<p class='error'>a value for INTEREST RATE is required</p>"; 
-   exit; 
-} // if 
+function calc_payment($pv, $payno, $int, $accuracy)
+{
+// check that required values have been supplied
+if (empty($pv)) {
+   echo "<p class='error'>a value for PRINCIPAL is required</p>";
+   exit;
+} // if
+if (empty($payno)) {
+   echo "<p class='error'>a value for NUMBER of PAYMENTS is required</p>";
+   exit;
+} // if
+if (empty($int)) {
+   echo "<p class='error'>a value for INTEREST RATE is required</p>";
+   exit;
+} // if
 
-// now do the calculation using this formula: 
+// now do the calculation using this formula:
 
-//****************************************** 
-//            INT * ((1 + INT) ** PAYNO) 
-// PMT = PV * -------------------------- 
-//             ((1 + INT) ** PAYNO) - 1 
-//****************************************** 
+//******************************************
+//            INT * ((1 + INT) ** PAYNO)
+// PMT = PV * --------------------------
+//             ((1 + INT) ** PAYNO) - 1
+//******************************************
 
-$int    = $int / 100;    // convert to a percentage 
-$value1 = $int * pow((1 + $int), $payno); 
-$value2 = pow((1 + $int), $payno) - 1; 
-$pmt    = $pv * ($value1 / $value2); 
-// $accuracy specifies the number of decimal places required in the result 
-$pmt    = number_format($pmt, $accuracy, ".", ""); 
+$int    = $int / 100;    // convert to a percentage
+$value1 = $int * pow((1 + $int), $payno);
+$value2 = pow((1 + $int), $payno) - 1;
+$pmt    = $pv * ($value1 / $value2);
+// $accuracy specifies the number of decimal places required in the result
+$pmt    = number_format($pmt, $accuracy, ".", "");
 
-return $pmt; 
+return $pmt;
 
-} // calc_payment ==================================================================== 
+} // calc_payment ====================================================================
 
 
 
@@ -887,9 +890,9 @@ if ($ldapconn) {
     if ($ldapbind) {
         echo "";
     } else {
-	
+
      echo "<meta http-equiv=\"refresh\" content=\"0;URL=index.php\">";
-		
+
 
     }
 
@@ -903,21 +906,21 @@ echo $username;
 
 
 $pass=$_POST['password'];
-$host="localhost"; // Host name 
-//$username="root"; // Mysql username 
-//$password="sefalana2008"; // Mysql password 
-$db_name="creditscoring"; // Database name 
+$host="localhost"; // Host name
+//$username="root"; // Mysql username
+//$password="sefalana2008"; // Mysql password
+$db_name="creditscoring"; // Database name
 // Connect to server and select databse.
-$ip =gethostbyname($_SERVER['REMOTE_ADDR']); 
+$ip =gethostbyname($_SERVER['REMOTE_ADDR']);
 //echo $ip;
 
 
-$connect=mysqli_connect("localhost","root","",$db_name); 
+$connect=mysqli_connect("localhost","admin","password",$db_name);
 //echo $pass;
   if (!$connect) {
-  mysqli_close($connect); 
+  mysqli_close($connect);
   echo "Cannot connect to the database! Please Check your username and password.";
-  die(); 
+  die();
 }
 
 
@@ -938,14 +941,14 @@ $connect=mysqli_connect("localhost","root","",$db_name);
 <td width="1286" align="CENTER" bgcolor="#000040" class="s_text"><font  color="#FFFFFF" size="7" face="Arial Narrow">CREDIT SCORING - Unsecured Loan</font></td><tr>
       </tr>
    <table class="s_text" >
-        <tr bgcolor="#ECF8FF" class="s_text"> 
+        <tr bgcolor="#ECF8FF" class="s_text">
           <td>
-        <p></br> 
+        <p></br>
         <form ACTION="rate_unsecured_loan_original.php" name="total_revenue_for_Affordability" method="post"  onclick = "ReCalculateForm()" onsubmit="return check(this);">
             <td><table><tr><td><p align="justify" class="s_text"><br>
 <table class="s_text">
 <tr>
-                <td><strong><font color="#FF0000">**</font></strong> <em><font color="#FF9900" size="1">System 
+                <td><strong><font color="#FF0000">**</font></strong> <em><font color="#FF9900" size="1">System
                   Generated Data</font></em></td>
               </tr>
  <tr>
@@ -953,7 +956,7 @@ $connect=mysqli_connect("localhost","root","",$db_name);
           <td></td><td>
 <input type="text" name="one" id ="one" onchange = "check_record_exist();"></td> </tr>
 <tr>
-          <td><strong><font color="#000000">Customer CIF <font color="#FF0000">(If 
+          <td><strong><font color="#000000">Customer CIF <font color="#FF0000">(If
             existing BBS Customer)</font></font></strong></td>
           <td></td><td>
 <input type="text" name="cif"></td> </tr>
@@ -1077,7 +1080,7 @@ $connect=mysqli_connect("localhost","root","",$db_name);
 <tr><td>Estimated Loan Current (Offered) Interest Rate pa</td><td width="60">&nbsp;</td><td>
 <input name="irate" type="text" onchange="return instal()">
 </td></tr>
- 
+
 <tr><td>Life Cover Amount</td><td width="60">&nbsp;</td><td>
 <input name="life_cover_amount" type="text">
 </td></tr>
@@ -1099,7 +1102,7 @@ $connect=mysqli_connect("localhost","root","",$db_name);
 
 
 <tr>
-                <td><strong><font color="#000066">Professional Revenues (Gross 
+                <td><strong><font color="#000066">Professional Revenues (Gross
                   amounts) Borrower:</font></strong> </td>
                 <td width="60"></td><td></td></tr>
 
@@ -1122,14 +1125,14 @@ $connect=mysqli_connect("localhost","root","",$db_name);
  </select>
 </td></tr>
 
-<tr><td>Affordability Ratio <strong><font color="#FF0000">**</font></strong></td><td width="60">&nbsp;</td><td> 
-<input name="affordability_ratio" type="text" readonly="true" > 
-</td></tr> 
+<tr><td>Affordability Ratio <strong><font color="#FF0000">**</font></strong></td><td width="60">&nbsp;</td><td>
+<input name="affordability_ratio" type="text" readonly="true" >
+</td></tr>
 
-<tr><td></td><td width="60">&nbsp;</td><td></td></tr> 
-<tr><td></td><td width="60">&nbsp;</td><td></td></tr> 
+<tr><td></td><td width="60">&nbsp;</td><td></td></tr>
+<tr><td></td><td width="60">&nbsp;</td><td></td></tr>
 
-<tr><td>Customer Type:</td><td width="60">&nbsp;</td><td><SELECT NAME="customer_type" > 
+<tr><td>Customer Type:</td><td width="60">&nbsp;</td><td><SELECT NAME="customer_type" >
 <option value=""> </option>
 <option value="Legal Entity">Legal Entity </option>
 <option value="Physical">Physical</option>
@@ -1161,7 +1164,7 @@ $connect=mysqli_connect("localhost","root","",$db_name);
 <tr><td>Surname :</td><td width="60">&nbsp;</td><td>
 <input name="surname" type="text">
 </td></tr>
-<tr><td>Gender:</td><td width="60">&nbsp;</td><td><SELECT NAME="gender" > 
+<tr><td>Gender:</td><td width="60">&nbsp;</td><td><SELECT NAME="gender" >
 <option value=""> </option>
 <option value="M">M</option>
 <option value="F">F</option>
@@ -1179,7 +1182,7 @@ $connect=mysqli_connect("localhost","root","",$db_name);
 </td></tr>
 
 <?php
-$con = mysqli_connect("localhost","root","",$db_name);
+$con = mysqli_connect("localhost","admin","password",$db_name);
 if (!$con)
   {
   die('Could not connect: ' . mysqli_error());
@@ -1193,8 +1196,8 @@ if (!$con)
 $query2 = "SELECT * FROM town order by town asc" ;
 	$resultn = mysqli_query($connect,$query2);
 	echo'<select name="town">';
-	while($row = mysqli_fetch_assoc( $resultn )) { 
-	 echo '<option value="'. $row['town'] .'">' . $row['town'] . '</option>';    
+	while($row = mysqli_fetch_assoc( $resultn )) {
+	 echo '<option value="'. $row['town'] .'">' . $row['town'] . '</option>';
 	}
 	echo '</select>';
 
@@ -1213,7 +1216,7 @@ $query2 = "SELECT * FROM town order by town asc" ;
 </br>
 
 </td></tr>
-<tr><td>Marital Status</td><td width="60"></td><td> <SELECT NAME="marital_status"> 
+<tr><td>Marital Status</td><td width="60"></td><td> <SELECT NAME="marital_status">
 <option value=""></option>
 <option value="Single">Single</option>
 <option value="Married">Married </option>
@@ -1228,29 +1231,29 @@ $query2 = "SELECT * FROM town order by town asc" ;
   <td><input type = "date" name ="borrower_birth"/> </td>
 </tr>
  <tr>
-   <td>Spouse BirthDate:      
+   <td>Spouse BirthDate:
      <input name="spouse_birth_checkbox" type="checkbox"
 			onclick="spouse_birth.disabled=!spouse_birth.disabled
-			localStorage.spouse_birth_checkbox_disabled=spouse_birth.disabled"/>	 
+			localStorage.spouse_birth_checkbox_disabled=spouse_birth.disabled"/>
   </td>
   <td width="60">&nbsp;</td>
   <td><input type = "date" name ="spouse_birth"/> </td>
 </tr>
 
 </br>
-<tr><td>Wedding Date:     
+<tr><td>Wedding Date:
      <input name="wedding_checkbox" type="checkbox"
 			onclick="wedding.disabled=!wedding.disabled
-			localStorage.wedding_checkbox_disabled=wedding.disabled"/>	 
+			localStorage.wedding_checkbox_disabled=wedding.disabled"/>
   </td>
   <td width="60">&nbsp;</td>
   <td><input type = "date" name ="wedding"/> </td>
 </tr>
-<tr><td> 
-<tr><td>Divorce Date:     
+<tr><td>
+<tr><td>Divorce Date:
      <input name="divorce_checkbox" type="checkbox"
 			onclick="divorce.disabled=!divorce.disabled
-			localStorage.divorce_checkbox_disabled=divorce.disabled"/>	 
+			localStorage.divorce_checkbox_disabled=divorce.disabled"/>
   </td>
   <td width="60">&nbsp;</td>
   <td><input type = "date" name ="divorce"/> </td>
@@ -1278,7 +1281,7 @@ $query2 = "SELECT * FROM town order by town asc" ;
 <option value="9">9</option>
 <option value="10">10</option>
 </SELECT>
-</td></tr>--> 
+</td></tr>-->
 
 <tr>
    <td><font color="#000066"><strong>Total Number of Children:<strong><font color="#FF0000">**</font></strong></strong></font></td>
@@ -1375,7 +1378,7 @@ Other dependants Living in Household Aunts/Uncles/Cousins</td><td width="60"></t
 <option value="10">10</option>
 </SELECT></td></tr>
 
-<tr><td><font color="#000066"><strong>TOTAL</strong></font> Dependants 
+<tr><td><font color="#000066"><strong>TOTAL</strong></font> Dependants
                   Living at home:<strong><font color="#FF0000">**</font></strong></td>
                 <td width="60"></td><td> <input type="text" name="dependants_at_home" value=0 onFocus="this.blur();" readonly="true"> </td></tr>
 
@@ -1555,7 +1558,7 @@ Other dependants Living in Household Aunts/Uncles/Cousins</td><td width="60"></t
 
 <tr><td>TOTAL BBS Products: <strong><font color="#FF0000">**</font></strong> </td><td width="10"></td><td><input type="text" name="total_bbs_products"></td></tr>
 
-<tr><td >BBS arrears for over 30days in last 12mnths?</br> 
+<tr><td >BBS arrears for over 30days in last 12mnths?</br>
 </td><td width="10"></td><td><SELECT NAME="loan_arrears">
 <option value="0">0</option>
 <option value="1">1</option>
@@ -1565,7 +1568,7 @@ Other dependants Living in Household Aunts/Uncles/Cousins</td><td width="60"></t
 </SELECT></td></tr>
 
 
-<tr><td >Renegotiated loans with arreas in past 24 months?</br> 
+<tr><td >Renegotiated loans with arreas in past 24 months?</br>
 </td><td width="10"></td><td><SELECT NAME="renegotiate">
 <option value=""></option>
 <option value="0">0</option>
@@ -1984,7 +1987,7 @@ Other dependants Living in Household Aunts/Uncles/Cousins</td><td width="60"></t
 <input type="hidden" name="username"  value="<?php echo $username;?>"/>
 <input type="hidden" name="password"  value="<?php echo $password; ?>"/>
 
-<input type="SUBMIT" name="RATE"  class="btn" value="Submit"/> 
+<input type="SUBMIT" name="RATE"  class="btn" value="Submit"/>
 <tr><td>&nbsp;</td></tr>
 
 </td></tr>
@@ -1997,8 +2000,8 @@ Other dependants Living in Household Aunts/Uncles/Cousins</td><td width="60"></t
 </td></tr>
 </table>
 </td>
-</tr>    
- </table> 
+</tr>
+ </table>
 </table>
 
 

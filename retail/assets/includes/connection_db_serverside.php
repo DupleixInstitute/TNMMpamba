@@ -1,9 +1,9 @@
 <?php
-	$dbDetails = array( 
-    'host' => 'localhost', 
-    'user' => 'root', 
-    'pass' => '', 
-    'db'   => 'creditscoring' 
-); 
+	$dbDetails = array(
+    'host' => 'localhost',
+    'user' => 'admin',
+    'pass' => 'password',
+    'db'   => 'creditscoring'
+);
 
 ?>

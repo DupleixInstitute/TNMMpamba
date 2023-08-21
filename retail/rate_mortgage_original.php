@@ -10,15 +10,15 @@
 <link href="btu.css" rel="stylesheet" type="text/css">
 </HEAD>
 <BODY BGCOLOR=#FFFFFF >
-<p><font class="s_text"> 
+<p><font class="s_text">
   <?php
-$username	=	$_POST['username'];
+$username	=	$_POST['username']??'tjmugova';
 echo $username;
-$pass		=	"";
-$host		=	"localhost"; // Host name 
-$user		=	"root";
-$db_name	=	"creditscoring"; // Database name 
-$ip =gethostbyname($_SERVER['REMOTE_ADDR']); 
+$pass		=	"password";
+$host		=	"localhost"; // Host name
+$user		=	"admin";
+$db_name	=	"creditscoring"; // Database name
+$ip =gethostbyname($_SERVER['REMOTE_ADDR']);
 
 $cif=NULL;
 $one=NULL;
@@ -206,7 +206,7 @@ $loan_instalment4 = NULL;
 $loan_instalment5 = NULL;
 $loan_instalment6 = NULL;
 $loan_instalment7 = NULL;
-$loan_instalment8 = NULL; 
+$loan_instalment8 = NULL;
 $loan_instalment9 = NULL;
 
 $username=$_POST['username'];
@@ -418,7 +418,7 @@ $dependants_at_home=$_POST['dependants_at_home'];
 $relationship=$_POST['relationship'];
 $total_bbs_products=$_POST['total_bbs_products'];
 $renegotiate=$_POST['renegotiate'];
-//echo 'týyyyyyyyy'; echo $renegotiate;
+//echo 'tï¿½yyyyyyyy'; echo $renegotiate;
 $loan_arrears=$_POST['loan_arrears'];
 $cards_held=$_POST['cards_held'];
 //echo 'thato'; echo $cards_held;
@@ -441,7 +441,7 @@ $ltvcomment="OK";
 
 
 if ($affordability_ratio > $affordability_policy)
-{ 
+{
 $affordabilitycomment="REJECT";
 }
 else
@@ -456,7 +456,7 @@ $affordabilitycomment="OK";
 
 if ($blacklisted=="True")
 $blacklistedcomment="REJECT";
-else 
+else
 $blacklistedcomment="OK";
 
 
@@ -625,7 +625,7 @@ $e=date($divorce);
 
 if($a == $b || $a==$c || $a==$d || $a==$e )
 {?>
- 
+
 <?php
 echo "<meta http-equiv=\"refresh\" content=\"0;URL=failed.php\">";
 die();
@@ -645,14 +645,14 @@ else
 <font class="s_text">
 <table width="760" border="0" align="center" cellpadding="0" cellspacing="0" class="bdr" ><tr>
   <td colspan="6" class="s_text"> <table width="100%" border="0" cellspacing="0" cellpadding="0" >
-      <tr> 
+      <tr>
         <td width="1286"><table width="770" height="165">
             <td><img src="img1.gif" alt="nknk" name="g" width="385" height="208"/>&nbsp;</td>
             <td><font color="#FFFFFF" size="16" face="Arial Narrow"><img src="img2.JPG" alt="nknk" name="g" width="385" height="208"/></font></td>
           </table></td>
       </tr>
-      <tr> 
-        <td width="1286" align="CENTER" bgcolor="#000040" class="s_text"><font  color="#FFFFFF" size="7" face="Arial Narrow">CREDIT 
+      <tr>
+        <td width="1286" align="CENTER" bgcolor="#000040" class="s_text"><font  color="#FFFFFF" size="7" face="Arial Narrow">CREDIT
           REPORT-Mortgage</font></td>
       <tr> </tr>
       <tr> </tr>
@@ -669,20 +669,20 @@ else
       <form ACTION="report_mortgage_original.php" method="post" name="f1">
         <table width="60%" border="1" align="center" cellpadding="0" cellspacing="0"  bordercolorlight="#60BAF0"   class="s_text">
           <p></p>
-          <tr > 
+          <tr >
             <td colspan="4" align="center" class="ntext">GENERAL INITIAL DATA</td>
           </tr>
-          <tr> 
+          <tr>
             <td class="ntext">BORROWER NAME</td>
             <td colspan="3" class="ntext" ><?php echo $name; echo ' '; echo $surname;?></td>
           </tr>
-          <tr> 
+          <tr>
             <td>&nbsp;</td>
             <td>&nbsp;</td>
             <td class="s_text">&nbsp;</td>
             <td>&nbsp;</td>
           </tr>
-          <tr> 
+          <tr>
             <td>Customer Type: Legal / Physical</td>
             <td >Reject if Legal </td>
             <td><?php echo $customer_type;?></td>
@@ -691,7 +691,7 @@ else
 	else
 	echo "<td bgcolor=\"#32C079\">OK</td>";?>
           </tr>
-          <tr> 
+          <tr>
             <td>Nationality: Boatswana/ Foreign</td>
             <td >Reject if Foreign</td>
             <td><?php echo $nationality;?></td>
@@ -700,13 +700,13 @@ else
 	else
 	echo "<td bgcolor=\"#32C079\">OK</td>";?>
           </tr>
-          <tr> 
+          <tr>
             <td>Permanent Residency: Botswana/Other</td>
             <td>&nbsp;</td>
             <td><?php echo $permanent_residence; ?></td>
             <td bgcolor="#32C079"><?php echo "OK"; ?></td>
           </tr>
-          <tr> 
+          <tr>
             <td>Blacklist Flag</td>
             <td>YES / NO</td>
             <td><?php echo $blacklisted; ?></td>
@@ -715,7 +715,7 @@ else
 	else
 	echo "<td bgcolor=\"#32C079\">OK</td>";?>
           </tr>
-          <tr> 
+          <tr>
             <td>Automatic Fraud Alert</td>
             <td>YES / NO</td>
             <td><?php echo $fraud_alert; ?></td>
@@ -724,7 +724,7 @@ else
 	else
 	echo "<td bgcolor=\"#32C079\">OK</td>";?>
           </tr>
-          <tr> 
+          <tr>
             <td>Loan to Value Policy</td>
             <td><?php echo $ltv_policy;?></td>
             <td><?php echo $ltv; ?></td>
@@ -733,7 +733,7 @@ else
 	else
 	echo "<td bgcolor=\"#32C079\">OK</td>";?>
           </tr>
-          <tr> 
+          <tr>
             <td>Affordability Policy</td>
             <td>70%</td>
             <td><?php echo $affordability_ratio;  ?></td>
@@ -742,7 +742,7 @@ else
 	else
 	echo "<td bgcolor=\"#32C079\">OK</td>";?>
           </tr>
-		  <tr> 
+		  <tr>
             <td>Debt Service Ratio</td>
             <td>80%</td>
             <td><?php echo $dsr ; ?></td>
@@ -751,7 +751,7 @@ else
 	else
 	echo "<td bgcolor=\"#32C079\">OK</td>";?>
           </tr>
-		    <tr> 
+		    <tr>
             <td>age</td>
             <td>below 65</td>
             <td><?php echo $age ; ?></td>
@@ -760,8 +760,8 @@ else
 	else
 	echo "<td bgcolor=\"#32C079\">OK</td>";?>
           </tr>
-		  
-		    <tr> 
+
+		    <tr>
             <td>Age plus loan maturity</td>
             <td>below 65</td>
             <td><?php echo $total_age; ?></td>
@@ -772,15 +772,15 @@ else
           </tr>
         </table></br></br></br>
         <table width="95%"  border="1" align="center" cellpadding="0" cellspacing="0"  bordercolorlight="#60BAF0"   class="s_text" >
-          <?php  
+          <?php
 		  $paid_debts_original=$paid_debts;
 if ($paid_debts >= $default_data)
 $paid_debts=1;
 else
 $paid_debts=0;
 
-		   
-			   
+
+
 //-----------------AGE GROUP OF BORROWER-------------------------------------------------------------
 
 //echo "age "; echo $age;
@@ -797,13 +797,13 @@ $paid_debts=0;
 	case ($age > 45):
        $age_score=200;
        break;
-	
+
 }
 $w_age_score=$age_score*0.02;
-//echo $marital_status_score;		   
-//---------------MARITAL STATUS----------------------------------------------------------------------			
-			
-			    
+//echo $marital_status_score;
+//---------------MARITAL STATUS----------------------------------------------------------------------
+
+
 switch ($marital_status) {
     case "Single":
         $marital_status_score=300;
@@ -919,7 +919,7 @@ case 'Primary Education':
 case 'Certificate':
       $education_level_score=250;
 		break;
-		
+
 case 'Diploma':
       $education_level_score=300;
 		break;
@@ -930,11 +930,11 @@ case 'Degree':
 case 'Masters Degree':
        $education_level_score=350;
 		break;
-			
+
 case 'PHD':
       $education_level_score=350;
 		break;
-		
+
 case 'Professional Course':
       $education_level_score=350;
 		break;
@@ -1072,13 +1072,13 @@ case "4":
 		break;
 case $total_bbs_products > "4":
        $total_bbs_products_score=500;
-		break;		
+		break;
 }
  $w_total_bbs_products_score= $total_bbs_products_score*0.02;
- 
- 
+
+
 //---------------LOAN ARREARS-----------------------------------------------------------------------
-	
+
 switch($loan_arrears){
 case "0":
        $loan_arrears_score=400;
@@ -1101,9 +1101,9 @@ case "na":
 	     $loan_arrears_score_comment='OK';
 		break;
 }
- $w_loan_arrears_score= $loan_arrears_score*0.10; 
- 
- 
+ $w_loan_arrears_score= $loan_arrears_score*0.10;
+
+
  //---------------RENEGOTIATIONS-----------------------------------------------------------------------
  switch($renegotiate){
   case "0":
@@ -1123,15 +1123,15 @@ case "N/A":
 	   $renegotiate_comment='OK';
 		break;
  }
- 
+
 $w_renegotiate_score=$renegotiate_score*0.15;
 
 
-	
 
-//---------------PAID DEBTS----------------------------------------------------------------------- 
 
- //echo 'ásk about paid debts';
+//---------------PAID DEBTS-----------------------------------------------------------------------
+
+ //echo 'ï¿½sk about paid debts';
 switch($paid_debts){
 case "0":
        $paid_debts_score=0;
@@ -1148,7 +1148,7 @@ case "1":
 
 
 //---------------JUDGEMENT-----------------------------------------------------------------------
-switch($judgement) 
+switch($judgement)
 {
 case "0":
        $judgement_score=500;
@@ -1169,7 +1169,7 @@ case "3":
 case $judgement>"3":
        $judgement_score=0;
 	   $judgement_score_comment='REJECT';
-		break;		
+		break;
  }
 
 $w_judgement_score=$judgement_score * 0.09;
@@ -1197,7 +1197,7 @@ case "3":
 case $default_data>"3":
        $default_data_score=0;
 	   $default_data_score_comment='REJECT';
-		break;		
+		break;
 }
 
 $w_default_data_score=$default_data_score* 0.09;
@@ -1245,7 +1245,7 @@ case "2":
 		break;
 case "3":
        $card_held_since_score=100;
-	   
+
 		break;
 case "4":
        $card_held_since_score=0;
@@ -1270,7 +1270,7 @@ case 2:
 		break;
 case 3:
        $loans_outstanding_score=100;
-	   
+
 		break;
 case 4:
        $loans_outstanding_score=0;
@@ -1320,7 +1320,7 @@ case ($deduct=="Yes");
 		break;
 case ($deduct=="No");
        $deduct_score=200;
-		break;	
+		break;
 }
 $w_deduct_score=$deduct_score*0.02;
 //---------------INTEREST RATE TYPE-----------------------------------------------------------------------
@@ -1373,82 +1373,82 @@ break;
 $w_loan_maturity_score=$loan_maturity_score * 0.01;
 
 //ADD THE TOTAL---------------------
-$total_personal_data=	$marital_status_score 			+ 
-						$age_score 						+ 
-						$no_of_children_score 			+ 
-						$dependants_at_home_score 		+ 
-						$education_level_score 			+ 
-						$professional_score 			+ 
-						$employment_score 				+ 
-						$years_at_job_score 			+ 
-						$revenues_score 				+ 
+$total_personal_data=	$marital_status_score 			+
+						$age_score 						+
+						$no_of_children_score 			+
+						$dependants_at_home_score 		+
+						$education_level_score 			+
+						$professional_score 			+
+						$employment_score 				+
+						$years_at_job_score 			+
+						$revenues_score 				+
 						$location_score;
 
 $w_total_personal_data
-					=	$w_marital_status_score 		+ 
-						$w_age_score 					+ 
-						$w_no_of_children_score 		+ 
-						$w_dependants_at_home_score 	+ 
-						$w_education_level_score 		+ 
-						$w_professional_score 			+ 
-						$w_employment_score 			+ 
-						$w_years_at_job_score 			+ 
-						$w_revenues_score 				+ 
+					=	$w_marital_status_score 		+
+						$w_age_score 					+
+						$w_no_of_children_score 		+
+						$w_dependants_at_home_score 	+
+						$w_education_level_score 		+
+						$w_professional_score 			+
+						$w_employment_score 			+
+						$w_years_at_job_score 			+
+						$w_revenues_score 				+
 						$w_location_score;
 
-$total_length		= 	$relationship_score 			+ 
-						$total_bbs_products_score 		+ 
-						$loan_arrears_score 			+ 
+$total_length		= 	$relationship_score 			+
+						$total_bbs_products_score 		+
+						$loan_arrears_score 			+
 						$renegotiate_score;
 
-$w_total_length		= 	$w_relationship_score 			+ 
-                        $w_total_bbs_products_score     + 
-						$w_loan_arrears_score           + 
+$w_total_length		= 	$w_relationship_score 			+
+                        $w_total_bbs_products_score     +
+						$w_loan_arrears_score           +
 						$w_renegotiate_score;
 
-$total_ICT			= 	$paid_debts_score 				+ 
-						$judgement_score 				+ 
-						$default_data_score 			+ 
+$total_ICT			= 	$paid_debts_score 				+
+						$judgement_score 				+
+						$default_data_score 			+
 						$trace_alerts_score;
 
-$w_total_ICT		= 	$w_paid_debts_score 			+ 
-						$w_judgement_score 				+ 
-						$w_default_data_score 			+ 
+$w_total_ICT		= 	$w_paid_debts_score 			+
+						$w_judgement_score 				+
+						$w_default_data_score 			+
 						$w_trace_alerts_score;
 
 
-$total_personal  	= 	$affordability_ratio_score   	+ 
-						$card_held_since_score 			+ 
-						$loans_outstanding_score 		+ 
-						$dsr_score; 
+$total_personal  	= 	$affordability_ratio_score   	+
+						$card_held_since_score 			+
+						$loans_outstanding_score 		+
+						$dsr_score;
 
-$w_total_personal	= 	$w_affordability_ratio_score 	+ 
-						$w_card_held_since_score 		+ 
-						$w_loans_outstanding_score 		+ 
+$w_total_personal	= 	$w_affordability_ratio_score 	+
+						$w_card_held_since_score 		+
+						$w_loans_outstanding_score 		+
 						$dsr_w_score;
 
-$total_product		=	$rate_type_score 				+ 
+$total_product		=	$rate_type_score 				+
                         $loan_maturity_score;
-$w_total_product	=	$w_rate_type_score 				+ 
+$w_total_product	=	$w_rate_type_score 				+
                         $w_loan_maturity_score;
 
-$score				=	$total_product 			+ 
-						$total_personal 		+  
-						$total_length 			+ 
-						$total_personal_data 	+ 
+$score				=	$total_product 			+
+						$total_personal 		+
+						$total_length 			+
+						$total_personal_data 	+
 						$total_ICT				+
 						$deduct_score;
 
-$w_score			=	$w_total_product 		+ 
-						$w_total_personal  		+ 
-						$w_total_length 		+ 
-						$w_total_personal_data 	+ 
+$w_score			=	$w_total_product 		+
+						$w_total_personal  		+
+						$w_total_length 		+
+						$w_total_personal_data 	+
 						$w_total_ICT			+
 						$w_deduct_score;
 
 
 ?>
-          <tr class="bdr2"  align="center"  > 
+          <tr class="bdr2"  align="center"  >
             <td class="ntext">SCORING ATTRIBUTES</td>
             <td class="ntext">WEIGHT</td>
 			<td class="ntext"><!--VALUE--></td>
@@ -1458,7 +1458,7 @@ $w_score			=	$w_total_product 		+
             <td class="ntext">MIN</td>
             <td class="ntext">MAX</td>
           </tr>
-          <tr align="center"> 
+          <tr align="center">
             <td>Marital Status</td>
             <td>3</td>
 			<td><?php echo $marital_status;?></td>
@@ -1468,7 +1468,7 @@ $w_score			=	$w_total_product 		+
             <td>6</td>
             <td>15</td>
           </tr>
-          <tr align="center"> 
+          <tr align="center">
             <td>Age Group of Borrower</td>
             <td>2</td>
 			<td><?php echo $age;?></td>
@@ -1478,7 +1478,7 @@ $w_score			=	$w_total_product 		+
             <td>2</td>
             <td>8</td>
           </tr>
-          <tr align="center"> 
+          <tr align="center">
             <td>Number of Chidren</td>
             <td>1</td>
 			<td><?php echo $no_of_children; ?></td>
@@ -1488,7 +1488,7 @@ $w_score			=	$w_total_product 		+
             <td>1</td>
             <td>4</td>
           </tr>
-          <tr align="center"> 
+          <tr align="center">
             <td>Number of household members</td>
             <td>1</td>
 			<td><?php echo $dependants_at_home; ?></td>
@@ -1498,7 +1498,7 @@ $w_score			=	$w_total_product 		+
             <td>1</td>
             <td>3</td>
           </tr>
-          <tr align="center"> 
+          <tr align="center">
             <td>Education level</td>
             <td>3</td>
 			<td><?php echo $education; ?></td>
@@ -1508,7 +1508,7 @@ $w_score			=	$w_total_product 		+
             <td>4</td>
             <td>14</td>
           </tr>
-          <tr align="center"> 
+          <tr align="center">
             <td>Professional category</td>
             <td>9</td>
 			<td><?php echo $professional; ?></td>
@@ -1518,7 +1518,7 @@ $w_score			=	$w_total_product 		+
             <td>16</td>
             <td>40</td>
           </tr>
-          <tr align="center"> 
+          <tr align="center">
             <td>Employment Contract type</td>
             <td>9</td>
 			<td><?php echo $employment;?></td>
@@ -1528,7 +1528,7 @@ $w_score			=	$w_total_product 		+
             <td>16</td>
             <td>40</td>
           </tr>
-          <tr align="center"> 
+          <tr align="center">
             <td>Years with employer(0-1; 1-5...)</td>
             <td>2</td>
 			<td><?php echo $years_at_job;?></td>
@@ -1538,7 +1538,7 @@ $w_score			=	$w_total_product 		+
             <td>4</td>
             <td>8</td>
           </tr>
-          <tr align="center"> 
+          <tr align="center">
             <td>Single or double salary</td>
             <td>3</td>
 			<td><?php echo $revenues;?></td>
@@ -1548,7 +1548,7 @@ $w_score			=	$w_total_product 		+
             <td>7.5</td>
             <td>15</td>
           </tr>
-          <tr align="center"> 
+          <tr align="center">
             <td>Area Of Residence</td>
             <td>2</td>
 			<td><?php echo $location;?></td>
@@ -1558,7 +1558,7 @@ $w_score			=	$w_total_product 		+
             <td>6</td>
             <td>12</td>
 			</tr>
-          <tr align="center" bgcolor="#E1F3FB"> 
+          <tr align="center" bgcolor="#E1F3FB">
             <td>&nbsp;</td>
             <td>&nbsp;</td>
             <td>&nbsp;</td>
@@ -1568,7 +1568,7 @@ $w_score			=	$w_total_product 		+
             <td>&nbsp;</td>
             <td>&nbsp;</td>
           </tr>
-          <tr align="center" bgcolor="#60BAF0" class="ntext"> 
+          <tr align="center" bgcolor="#60BAF0" class="ntext">
             <td>PERSONAL DATA</td>
             <td>33</td>
 			 <td></td>
@@ -1578,7 +1578,7 @@ $w_score			=	$w_total_product 		+
             <td>63.5</td>
             <td>159</td>
           </tr>
-          <tr align="center" bgcolor="#E1F3FB"> 
+          <tr align="center" bgcolor="#E1F3FB">
             <td>&nbsp;</td>
             <td>&nbsp;</td>
             <td>&nbsp;</td>
@@ -1588,7 +1588,7 @@ $w_score			=	$w_total_product 		+
             <td>&nbsp;</td>
             <td>&nbsp;</td>
           </tr>
-          <tr align="center"> 
+          <tr align="center">
             <td>Years of banking relationship with BBS </td>
             <td>3</td>
 			 <td><?php echo $relationship; ?></td>
@@ -1598,7 +1598,7 @@ $w_score			=	$w_total_product 		+
             <td>3</td>
             <td>15</td>
           </tr>
-          <tr align="center"> 
+          <tr align="center">
             <td># of banking products with BBS excl.new request</td>
             <td>2</td>
 			<td><?php echo $total_bbs_products;?></td>
@@ -1608,7 +1608,7 @@ $w_score			=	$w_total_product 		+
             <td>2</td>
             <td>10</td>
           </tr>
-          <tr align="center"> 
+          <tr align="center">
             <td># of arreas incidence over the last 12 months</td>
             <td>9</td>
 			<td><?php echo $loan_arrears;?></td>
@@ -1621,7 +1621,7 @@ $w_score			=	$w_total_product 		+
             <td>0</td>
             <td>40</td>
           </tr>
-          <tr align="center"> 
+          <tr align="center">
             <td>Loan overdue & renegotiated(last 2 years)</td>
             <td>13</td>
 			<td><?php echo $renegotiate;?></td>
@@ -1634,19 +1634,19 @@ $w_score			=	$w_total_product 		+
             <td>0</td>
             <td>60</td>
           </tr>
-		  
-          <tr align="center" bgcolor="#60BAF0" class="ntext"> 
+
+          <tr align="center" bgcolor="#60BAF0" class="ntext">
             <td>Length & depth of banking BBS relationship</td>
             <td>27</td>
 			<td></td>
-			
+
             <td><?php echo $total_length;?></td>
             <td><?php echo $w_total_length;?></td>
             <td>&nbsp;</td>
             <td>5</td>
             <td>125</td>
           </tr>
-          <tr align="center">           
+          <tr align="center">
             <td>paid debts vs.Defaults(if 1=more paid than defaults)</td>
             <td>1</td>
 			<td><?php echo $paid_debts_original;?></td>
@@ -1659,7 +1659,7 @@ $w_score			=	$w_total_product 		+
             <td>0</td>
             <td>5</td>
           </tr>
-          <tr align="center"> 
+          <tr align="center">
             <td>Judgements</td>
             <td>10</td>
 			   <td><?php echo $judgement;?></td>
@@ -1672,7 +1672,7 @@ $w_score			=	$w_total_product 		+
             <td>0</td>
             <td>45</td>
           </tr>
-          <tr align="center"> 
+          <tr align="center">
             <td>Defaults</td>
             <td>10</td>
 			<td><?php echo $default_data;?></td>
@@ -1685,7 +1685,7 @@ $w_score			=	$w_total_product 		+
             <td>0</td>
             <td>45</td>
           </tr>
-          <tr align="center"> 
+          <tr align="center">
             <td>Traces</td>
             <td>2</td>
 			 <td><?php echo $trace_alerts;?></td>
@@ -1697,7 +1697,7 @@ $w_score			=	$w_total_product 		+
 	echo "<td bgcolor=\"#32C079\">OK</td>"; ?>
             <td>0</td>
             <td>10</td>
-		 <tr align="center" bgcolor="#E1F3FB"> 
+		 <tr align="center" bgcolor="#E1F3FB">
             <td>&nbsp;</td>
             <td>&nbsp;</td>
             <td>&nbsp;</td>
@@ -1707,7 +1707,7 @@ $w_score			=	$w_total_product 		+
             <td>&nbsp;</td>
             <td>&nbsp;</td>
           </tr>
-          <tr align="center" bgcolor="#60BAF0" class="ntext"> 
+          <tr align="center" bgcolor="#60BAF0" class="ntext">
             <td>ITC REPORT SUB-RECORD</td>
             <td>23</td>
 			<td></td>
@@ -1716,7 +1716,7 @@ $w_score			=	$w_total_product 		+
             <td>&nbsp;</td>
             <td>0</td>
             <td>105</td>
-          <tr align="center" bgcolor="#E1F3FB"> 
+          <tr align="center" bgcolor="#E1F3FB">
             <td>&nbsp;</td>
             <td>&nbsp;</td>
             <td>&nbsp;</td>
@@ -1725,7 +1725,7 @@ $w_score			=	$w_total_product 		+
             <td>&nbsp;</td>
             <td>&nbsp;</td>
             <td>&nbsp;</td>
-          <tr align="center"> 
+          <tr align="center">
             <td>Number of credit card personal held</td>
             <td>1</td>
 			<td><?php echo $card_held_since;?></td>
@@ -1735,7 +1735,7 @@ $w_score			=	$w_total_product 		+
             <td>0</td>
             <td>5</td>
           </tr>
-          <tr align="center"> 
+          <tr align="center">
             <td>Number of loans presently outstanding</td>
             <td>1</td>
 			 <td><?php echo $loans_outstanding;?></td>
@@ -1745,7 +1745,7 @@ $w_score			=	$w_total_product 		+
             <td>0</td>
             <td>5</td>
           </tr>
-          <tr align="center"> 
+          <tr align="center">
             <td>Affordability ratio(Inst/Salary; from 0 to y%,etc) </td>
             <td>5</td>
 			 <td><?php echo $affordability_ratio;?></td>
@@ -1758,7 +1758,7 @@ $w_score			=	$w_total_product 		+
             <td>0</td>
             <td>25</td>
           </tr>
-          <tr align="center"> 
+          <tr align="center">
             <td>Debt Service Ratio </td>
             <td>3</td>
 			 <td><?php echo round($debtserviceratio,2);?></td>
@@ -1771,7 +1771,7 @@ $w_score			=	$w_total_product 		+
             <td>3</td>
             <td>12</td>
           </tr>
-          <tr align="center" bgcolor="#60BAF0" class="ntext"> 
+          <tr align="center" bgcolor="#60BAF0" class="ntext">
             <td>Personal Financial Data</td>
             <td>10</td>
 			    <td></td>
@@ -1781,7 +1781,7 @@ $w_score			=	$w_total_product 		+
             <td>3</td>
             <td>47</td>
           </tr>
-          <tr align="center" bgcolor="#E1F3FB"> 
+          <tr align="center" bgcolor="#E1F3FB">
             <td>&nbsp;</td>
             <td>&nbsp;</td>
             <td>&nbsp;</td>
@@ -1790,7 +1790,7 @@ $w_score			=	$w_total_product 		+
             <td>&nbsp;</td>
             <td>&nbsp;</td>
             <td>&nbsp;</td>
-          <tr align="center"> 
+          <tr align="center">
             <td>Mortgage Loan Type</td>
             <td>2</td>
 			 <td><?php echo $rate_type;?></td>
@@ -1800,7 +1800,7 @@ $w_score			=	$w_total_product 		+
             <td>4</td>
             <td>8</td>
           </tr>
-          <tr align="center"> 
+          <tr align="center">
             <td>Maturity of the loan in years</td>
             <td>1</td>
 			 <td><?php echo $loan_maturity;?></td>
@@ -1810,7 +1810,7 @@ $w_score			=	$w_total_product 		+
             <td>2.5</td>
             <td>4</td>
           </tr>
-          <tr align="center" bgcolor="#60BAF0" class="ntext"> 
+          <tr align="center" bgcolor="#60BAF0" class="ntext">
             <td>Product Characteristics</td>
             <td>3</td>
 			<td></td>
@@ -1820,7 +1820,7 @@ $w_score			=	$w_total_product 		+
             <td>6.5</td>
             <td>12</td>
           </tr>
-          <tr align="center" bgcolor="#FFFFFF"> 
+          <tr align="center" bgcolor="#FFFFFF">
             <td>&nbsp;</td>
             <td>&nbsp;</td>
             <td>&nbsp;</td>
@@ -1829,8 +1829,8 @@ $w_score			=	$w_total_product 		+
             <td>&nbsp;</td>
             <td>&nbsp;</td>
             <td>&nbsp;</td>
-		  </tr>	
-          <tr align="center" bgcolor="#60BAF0" class="ntext"> 
+		  </tr>
+          <tr align="center" bgcolor="#60BAF0" class="ntext">
             <td>Deduct at source</td>
             <td>2</td>
 			<td><?php echo $deduct;?></td>
@@ -1840,7 +1840,7 @@ $w_score			=	$w_total_product 		+
             <td>4</td>
             <td>8</td>
           </tr>
-         <tr align="center" bgcolor="#CCEBF7" class="ntext"> 
+         <tr align="center" bgcolor="#CCEBF7" class="ntext">
             <td>TOTAL FINAL RESULTS</td>
             <td>100%</td>
 			 <td><?php echo "SCORE";?></td>
@@ -1857,13 +1857,13 @@ if (!$con)
   {
   die('Could not connect: ' . mysqli_error());
   }
-		
+
 $sql2=	"INSERT INTO creditscore (
 			omang_passport_num,
 			cif,
 			loan_number,
 			loan_category,
-			marital_status_score, 
+			marital_status_score,
 			w_marital_status_score,
 			age_score,
 			w_age_score,
@@ -1873,47 +1873,47 @@ $sql2=	"INSERT INTO creditscore (
 			w_dependants_at_home,
 			education_level_score,
 			w_education_level_score,
-			professional_score, 
+			professional_score,
 			w_professional_score,
-			employment_score, 
-			w_employment_score, 
-			years_at_job_score, 
-			w_years_at_job_score, 
-			revenues_score, 
+			employment_score,
+			w_employment_score,
+			years_at_job_score,
+			w_years_at_job_score,
+			revenues_score,
 			w_revenues_score,
-			location_score, 
-			w_location_score, 
-			relationship_score, 
-			w_relationship_score, 
-			total_bbs_products_score, 
-			w_total_bbs_products_score, 
-			loan_arrears, 
-			w_loan_arrears, 
-			renegotiate_score, 
-			w_renegotiate_score, 
-			paid_debts_score, 
-			w_paid_debts_score, 
-			judgement_score, 
-			w_judgement_score, 
-			default_data_score, 
-			w_default_data_score, 
-			trace_alerts_score, 
-			w_trace_alerts_score, 
-			card_held_since_score, 
-			w_card_held_since_score, 
-			loans_outstanding_score, 
+			location_score,
+			w_location_score,
+			relationship_score,
+			w_relationship_score,
+			total_bbs_products_score,
+			w_total_bbs_products_score,
+			loan_arrears,
+			w_loan_arrears,
+			renegotiate_score,
+			w_renegotiate_score,
+			paid_debts_score,
+			w_paid_debts_score,
+			judgement_score,
+			w_judgement_score,
+			default_data_score,
+			w_default_data_score,
+			trace_alerts_score,
+			w_trace_alerts_score,
+			card_held_since_score,
+			w_card_held_since_score,
+			loans_outstanding_score,
 			w_loans_outstanding_score,
-			affordability_ratio_score, 
-			w_affordability_ratio_score, 
-			rate_type_score, 
-			w_rate_type_score, 
-			loan_maturity_score, 
+			affordability_ratio_score,
+			w_affordability_ratio_score,
+			rate_type_score,
+			w_rate_type_score,
+			loan_maturity_score,
 			w_loan_maturity_score,
 			score,
 			deduct_score,
 			w_deduct_score,
 			age_comment
-        ) 
+        )
 		VALUES(
 			'$omang_passport_num',
 			'$cif',
@@ -1929,50 +1929,50 @@ $sql2=	"INSERT INTO creditscore (
 			'$w_dependants_at_home_score',
 			'$education_level_score',
 			'$w_education_level_score',
-			'$professional_score', 
+			'$professional_score',
 			'$w_professional_score',
-			'$employment_score', 
-			'$w_employment_score', 
-			'$years_at_job_score', 
-			'$w_years_at_job_score', 
-			'$revenues_score', 
+			'$employment_score',
+			'$w_employment_score',
+			'$years_at_job_score',
+			'$w_years_at_job_score',
+			'$revenues_score',
 			'$w_revenues_score',
-			'$location_score', 
-			'$w_location_score', 
-			'$relationship_score', 
-			'$w_relationship_score', 
-			'$total_bbs_products_score', 
-			'$w_total_bbs_products_score', 
-			'$loan_arrears', 
-			'$w_loan_arrears_score', 
-			'$renegotiate_score', 
-			'$w_renegotiate_score', 
-			'$paid_debts_score', 
-			'$w_paid_debts_score', 
-			'$judgement_score', 
-			'$w_judgement_score', 
-			'$default_data_score', 
-			'$w_default_data_score', 
-			'$trace_alerts_score', 
-			'$w_trace_alerts_score', 
-			'$card_held_since_score', 
-			'$w_card_held_since_score', 
-			'$loans_outstanding_score', 
+			'$location_score',
+			'$w_location_score',
+			'$relationship_score',
+			'$w_relationship_score',
+			'$total_bbs_products_score',
+			'$w_total_bbs_products_score',
+			'$loan_arrears',
+			'$w_loan_arrears_score',
+			'$renegotiate_score',
+			'$w_renegotiate_score',
+			'$paid_debts_score',
+			'$w_paid_debts_score',
+			'$judgement_score',
+			'$w_judgement_score',
+			'$default_data_score',
+			'$w_default_data_score',
+			'$trace_alerts_score',
+			'$w_trace_alerts_score',
+			'$card_held_since_score',
+			'$w_card_held_since_score',
+			'$loans_outstanding_score',
 			'$w_loans_outstanding_score',
-			'$affordability_ratio_score', 
-			'$w_affordability_ratio_score', 
-			'$rate_type_score', 
-			'$w_rate_type_score', 
-			'$loan_maturity_score', 
+			'$affordability_ratio_score',
+			'$w_affordability_ratio_score',
+			'$rate_type_score',
+			'$w_rate_type_score',
+			'$loan_maturity_score',
 			'$w_loan_maturity_score',
 			'$score',
 			'$deduct_score',
 			'$w_deduct_score',
 			'$age_comment'
 		)
-		
+
 		ON DUPLICATE KEY UPDATE
-		
+
 			omang_passport_num           = '$omang_passport_num',
 			cif                          = '$cif',
 			loan_number                  = '$loan_number',
@@ -1987,48 +1987,48 @@ $sql2=	"INSERT INTO creditscore (
 			w_dependants_at_home         = '$w_dependants_at_home_score',
 			education_level_score        = '$education_level_score',
 			w_education_level_score      = '$w_education_level_score',
-			professional_score           = '$professional_score', 
+			professional_score           = '$professional_score',
 			w_professional_score         = '$w_professional_score',
-			employment_score             = '$employment_score', 
-			w_employment_score           = '$w_employment_score', 
-			years_at_job_score           = '$years_at_job_score', 
-			w_years_at_job_score         = '$w_years_at_job_score', 
-			revenues_score               = '$revenues_score', 
+			employment_score             = '$employment_score',
+			w_employment_score           = '$w_employment_score',
+			years_at_job_score           = '$years_at_job_score',
+			w_years_at_job_score         = '$w_years_at_job_score',
+			revenues_score               = '$revenues_score',
 			w_revenues_score             = '$w_revenues_score',
-			location_score               = '$location_score', 
-			w_location_score             = '$w_location_score', 
-			relationship_score           = '$relationship_score', 
-			w_relationship_score         = '$w_relationship_score', 
-			total_bbs_products_score     = '$total_bbs_products_score', 
-			w_total_bbs_products_score   = '$w_total_bbs_products_score', 
-			loan_arrears                 = '$loan_arrears', 
-			w_loan_arrears               = '$w_loan_arrears_score', 
-			renegotiate_score            = '$renegotiate_score', 
-			w_renegotiate_score          = '$w_renegotiate_score', 
-			paid_debts_score             = '$paid_debts_score', 
-			w_paid_debts_score           = '$w_paid_debts_score', 
-			judgement_score              = '$judgement_score', 
-			w_judgement_score            = '$w_judgement_score', 
-			default_data_score           = '$default_data_score', 
-			w_default_data_score         = '$w_default_data_score', 
-			trace_alerts_score           = '$trace_alerts_score', 
-			w_trace_alerts_score         = '$w_trace_alerts_score', 
-			card_held_since_score        = '$card_held_since_score', 
-			w_card_held_since_score      = '$w_card_held_since_score', 
-			loans_outstanding_score      = '$loans_outstanding_score', 
+			location_score               = '$location_score',
+			w_location_score             = '$w_location_score',
+			relationship_score           = '$relationship_score',
+			w_relationship_score         = '$w_relationship_score',
+			total_bbs_products_score     = '$total_bbs_products_score',
+			w_total_bbs_products_score   = '$w_total_bbs_products_score',
+			loan_arrears                 = '$loan_arrears',
+			w_loan_arrears               = '$w_loan_arrears_score',
+			renegotiate_score            = '$renegotiate_score',
+			w_renegotiate_score          = '$w_renegotiate_score',
+			paid_debts_score             = '$paid_debts_score',
+			w_paid_debts_score           = '$w_paid_debts_score',
+			judgement_score              = '$judgement_score',
+			w_judgement_score            = '$w_judgement_score',
+			default_data_score           = '$default_data_score',
+			w_default_data_score         = '$w_default_data_score',
+			trace_alerts_score           = '$trace_alerts_score',
+			w_trace_alerts_score         = '$w_trace_alerts_score',
+			card_held_since_score        = '$card_held_since_score',
+			w_card_held_since_score      = '$w_card_held_since_score',
+			loans_outstanding_score      = '$loans_outstanding_score',
 			w_loans_outstanding_score    = '$w_loans_outstanding_score',
-			affordability_ratio_score    = '$affordability_ratio_score', 
-			w_affordability_ratio_score  = '$w_affordability_ratio_score', 
-			rate_type_score              = '$rate_type_score', 
-			w_rate_type_score            = '$w_rate_type_score', 
-			loan_maturity_score          = '$loan_maturity_score', 
+			affordability_ratio_score    = '$affordability_ratio_score',
+			w_affordability_ratio_score  = '$w_affordability_ratio_score',
+			rate_type_score              = '$rate_type_score',
+			w_rate_type_score            = '$w_rate_type_score',
+			loan_maturity_score          = '$loan_maturity_score',
 			w_loan_maturity_score        = '$w_loan_maturity_score',
 			score                        = '$score',
 			deduct_score                 = '$deduct_score',
 			w_deduct_score               = '$w_deduct_score',
 			age_comment                  = '$age_comment'";
 
-  
+
 if (!mysqli_query($con,$sql2))
   {
   die('Error1: ' . mysqli_error());
@@ -2147,7 +2147,7 @@ $sql3=	"INSERT INTO cust_information (
 			loan_instalment7,
 			loan_instalment8,
 			loan_instalment9
-			) 
+			)
 		VALUES(
 		    '$omang_passport_num',
 			'$cif',
@@ -2255,9 +2255,9 @@ $sql3=	"INSERT INTO cust_information (
 			'$loan_instalment8',
 			'$loan_instalment9'
 
-		)	
+		)
 		ON DUPLICATE KEY UPDATE
-		
+
 			omang_passport_num                 = '$omang_passport_num',
 			CIF                                = '$cif',
 			loan_number                        = '$loan_number',
@@ -2364,13 +2364,13 @@ $sql3=	"INSERT INTO cust_information (
 			loan_instalment8                   = '$loan_instalment8',
 			loan_instalment9                   = '$loan_instalment9'";
 
-  
+
 if (!mysqli_query($con,$sql3))
   {
   die('Error2ERR: ' . mysqli_error());
   }
   ?>
-	
+
         <input type="hidden" name="application_ref" value="<?php echo mysqli_insert_id($con);?>"/>
         <input type="hidden" name="password" value="<?php echo $password;?>"/>
 	    <input type="hidden" name="username" value="<?php echo $username;?>"/>
@@ -2379,8 +2379,8 @@ if (!mysqli_query($con,$sql3))
         <input type="hidden" name="fraud_alert" value="<?php echo $fraud_alert;?>"/>
         <input type="hidden" name="renegotiate_comment" value="<?php echo $renegotiate_comment;?>"/>
         <input type="hidden" name="affordabilitycomment" value="<?php echo $affordabilitycomment;?>"/>
-	    
-		
+
+
 		<input type="hidden" name="loan_amount" value="<?php echo $loan_amount;?>"/>
         <input type="hidden" name="loanandinsurance" value="<?php echo $loanandinsurance;?>"/>
         <input type="hidden" name="open_market_value" value="<?php echo $open_market_value;?>"/>
@@ -2415,6 +2415,6 @@ if (!mysqli_query($con,$sql3))
 <?php
 }
 ?>
-</font> 
+</font>
 </BODY>
 </HTML>

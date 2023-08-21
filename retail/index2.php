@@ -19,7 +19,9 @@
     });
 </script>
 <?php
-
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 /** UNCOMMENT THE FOLLOWING LINES **********************************************************************************
 
 echo "<meta http-equiv=\"refresh\" content=\"0;URL=index.php\">";
@@ -34,20 +36,20 @@ $mytime  = date("H.i");
 //echo $mytime;echo $mydate;
 //echo 'ttt';
 //echo $mytime;j
-$pass    = "";
-$host    = "localhost"; // Host name 
-$user    = "root"; // Mysql username 
-$db_name ="creditscoring"; // Database name 
+$pass    = "password";
+$host    = "localhost"; // Host name
+$user    = "admin"; // Mysql username
+$db_name ="creditscoring"; // Database name
 // Connect to server and select databse.
-$ip =gethostbyname($_SERVER['REMOTE_ADDR']); 
+$ip =gethostbyname($_SERVER['REMOTE_ADDR']);
 $user_sql="select * from users where name='$username'";
 //==================================================================================================================
-try {  
+try {
       // connect to database using PHP 5
-      $connect=mysql_connect($host,$user,$pass); 
+      $connect=mysql_connect($host,$user,$pass);
 	  if (!$connect) {
-		  mysql_close($connect); 
-		  echo "Cannot connect to the database! Please Check your username and password."; 
+		  mysql_close($connect);
+		  echo "Cannot connect to the database! Please Check your username and password.";
 	  }
 	  else {
 		 mysql_select_db($db_name, $connect)
@@ -62,14 +64,14 @@ try {
 	  $name=$rows['name'];
 		//echo $name;
 	  $count=mysql_num_rows($resultm);
-}  
-//catch exception  
-catch (Error $e) {  
+}
+//catch exception
+catch (Error $e) {
       // connect to database using PHP >5
-      $connect=mysqli_connect($host,$user,$pass,$db_name); 
+      $connect=mysqli_connect($host,$user,$pass,$db_name);
 	  if (!$connect) {
-		  mysqli_close($connect); 
-		  echo "Cannot connect to the database! Please Check your username and password."; 
+		  mysqli_close($connect);
+		  echo "Cannot connect to the database! Please Check your username and password.";
 	  }
 	  $resultm= mysqli_query($connect,$user_sql);
 	  if (!$resultm){
@@ -79,8 +81,8 @@ catch (Error $e) {
 	  $name=$rows['name'];
 		//echo $name;
 	  $count=mysqli_num_rows($resultm);
- }  
-  
+ }
+
 //================================================================================================================
 
 //echo $count;

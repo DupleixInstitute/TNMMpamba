@@ -1,0 +1,236 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Events\LoanProductCreated;
+use App\Events\LoanProductStatusChanged;
+use App\Models\LoanProductCategory;
+use App\Models\LoanProduct;
+use App\Models\Comment;
+use App\Models\LoanProductScoringAttributeOptionValue;
+use App\Models\ScoringAttributeGroup;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Inertia\Inertia;
+
+class LoanProductsController extends Controller
+{
+    public function __construct()
+    {
+        $this->middleware('auth');
+        $this->middleware(['permission:loans.products.index'])->only(['index', 'show']);
+        $this->middleware(['permission:loans.products.create'])->only(['create', 'store']);
+        $this->middleware(['permission:loans.products.update'])->only(['edit', 'update']);
+        $this->middleware(['permission:loans.products.destroy'])->only(['destroy']);
+    }
+
+    public function index()
+    {
+
+        $products = LoanProduct::filter(\request()->only('search', 'status'))
+            ->with(['category', 'createdBy'])
+            ->orderBy('created_at', 'desc')
+            ->paginate(20);
+        return Inertia::render('LoanProducts/Index', [
+            'filters' => \request()->all('search', 'status', 'type'),
+            'products' => $products,
+            'categories' => LoanProductCategory::all()->map(function ($item) {
+                return [
+                    'label' => $item->name,
+                    'value' => $item->id,
+                ];
+            }),
+        ]);
+    }
+
+
+    public function create()
+    {
+
+        return Inertia::render('LoanProducts/Create', [
+            'categories' => LoanProductCategory::all()->map(function ($item) {
+                return [
+                    'label' => $item->name,
+                    'value' => $item->id,
+                ];
+            }),
+        ]);
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'name' => ['required', 'string'],
+            'active' => ['required'],
+        ]);
+        $product = new LoanProduct();
+        $product->created_by_id = Auth::id();
+        $product->loan_product_category_id = $request->loan_product_category_id;
+        $product->name = $request->name;
+        $product->active = $request->active ? 1 : 0;
+        $product->description = $request->description;
+        $product->save();
+
+        activity()
+            ->performedOn($product)
+            ->log('Create Loan Product');
+        return redirect()->route('loan_products.index')->with('success', 'Loan Product created successfully.');
+    }
+
+
+    public function show(LoanProduct $product)
+    {
+        $product->load(['category', 'createdBy', 'attributes', 'attributes.attribute']);
+        $groups = ScoringAttributeGroup::with(['attributes'])->get();
+        $groups->transform(function ($group) use ($product) {
+            if ($product->attributes->where('scoring_attribute_group_id', $group->id)->count()) {
+                $group->used = true;
+            } else {
+                $group->used = false;
+            }
+            $group->attributes->transform(function ($item) use ($product) {
+                if ($product->attributes->where('scoring_attribute_id', $item->id)->count()) {
+                    $item->used = true;
+                } else {
+                    $item->used = false;
+                }
+
+                if ($item->field_type === 'dropdown' || $item->field_type === 'radio' || $item->field_type === 'checkbox') {
+                    $options=json_decode($item->options);
+                    $optionsArray=[];
+                    foreach ($options as $option){
+                        $optionsArray[]=[
+                            'id'=>'',
+                            'name'=>$option,
+                            'weight'=>'',
+                            'score'=>'',
+                            'active'=>true,
+                        ];
+                    }
+                    $item->options = $optionsArray;
+                }
+                return $item;
+            });
+
+            return $group;
+        });
+        $product->attributes->transform(function ($item) {
+            if ($item->field_type === 'dropdown' || $item->field_type === 'radio' || $item->field_type === 'checkbox') {
+                $options=json_decode($item->options);
+                $optionsArray=[];
+                foreach ($options as $option){
+                    if ($opt=LoanProductScoringAttributeOptionValue::where('loan_product_scoring_attribute_id',$item->id)->where('name',$option)->first()){
+                        $optionsArray[]=  $opt;
+                    }else{
+                        $optionsArray[]=[
+                            'id'=>'',
+                            'name'=>$option,
+                            'weight'=>'',
+                            'score'=>'',
+                            'active'=>true,
+                        ];
+                    }
+                }
+                $item->options = $optionsArray;
+            }
+            return $item;
+        });
+        $product->score_attributes = $product->attributes->where('is_group', 1);
+        $product->score_attributes->transform(function ($score) use ($product) {
+            $score->attributes = $product->attributes->where('scoring_attribute_group_id', $score->id);
+            return $score;
+        });
+
+        return Inertia::render('LoanProducts/Show', [
+            'product' => $product,
+            'groups' => $groups
+        ]);
+    }
+
+    public function edit(LoanProduct $product)
+    {
+
+        return Inertia::render('LoanProducts/Edit', [
+            'product' => $product,
+            'categories' => LoanProductCategory::all()->map(function ($item) {
+                return [
+                    'label' => $item->name,
+                    'value' => $item->id,
+                ];
+            }),
+        ]);
+    }
+
+    public function update(Request $request, LoanProduct $product)
+    {
+
+        $request->validate([
+            'name' => ['required', 'string'],
+            'active' => ['required'],
+        ]);
+        $product->loan_product_category_id = $request->loan_product_category_id;
+        $product->name = $request->name;
+        $product->active = $request->active ? 1 : 0;
+        $product->description = $request->description;
+        $product->save();
+        activity()
+            ->performedOn($product)
+            ->log('Update Loan Product');
+        return redirect()->route('loan_products.index')->with('success', 'LoanProduct updated successfully.');
+    }
+
+    public function destroy(LoanProduct $product)
+    {
+
+        $product->delete();
+        activity()
+            ->performedOn($product)
+            ->log('Delete LoanProduct');
+        return redirect()->route('loan_products.index')->with('success', 'LoanProduct deleted successfully.');
+    }
+
+    public function search(Request $request)
+    {
+        $search = $request->s;
+        $id = $request->id;
+        $data = LoanProduct::with(['coPayers', 'coPayers.coPayer'])->where(function ($query) use ($search) {
+            $query->where('first_name', 'like', "%$search%");
+            $query->orWhere('last_name', 'like', "%$search%");
+            $query->orWhere('middle_name', 'like', "%$search%");
+            $query->orWhere('id', 'like', "%$search%");
+            $query->orWhere('id_number', 'like', "%$search%");
+            $query->orWhere('external_id', 'like', "%$search%");
+        })->when($id, function ($query) use ($id) {
+            return $query->where('id', $id);
+        })->get();
+        return response()->json($data);
+    }
+
+    public function storeComment(Request $request, LoanProduct $product)
+    {
+        $request->validate([
+            'description' => ['required'],
+        ]);
+        $comment = new Comment();
+        $comment->created_by_id = Auth::id();
+        $comment->record_id = $product->id;
+        $comment->category = 'product';
+        $comment->description = $request->description;
+        $comment->save();
+
+        activity()
+            ->performedOn($product)
+            ->log('Create LoanProduct Comment');
+        return redirect()->route('products.show', $product->id)->with('success', 'comment created successfully.');
+    }
+
+    public function destroyComment(Comment $comment)
+    {
+
+        $comment->delete();
+        activity()
+            ->performedOn($comment)
+            ->log('Delete LoanProduct comment');
+        return redirect()->route('products.show', $comment->record_id)->with('success', 'comment deleted successfully.');
+    }
+}

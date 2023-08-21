@@ -1,0 +1,215 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Storage;
+use Laravel\Jetstream\Features;
+
+class Client extends Model
+{
+    use HasFactory;
+    use SoftDeletes;
+
+    protected $appends = [
+        'name',
+        'profile_photo_url',
+        'age',
+        'join_date',
+    ];
+
+    public function createdBy()
+    {
+        return $this->belongsTo(User::class, 'created_by_id', 'id');
+    }
+
+    public function user()
+    {
+        return $this->hasOne(User::class);
+    }
+    public function province()
+    {
+        return $this->belongsTo(Province::class);
+    }
+
+    public function district()
+    {
+        return $this->belongsTo(District::class);
+    }
+    public function ward()
+    {
+        return $this->belongsTo(Ward::class);
+    }
+    public function village()
+    {
+        return $this->belongsTo(Village::class);
+    }
+
+    public function branch()
+    {
+        return $this->belongsTo(Branch::class, 'branch_id', 'id');
+    }
+
+    public function country()
+    {
+        return $this->belongsTo(Country::class);
+    }
+
+    public function courses()
+    {
+        return $this->hasMany(Course::class, 'member_id', 'id');
+    }
+
+    public function loans()
+    {
+        return $this->hasMany(LoanApplication::class, 'member_id', 'id');
+    }
+
+    public function invoices()
+    {
+        return $this->hasMany(Invoice::class, 'patient_id', 'id');
+    }
+
+    public function consultations()
+    {
+        return $this->hasMany(Consultation::class, 'patient_id', 'id');
+    }
+
+    public function files()
+    {
+        return $this->hasMany(File::class, 'record_id', 'id')->where('category', 'patients');
+    }
+    public function sales()
+    {
+        return $this->hasMany(InventoryProductSale::class);
+    }
+
+
+    public function getNameAttribute()
+    {
+        return $this->first_name . ' ' . $this->middle_name . ' ' . $this->last_name;
+    }
+
+    public function getJoinDateAttribute()
+    {
+        return $this->created_at->format('Y-m-d');
+    }
+
+    public function getAgeAttribute()
+    {
+        return Carbon::now()->diffForHumans(Carbon::parse($this->dob), true, true);
+    }
+
+    public function scopeOrderByName($query)
+    {
+        $query->orderBy('last_name')->orderBy('first_name');
+    }
+
+    public function scopeFilter($query, array $filters)
+    {
+        $query->when($filters['search'] ?? null, function ($query, $search) {
+            $query->where(function ($query) use ($search) {
+                $query->where('first_name', 'like', '%' . $search . '%')
+                    ->orWhere('last_name', 'like', '%' . $search . '%')
+                    ->orWhere('id', 'like', '%' . $search . '%')
+                    ->orWhere('email', 'like', '%' . $search . '%')
+                    ->orWhere('mobile', 'like', '%' . $search . '%')
+                    ->orWhere('id_number', 'like', '%' . $search . '%')
+                    ->orWhere('external_id', 'like', '%' . $search . '%')
+                    ->orWhere('middle_name', 'like', '%' . $search . '%');
+            });
+        })->when($filters['gender'] ?? null, function ($query, $gender) {
+            $query->where(function ($query) use ($gender) {
+                $query->where('gender', $gender);
+            });
+        })->when($filters['province_id'] ?? null, function ($query, $gender) {
+            $query->where(function ($query) use ($gender) {
+                $query->where('province_id', $gender);
+            });
+        })->when($filters['branch_id'] ?? null, function ($query, $gender) {
+            $query->where(function ($query) use ($gender) {
+                $query->where('branch_id', $gender);
+            });
+        })->when($filters['district_id'] ?? null, function ($query, $gender) {
+            $query->where(function ($query) use ($gender) {
+                $query->where('district_id', $gender);
+            });
+        })->when($filters['ward_id'] ?? null, function ($query, $gender) {
+            $query->where(function ($query) use ($gender) {
+                $query->where('ward_id', $gender);
+            });
+        })->when($filters['village_id'] ?? null, function ($query, $gender) {
+            $query->where(function ($query) use ($gender) {
+                $query->where('village_id', $gender);
+            });
+        });
+    }
+
+    public function getProfilePhotoUrlAttribute()
+    {
+        return $this->profile_photo_path
+            ? Storage::disk($this->profilePhotoDisk())->url($this->profile_photo_path)
+            : $this->defaultProfilePhotoUrl();
+    }
+
+    /**
+     * Get the default profile photo URL if no profile photo has been uploaded.
+     *
+     * @return string
+     */
+    protected function defaultProfilePhotoUrl()
+    {
+        return 'https://ui-avatars.com/api/?name=' . urlencode($this->name) . '&color=7F9CF5&background=EBF4FF';
+    }
+
+    protected function profilePhotoDisk()
+    {
+        return isset($_ENV['VAPOR_ARTIFACT_NAME']) ? 's3' : config('jetstream.profile_photo_disk', 'public');
+    }
+
+    public function updateProfilePhoto(UploadedFile $photo)
+    {
+        tap($this->profile_photo_path, function ($previous) use ($photo) {
+            $this->forceFill([
+                'profile_photo_path' => $photo->storePublicly(
+                    'profile-photos', ['disk' => $this->profilePhotoDisk()]
+                ),
+            ])->save();
+
+            if ($previous) {
+                Storage::disk($this->profilePhotoDisk())->delete($previous);
+            }
+        });
+    }
+
+    /**
+     * Delete the user's profile photo.
+     *
+     * @return void
+     */
+    public function deleteProfilePhoto()
+    {
+        if (!Features::managesProfilePhotos()) {
+            return;
+        }
+
+        Storage::disk($this->profilePhotoDisk())->delete($this->profile_photo_path);
+
+        $this->forceFill([
+            'profile_photo_path' => null,
+        ])->save();
+    }
+
+    public function getTotalBalanceAttribute()
+    {
+        return Invoice::where('patient_id',$this->id)->sum();
+}
+    public function isDemoPatient()
+    {
+        return $this->email === 'patient@localhost.com';
+    }
+}
