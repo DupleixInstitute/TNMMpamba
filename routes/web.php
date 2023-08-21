@@ -96,6 +96,7 @@ Route::prefix('loan_product')->name('loan_products.')->group(function () {
     Route::get('/{product}/edit', [LoanProductsController::class, 'edit'])->name('edit');
     Route::put('/{product}/update', [LoanProductsController::class, 'update'])->name('update');
     Route::delete('/{product}/destroy', [LoanProductsController::class, 'destroy'])->name('destroy');
+    Route::post('/{product}/sync_attributes', [LoanProductsController::class, 'syncAttributes'])->name('sync_attributes');
 //comments
     Route::post('/{article}/comment/store', [LoanProductsController::class, 'storeComment'])->name('comments.store');
     Route::delete('/comment/{comment}/destroy', [LoanProductsController::class, 'destroyComment'])->name('comments.destroy');

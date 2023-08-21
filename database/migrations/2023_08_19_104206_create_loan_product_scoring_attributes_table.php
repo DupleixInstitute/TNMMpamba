@@ -18,12 +18,12 @@ return new class extends Migration
             $table->unsignedBigInteger('scoring_attribute_group_id')->nullable();
             $table->unsignedBigInteger('scoring_attribute_id')->nullable();
             $table->integer('order_position')->nullable()->default(0);
-            $table->decimal('weight')->default(0.0);
-            $table->decimal('effective_weight')->default(0.0);
-            $table->decimal('score')->default(0.0);
-            $table->decimal('weighted_score')->default(0.0);
-            $table->decimal('min_score')->default(0.0);
-            $table->decimal('max_score')->default(0.0);
+            $table->decimal('weight')->default(0.0)->nullable();
+            $table->decimal('effective_weight')->default(0.0)->nullable();
+            $table->decimal('score')->default(0.0)->nullable();
+            $table->decimal('weighted_score')->default(0.0)->nullable();
+            $table->decimal('min_score')->default(0.0)->nullable();
+            $table->decimal('max_score')->default(0.0)->nullable();
             $table->string('name')->nullable();
             $table->string('reject_value')->nullable();
             $table->string('accept_value')->nullable();

@@ -178,6 +178,7 @@
 
                     <div class="mt-4">
                         <jet-button class="w-full justify-center" :class="{ 'opacity-25': form.processing }"
+                                    @click="submit"
                                     :disabled="form.processing||!readyToSave">
                             Save
                         </jet-button>
@@ -216,8 +217,7 @@
         </jet-dialog-modal>
         <jet-dialog-modal :show="showAddAttributeModal" @close="showAddAttributeModal = false">
             <template #title>
-                <span v-if="item.id">Edit Attribute</span>
-                <span v-else>Add Attribute</span>
+                <span>Add Attribute</span>
             </template>
             <template #content>
                 <div class="grid grid-cols-1 gap-2 ">
@@ -258,27 +258,6 @@
                 </jet-secondary-button>
 
                 <jet-danger-button class="ml-2" @click.native="destroy" :class="{ 'opacity-25': processing }"
-                                   :disabled="processing">
-                    Delete Record
-                </jet-danger-button>
-            </template>
-        </jet-confirmation-modal>
-        <jet-confirmation-modal :show="confirmItemDeletion" @close="confirmItemDeletion = false">
-            <template #title>
-                Delete Record
-            </template>
-
-            <template #content>
-                Are you sure you want to delete record?
-            </template>
-
-            <template #footer>
-                <jet-secondary-button @click.native="confirmItemDeletion = false">
-                    Nevermind
-                </jet-secondary-button>
-
-                <jet-danger-button class="ml-2" @click.native="destroyItem"
-                                   :class="{ 'opacity-25': processing }"
                                    :disabled="processing">
                     Delete Record
                 </jet-danger-button>
@@ -345,22 +324,8 @@ export default {
             group_id: '',
             attribute_id: '',
             form: this.$inertia.form({
-                attributes: this.product.score_attributes,
+                attributes: JSON.parse(JSON.stringify(this.product.score_attributes)),
             }),
-            item: {
-                id: '',
-                loan_product_group_id: this.product.id,
-                name: '',
-                field_type: '',
-                description: '',
-                condition: '',
-                options: [],
-                default_values: '',
-                rules: '',
-                class: '',
-                required: true,
-                active: true,
-            },
             readyToSave: false,
             confirmingDeletion: false,
             selectedGroup: null,
@@ -443,7 +408,7 @@ export default {
                         if (item.scoring_attribute_group_id == this.selectedGroup.scoring_attribute_group_id) {
                             item.attributes.push({
                                 id: '',
-                                scoring_attribute_group_id: '',
+                                scoring_attribute_group_id: item.scoring_attribute_group_id,
                                 attribute: attribute,
                                 name: attribute.name,
                                 scoring_attribute_id: attribute.id,
@@ -475,10 +440,11 @@ export default {
             let formGood = true
             this.groupPercentagesTotal = 0
             this.attributePercentagesTotal = 0
-            this.form.attributes.forEach(item => {
+            Object.keys(this.form.attributes).forEach(key => {
+                let item=this.form.attributes[key]
                 this.groupPercentagesTotal += parseFloat(item.weight || 0)
-                item.attributes.forEach(attr => {
-                    console.log(attr)
+                Object.keys(item.attributes).forEach(k => {
+                    let attr=item.attributes[k]
                     attr.score = parseFloat(item.score) * parseFloat(attr.weight) / 100
                     this.attributePercentagesTotal += parseFloat(attr.weight || 0)
                     if (attr.attribute.options && attr.attribute.options.length) {
@@ -509,6 +475,14 @@ export default {
                 this.errors.push('Attribute percentages not matching group percentages')
             }
             this.readyToSave = formGood
+        },
+        submit() {
+            this.form.post(this.route('loan_products.sync_attributes', this.product.id), {
+                preserveScroll: true,
+                onSuccess: () => {
+                    this.$inertia.reload()
+                },
+            })
         },
         deleteItem(type, parentIndex, index = '') {
             this.$swal({
@@ -545,47 +519,6 @@ export default {
             this.confirmingDeletion = false
             window.location = route('loan_products.index')
         },
-        editItem(id) {
-            this.editingItem = true
-            this.product.products.forEach(item => {
-                if (item.id == id) {
-                    this.item = item
-                    this.showItemModal = true
-                }
-            })
-        },
-        deleteItemAction(id) {
-            this.confirmItemDeletion = true
-            this.selectedRecord = id
-        },
-        destroyItem() {
-            this.$inertia.delete(this.route('loan_products.items.destroy', this.selectedRecord))
-            this.confirmItemDeletion = false
-        },
-        storeItem() {
-            this.processing = true
-            this.$inertia.post(this.route('loan_products.items.store', this.product.id), this.item, {
-                onSuccess: () => {
-                    this.$inertia.reload()
-                    this.showItemModal = false
-                    this.item = {
-                        id: '',
-                        loan_product_group_id: this.product.id,
-                        name: '',
-                        field_type: '',
-                        description: '',
-                        condition: '',
-                        options: [],
-                        default_values: '',
-                        rules: '',
-                        class: '',
-                        required: true,
-                        active: true,
-                    }
-                }
-            })
-            this.processing = false
-        },
 
     },
     computed: {
@@ -614,35 +547,7 @@ export default {
             return attributes
         }
     },
-    watch: {
-        'item.field_type': function (val) {
-            if (val === 'dropdown' || val === 'radio' || val === 'checkbox') {
-                if (!this.item.options.length) {
-                    this.item.options = []
-                }
-            } else {
-                this.item.options = ''
-            }
-        },
-        showItemModal: function (val) {
-            if (!val) {
-                this.item = {
-                    id: '',
-                    loan_product_group_id: this.product.id,
-                    name: '',
-                    field_type: '',
-                    description: '',
-                    condition: '',
-                    options: [],
-                    default_values: '',
-                    rules: '',
-                    class: '',
-                    required: true,
-                    active: true,
-                }
-            }
-        }
-    }
+    watch: {}
 }
 </script>
 <style scoped>

@@ -7,6 +7,7 @@ use App\Events\LoanProductStatusChanged;
 use App\Models\LoanProductCategory;
 use App\Models\LoanProduct;
 use App\Models\Comment;
+use App\Models\LoanProductScoringAttribute;
 use App\Models\LoanProductScoringAttributeOptionValue;
 use App\Models\ScoringAttributeGroup;
 use Illuminate\Http\Request;
@@ -20,7 +21,7 @@ class LoanProductsController extends Controller
         $this->middleware('auth');
         $this->middleware(['permission:loans.products.index'])->only(['index', 'show']);
         $this->middleware(['permission:loans.products.create'])->only(['create', 'store']);
-        $this->middleware(['permission:loans.products.update'])->only(['edit', 'update']);
+        $this->middleware(['permission:loans.products.update'])->only(['edit', 'update', 'syncAttributes']);
         $this->middleware(['permission:loans.products.destroy'])->only(['destroy']);
     }
 
@@ -96,15 +97,20 @@ class LoanProductsController extends Controller
                 }
 
                 if ($item->field_type === 'dropdown' || $item->field_type === 'radio' || $item->field_type === 'checkbox') {
-                    $options=json_decode($item->options);
-                    $optionsArray=[];
-                    foreach ($options as $option){
-                        $optionsArray[]=[
-                            'id'=>'',
-                            'name'=>$option,
-                            'weight'=>'',
-                            'score'=>'',
-                            'active'=>true,
+                    $options = json_decode($item->options);
+                    $optionsArray = [];
+                    foreach ($options as $option) {
+                        $optionsArray[] = [
+                            'id' => '',
+                            'loan_product_scoring_attribute_id' => '',
+                            'scoring_attribute_id' => $item->id,
+                            'name' => $option,
+                            'weight' => '',
+                            'score' => '',
+                            'effective_weight' => '',
+                            'weighted_score' => '',
+                            'description' => '',
+                            'active' => true,
                         ];
                     }
                     $item->options = $optionsArray;
@@ -115,34 +121,42 @@ class LoanProductsController extends Controller
             return $group;
         });
         $product->attributes->transform(function ($item) {
-            if ($item->field_type === 'dropdown' || $item->field_type === 'radio' || $item->field_type === 'checkbox') {
-                $options=json_decode($item->options);
-                $optionsArray=[];
-                foreach ($options as $option){
-                    if ($opt=LoanProductScoringAttributeOptionValue::where('loan_product_scoring_attribute_id',$item->id)->where('name',$option)->first()){
-                        $optionsArray[]=  $opt;
-                    }else{
-                        $optionsArray[]=[
-                            'id'=>'',
-                            'name'=>$option,
-                            'weight'=>'',
-                            'score'=>'',
-                            'active'=>true,
-                        ];
+            if(!empty($item->attribute)){
+                if ($item->attribute->field_type === 'dropdown' || $item->attribute->field_type === 'radio' || $item->attribute->field_type === 'checkbox') {
+                    $options = json_decode($item->attribute->options);
+                    $optionsArray = [];
+                    foreach ($options as $option) {
+                        if ($opt = LoanProductScoringAttributeOptionValue::where('loan_product_scoring_attribute_id', $item->id)->where('name', $option)->first()) {
+                            $optionsArray[] = $opt;
+                        } else {
+                            $optionsArray[] = [
+                                'id' => '',
+                                'loan_product_scoring_attribute_id' => '',
+                                'scoring_attribute_id' => $item->id,
+                                'name' => $option,
+                                'weight' => '',
+                                'score' => '',
+                                'effective_weight' => '',
+                                'weighted_score' => '',
+                                'description' => '',
+                                'active' => true,
+                            ];
+                        }
                     }
+                    $item->attribute->options = $optionsArray;
                 }
-                $item->options = $optionsArray;
             }
             return $item;
         });
         $product->score_attributes = $product->attributes->where('is_group', 1);
+
         $product->score_attributes->transform(function ($score) use ($product) {
-            $score->attributes = $product->attributes->where('scoring_attribute_group_id', $score->id);
+            $score->attributes = $product->attributes->where('scoring_attribute_group_id', $score->scoring_attribute_group_id)->where('is_group', 0)->toArray();
+
             return $score;
         });
-
         return Inertia::render('LoanProducts/Show', [
-            'product' => $product,
+            'product' => $product->toArray(),
             'groups' => $groups
         ]);
     }
@@ -204,6 +218,103 @@ class LoanProductsController extends Controller
             return $query->where('id', $id);
         })->get();
         return response()->json($data);
+    }
+
+    public function syncAttributes(Request $request, LoanProduct $product)
+    {
+        $attributes = $request->json('attributes');
+        $existingAttributes = [];
+        $existingOptions = [];
+        $allAttributes = LoanProductScoringAttribute::where('loan_product_id', $product->id)->get();
+        $allOptions = LoanProductScoringAttributeOptionValue::where('loan_product_id', $product->id)->get();
+        foreach ($attributes as $key) {
+            if (!empty($key['id'])) {
+                $existingAttributes[] = $key['id'];
+                $attribute = LoanProductScoringAttribute::find($key['id']);
+            } else {
+                $attribute = new LoanProductScoringAttribute();
+                $attribute->created_by_id = Auth::id();
+                $attribute->loan_product_id = $product->id;
+                $attribute->scoring_attribute_group_id = $key['scoring_attribute_group_id'];
+            }
+            $attribute->name = $key['name'];
+            $attribute->weight = $key['weight'] ?? 0.0;
+            $attribute->effective_weight = $key['effective_weight'] ?? 0.0;
+            $attribute->score = $key['score'] ?? 0.0;
+            $attribute->weighted_score = $key['weighted_score'] ?? 0.0;
+            $attribute->min_score = $key['min_score'] ?? 0.0;
+            $attribute->max_score = $key['max_score'] ?? 0.0;
+            $attribute->reject_value = $key['reject_value'];
+            $attribute->accept_value = $key['accept_value'];
+            $attribute->order_position = $key['order_position'];
+            $attribute->active = $key['active'] ? 1 : 0;
+            $attribute->is_group = $key['is_group'] ? 1 : 0;
+            $attribute->save();
+            foreach ($key['attributes'] as $item) {
+                if (!empty($item['id'])) {
+                    $existingAttributes[] = $item['id'];
+                    $attribute = LoanProductScoringAttribute::find($item['id']);
+                } else {
+                    $attribute = new LoanProductScoringAttribute();
+                    $attribute->created_by_id = Auth::id();
+                    $attribute->loan_product_id = $product->id;
+                    $attribute->scoring_attribute_id = $item['scoring_attribute_id'];
+                    $attribute->scoring_attribute_group_id = $item['scoring_attribute_group_id'];
+                }
+                $attribute->name = $item['name'];
+                $attribute->weight = $item['weight'] ?? 0.0;
+                $attribute->effective_weight = $item['effective_weight'] ?? 0.0;
+                $attribute->score = $item['score'] ?? 0.0;
+                $attribute->weighted_score = $item['weighted_score'] ?? 0.0;
+                $attribute->min_score = $item['min_score'] ?? 0.0;
+                $attribute->max_score = $item['max_score'] ?? 0.0;
+                $attribute->reject_value = $item['reject_value'];
+                $attribute->accept_value = $item['accept_value'];
+                $attribute->order_position = $item['order_position'];
+                $attribute->active = $item['active'] ? 1 : 0;
+                $attribute->is_group = $item['is_group'] ? 1 : 0;
+                $attribute->save();
+                //save options
+                if (($item['attribute']['field_type'] === 'dropdown' || $item['attribute']['field_type'] === 'radio' || $item['attribute']['field_type'] === 'checkbox') && !empty($item['attribute']['options'])) {
+                    foreach ($item['attribute']['options'] as $option) {
+                        if (!empty($option['id'])) {
+                            $attributeOption = LoanProductScoringAttributeOptionValue::find($option['id']);
+                            $existingOptions[] = $option['id'];
+                        } else {
+                            $attributeOption = new LoanProductScoringAttributeOptionValue();
+                            $attributeOption->loan_product_scoring_attribute_id = $attribute->id;
+                            $attributeOption->scoring_attribute_id = $option['scoring_attribute_id'];
+                            $attributeOption->loan_product_id = $product->id;
+                        }
+                        $attributeOption->weight = $option['weight'] ?? 0.0;
+                        $attributeOption->effective_weight = $option['effective_weight'] ?? 0.0;
+                        $attributeOption->score = $option['score'] ?? 0.0;
+                        $attributeOption->weighted_score = $option['weighted_score'] ?? 0.0;
+                        $attributeOption->name = $option['name'];
+                        $attributeOption->active = $option['active'] ? 1 : 0;
+                        $attributeOption->save();
+                    }
+                }
+            }
+        }
+        //delete attributes that have been removed
+        $allAttributes->each(function ($item) use ($existingAttributes) {
+            if (!in_array($item->id, $existingAttributes)) {
+                LoanProductScoringAttribute::where('id', $item->id)->delete();
+                if ($item->is_group) {
+                    LoanProductScoringAttribute::where('scoring_attribute_group_id', $item->id)->delete();
+                }
+            }
+        });
+        $allOptions->each(function ($item) use ($existingOptions) {
+            if (!in_array($item->id, $existingOptions)) {
+                LoanProductScoringAttributeOptionValue::where('id', $item->id)->delete();
+            }
+        });
+        activity()
+            ->performedOn($product)
+            ->log('Update Loan Product');
+        return redirect()->route('loan_products.show', $product->id)->with('success', 'Product attributes updated successfully.');
     }
 
     public function storeComment(Request $request, LoanProduct $product)
