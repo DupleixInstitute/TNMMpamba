@@ -19,6 +19,7 @@ return new class extends Migration {
             $table->decimal('weight')->default(0.0)->nullable();
             $table->decimal('effective_weight')->default(0.0)->nullable();
             $table->decimal('score')->default(0.0)->nullable();
+            $table->decimal('score_percentage')->default(0.0)->nullable();
             $table->decimal('weighted_score')->default(0.0)->nullable();
             $table->text('value')->nullable();
             $table->text('description')->nullable();
