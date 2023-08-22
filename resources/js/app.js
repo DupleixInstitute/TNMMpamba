@@ -20,7 +20,6 @@ import VueSweetalert2 from 'vue-sweetalert2';
 import {Head, Link} from '@inertiajs/inertia-vue3'
 // If you don't need the styles, do not connect
 import 'sweetalert2/dist/sweetalert2.min.css';
-import CKEditor from '@ckeditor/ckeditor5-vue';
 import Toaster from "@meforma/vue-toaster";
 
 import numeral from 'numeral';

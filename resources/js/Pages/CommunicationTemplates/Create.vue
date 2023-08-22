@@ -56,8 +56,11 @@
                         </div>
                         <div v-if="form.type==='email'">
                             <jet-label for="description" value="Description"/>
-                            <ckeditor :editor="editor" rows="20" v-model="form.description"
-                                       :config="{height:'600px'}"></ckeditor>
+                            <editor
+                                v-model="form.description"
+                                api-key="no-api-key"
+                                :init="editorConfig"
+                            />
                             <jet-input-error :message="form.errors.description" class="mt-2"/>
 
                         </div>
@@ -90,7 +93,7 @@ import JetLabel from "@/Jetstream/Label.vue";
 import Select from "@/Jetstream/Select.vue";
 import FileInput from "@/Jetstream/FileInput.vue";
 import TextareaInput from "@/Jetstream/TextareaInput.vue";
-import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
+import Editor from "@tinymce/tinymce-vue";
 
 
 export default {
@@ -105,7 +108,7 @@ export default {
         JetInputError,
         FileInput,
         TextareaInput,
-
+        Editor,
     },
     data() {
         return {
@@ -116,7 +119,7 @@ export default {
                 active: true,
                 description: null,
             }),
-            editor: ClassicEditor,
+
             pageTitle: "Create Template",
             pageDescription: "Create Template",
         }
