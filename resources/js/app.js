@@ -42,7 +42,7 @@ createInertiaApp({
         inertiaApp.component('InertiaHead', Head)
         inertiaApp.component('InertiaLink', Link)
         inertiaApp.use(VueSweetalert2);
-        inertiaApp.use(CKEditor);
+      
         inertiaApp.use(VueGridLayout);
         inertiaApp.use(Toaster);
         inertiaApp.mixin({
