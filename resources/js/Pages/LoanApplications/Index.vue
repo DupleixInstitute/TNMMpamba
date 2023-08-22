@@ -130,7 +130,7 @@
                                               tabindex="-1" class="text-indigo-600 hover:text-indigo-900" title="Edit">
                                     <font-awesome-icon icon="edit"/>
                                 </inertia-link>
-                                <a href="#" v-if="can('loan_applications.destroy')" @click="deleteAction(application.id)"
+                                <a href="#" v-if="can('loans.applications.destroy')" @click="deleteAction(application.id)"
                                    class="text-red-600 hover:text-red-900" title="Delete">
                                     <font-awesome-icon icon="trash"/>
                                 </a>
@@ -149,7 +149,7 @@
             </template>
 
             <template #content>
-                Are you sure you want to delete your account? Once record is deleted, all of its resources and
+                Are you sure you want to delete record? Once record is deleted, all of its resources and
                 data will be permanently deleted.
             </template>
 
@@ -160,7 +160,7 @@
 
                 <jet-danger-button class="ml-2" @click.native="destroy" :class="{ 'opacity-25': form.processing }"
                                    :disabled="form.processing">
-                    Delete Account
+                    Delete
                 </jet-danger-button>
             </template>
         </jet-confirmation-modal>

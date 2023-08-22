@@ -270,10 +270,13 @@ class ClientsController extends Controller
     public function loanApplication(Client $client)
     {
 
-        $applications = LoanApplication::with(['product'])
+        $applications = LoanApplication::with(['staff', 'client', 'product'])
+            ->filter(\request()->only('search', 'client_id', 'loan_product_id', 'province_id', 'branch_id', 'district_id', 'ward_id', 'date_range', 'village_id', 'staff_id', 'status'))
             ->where('client_id', $client->id)
             ->orderBy('created_at', 'desc')
             ->paginate(20);
+
+
         return Inertia::render('Clients/LoanApplications/Index', [
             'client' => $client,
             'applications' => $applications,

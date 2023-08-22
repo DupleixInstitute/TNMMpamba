@@ -13,11 +13,11 @@
                 <form @submit.prevent="submit" enctype="multipart/form-data">
                     <div class="grid grid-cols-1 md:grid-cols-1 gap-2 mt-4">
                         <div>
-                            Client:{{application.client.name}}
+                            <b>Client:</b>{{application.client.name}}
 
                         </div>
                         <div>
-                            Product:{{application.product.name}}
+                            <b>Product:</b>{{application.product.name}}
 
                         </div>
                     </div>
@@ -41,6 +41,68 @@
                             </flat-pickr>
                             <jet-input-error :message="form.errors.date" class="mt-2"/>
 
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <div v-for="(group,parentIndex) in form.attributes" class="mb-4">
+                            <h4 class="font-bold">{{ group.name }}</h4>
+                            <div class="grid grid-cols-1 gap-4">
+                                <div v-for="(field,index) in group.attributes">
+                                    <div
+                                        v-if="field.attribute.field_type==='text'||field.attribute.field_type==='number'">
+                                        <jet-label :for="'field_'+parentIndex+'_'+index" :value="field.name"/>
+                                        <jet-input :id="'field_'+parentIndex+'_'+index"
+                                                   :type="field.attribute.field_type"
+                                                   class=" block w-full" :required="field.attribute.required"
+                                                   v-model="field.value"/>
+                                    </div>
+                                    <div v-if="field.attribute.field_type==='textarea'">
+                                        <jet-label :for="'field_'+parentIndex+'_'+index" :value="field.name"/>
+                                        <textarea-input :id="'field_'+parentIndex+'_'+index" class=" block w-full"
+                                                        v-if="field.attribute.field_type==='textarea'"
+                                                        v-model="field.value" :required="field.attribute.required"/>
+                                    </div>
+                                    <div v-if="field.attribute.field_type==='dropdown'">
+                                        <jet-label :for="'field_'+parentIndex+'_'+index" :value="field.name"/>
+                                        <select
+                                            class="border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 rounded-md shadow-sm w-full"
+                                            v-model="field.value" :id="'field_'+parentIndex+'_'+index"
+                                            v-if="field.attribute.field_type==='dropdown'"
+                                            :required="field.attribute.required">
+                                            <option v-for="option in field.attribute.options" :value="option.name">
+                                                {{ option.name }}
+                                            </option>
+                                        </select>
+                                    </div>
+                                    <div v-if="field.attribute.field_type==='date'">
+                                        <jet-label :for="'field_'+parentIndex+'_'+index" :value="field.name"/>
+                                        <textarea-input :id="'field_'+parentIndex+'_'+index" class=" block w-full"
+                                                        v-if="field.attribute.field_type==='textarea'"
+                                                        v-model="field.value"/>
+                                        <flat-pickr
+                                            v-model="field.value"
+                                            class="form-control w-full"
+                                            placeholder="Select date"
+                                            :required="field.attribute.required"
+                                            :id="'field_'+parentIndex+'_'+index">
+                                        </flat-pickr>
+                                    </div>
+                                    <div v-if="field.attribute.field_type==='radio'">
+                                        <jet-label :for="'field_'+parentIndex+'_'+index" :value="field.name"/>
+                                        <div v-for="option in field.attribute.options" class="flex items-center mb-4">
+                                            <input v-model="field.value" :id="'field_'+parentIndex+'_'+index+'_'+option" type="radio" :value="option" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                                            <label :for="'field_'+parentIndex+'_'+index+'_'+option"  class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">{{ option }}</label>
+                                        </div>
+                                    </div>
+                                    <div v-if="field.attribute.field_type==='checkbox'">
+                                        <jet-label :for="'field_'+parentIndex+'_'+index" :value="field.name"/>
+                                        <div v-for="option in field.attribute.options" class="flex items-center mb-4">
+                                            <input v-model="field.value" :id="'field_'+parentIndex+'_'+index+'_'+option" type="checkbox" :value="option" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                                            <label :for="'field_'+parentIndex+'_'+index+'_'+option"  class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">{{ option }}</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="mt-4">
@@ -130,6 +192,7 @@ export default {
                 description: this.application.description,
                 date: this.application.date,
                 status: this.application.status,
+                attributes:JSON.parse(JSON.stringify(this.application.product.scoring_attributes))
             }),
             usersMultiSelect: {
                 value: null,

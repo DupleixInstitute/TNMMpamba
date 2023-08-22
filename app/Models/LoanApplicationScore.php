@@ -14,9 +14,9 @@ class LoanApplicationScore extends Model
     ];
 
 
-    public function member()
+    public function application()
     {
-        return $this->belongsTo(Client::class);
+        return $this->belongsTo(LoanApplication::class);
     }
     public function category()
     {

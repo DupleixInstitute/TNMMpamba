@@ -26,6 +26,10 @@ class LoanApplication extends Model
     {
         return $this->belongsTo(User::class);
     }
+    public function scores()
+    {
+        return $this->hasMany(LoanApplicationScore::class,'loan_application_id');
+    }
     public function scopeFilter($query, array $filters)
     {
         $query->when($filters['search'] ?? null, function ($query, $search) {

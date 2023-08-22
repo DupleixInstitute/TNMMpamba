@@ -20,8 +20,8 @@
                 <div class="w-full md:w-9/12 p-4 md:ml-4 bg-white sm:mt-4">
                     <div class="flex justify-between ">
                         <h2 class="font-semibold text-xl text-gray-800 leading-tight">Loans</h2>
-                        <inertia-link class="btn btn-blue" v-if="can('loans.create')"
-                                      :href="route('loans.create',{client_id:client.id})">
+                        <inertia-link class="btn btn-blue" v-if="can('loans.applications.create')"
+                                      :href="route('loan_applications.create',{client_id:client.id})">
                             <span>Create </span>
                             <span class="hidden md:inline">Loan</span>
                         </inertia-link>
@@ -31,60 +31,66 @@
                             <thead class="bg-gray-50">
                             <tr class="text-left font-bold">
                                 <th class="px-6 pt-4 pb-4 font-medium text-gray-500">ID</th>
-                                <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Category</th>
+                                <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Product</th>
                                 <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Amount</th>
+                                <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Score</th>
                                 <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Status</th>
                                 <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Date</th>
                                 <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Action</th>
                             </tr>
                             </thead>
                             <tbody>
-                            <tr v-if="!loans.data.length">
-                                <td colspan="6" class="px-6 py-4 text-center">
-                                    No Loans yet
+                            <tr v-if="!applications.data.length">
+                                <td colspan="7" class="px-6 py-4 text-center">
+                                    No applications yet
                                 </td>
                             </tr>
-                            <tr v-for="loan in loans.data" :key="loan.id"
+                            <tr v-for="application in applications.data" :key="application.id"
                                 class="hover:bg-gray-100 focus-within:bg-gray-100">
                                 <td class="border-t">
-                                    <inertia-link class="px-6 py-4 flex items-center" :href="route('loans.show', loan.id)"
+                                    <inertia-link class="px-6 py-4 flex items-center" :href="route('loan_applications.show', application.id)"
                                                   tabindex="-1">
-                                        {{ loan.id }}
+                                        {{ application.id }}
                                     </inertia-link>
                                 </td>
                                 <td class="border-t">
-                            <span class="px-6 py-4 flex items-center" v-if="loan.category">
-                                {{loan.category.name}}
+                            <span class="px-6 py-4 flex items-center" v-if="application.product">
+                                {{application.product.name}}
                             </span>
                                 </td>
                                 <td class="border-t">
                             <span class="px-6 py-4 flex items-center">
-                                 {{ $filters.formatNumber(loan.amount) }}
+                                 {{ $filters.formatNumber(application.amount) }}
+                            </span>
+                                </td>
+                                <td class="border-t">
+                            <span class="px-6 py-4 flex items-center">
+                                 {{ $filters.formatNumber(application.score) }} ({{$filters.formatNumber(application.score_percentage)}}%)
                             </span>
                                 </td>
                                 <td class="border-t">
                                  <span class="px-6 py-4 flex items-center">
-                                    <span v-if="loan.status=='received'"
+                                    <span v-if="application.status=='pending'"
                                           class="px-2 rounded-full bg-yellow-100 text-yellow-800">
-                                        received
+                                        pending
                                     </span>
-                                    <span v-if="loan.status=='in_progress'"
+                                    <span v-if="application.status=='in_progress'"
                                           class="px-2 rounded-full bg-blue-100 text-blue-800">
                                         in progress
                                     </span>
-                                     <span v-if="loan.status=='approved'"
+                                     <span v-if="application.status=='approved'"
                                            class="px-2 rounded-full bg-green-100 text-green-800">
                                         approved
                                     </span>
-                                    <span v-if="loan.status=='done'"
+                                    <span v-if="application.status=='done'"
                                           class="px-2 rounded-full bg-green-100 text-green-800">
                                         done
                                     </span>
-                                    <span v-if="loan.status=='cancelled'"
+                                    <span v-if="application.status=='cancelled'"
                                           class="px-2 rounded-full bg-red-100 text-red-800">
                                         cancelled
                                     </span>
-                                     <span v-if="loan.status=='rejected'"
+                                     <span v-if="application.status=='rejected'"
                                            class="px-2 rounded-full bg-red-100 text-red-800">
                                         rejected
                                     </span>
@@ -92,22 +98,22 @@
                                 </td>
                                 <td class="border-t">
                             <span class="px-6 py-4 flex items-center">
-                                 {{ loan.date }}
+                                 {{ application.date }}
                             </span>
                                 </td>
 
                                 <td class="border-t w-px pr-2">
                                     <div class=" flex items-center gap-4">
-                                        <inertia-link :href="route('loans.show', loan.id)"
+                                        <inertia-link :href="route('loan_applications.show', application.id)"
                                                       tabindex="-1" class="text-green-600 hover:text-green-900" title="View">
                                             <font-awesome-icon icon="search"/>
                                         </inertia-link>
-                                        <inertia-link v-if="can('loans.update')"
-                                                      :href="route('loans.edit', loan.id)"
+                                        <inertia-link v-if="can('loans.applications.update')"
+                                                      :href="route('loan_applications.edit', application.id)"
                                                       tabindex="-1" class="text-indigo-600 hover:text-indigo-900" title="Edit">
                                             <font-awesome-icon icon="edit"/>
                                         </inertia-link>
-                                        <a href="#" v-if="can('loans.destroy')" @click="deleteAction(loan.id)"
+                                        <a href="#" v-if="can('loans.applications.destroy')" @click="deleteAction(application.id)"
                                            class="text-red-600 hover:text-red-900" title="Delete">
                                             <font-awesome-icon icon="trash"/>
                                         </a>
@@ -117,7 +123,7 @@
                             </tbody>
                         </table>
                     </div>
-                    <pagination v-if="loans.data.length" :links="loans.links"/>
+                    <pagination v-if="applications.data.length" :links="applications.links"/>
                 </div>
             </div>
         </div>
@@ -180,7 +186,7 @@ export default {
     },
     props: {
         client: Object,
-        loans: Object,
+        applications: Object,
 
     },
     data() {
@@ -190,8 +196,8 @@ export default {
             },
             confirmingDeletion: false,
             selectedRecord: null,
-            pageTitle: "Client Consultations",
-            pageDescription: "Manage Clients",
+            pageTitle: "Loan Applications",
+            pageDescription: "Loan Applications",
 
         }
     },
@@ -202,7 +208,7 @@ export default {
         },
         destroy() {
 
-            this.$inertia.delete(this.route('loans.destroy', this.selectedRecord))
+            this.$inertia.delete(this.route('loan_applications.destroy', this.selectedRecord))
             this.confirmingDeletion = false
         },
     },

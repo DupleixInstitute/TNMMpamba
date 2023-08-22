@@ -11,6 +11,7 @@ use App\Models\CommunicationTemplate;
 use App\Models\CourseCategory;
 use App\Models\CourseMaterial;
 use App\Models\District;
+use App\Models\LoanProduct;
 use App\Models\LoanProductCategory;
 use App\Models\Province;
 use App\Models\SmsGateway;
@@ -80,13 +81,7 @@ class CommunicationCampaignController extends Controller
                     'label' => $item->name
                 ];
             }),
-            'loanCategories' => LoanProductCategory::get()->map(function ($item) {
-                return [
-                    'value' => $item->id,
-                    'label' => $item->name
-                ];
-            }),
-            'courseCategories' => CourseCategory::get()->map(function ($item) {
+            'products' => LoanProduct::get()->map(function ($item) {
                 return [
                     'value' => $item->id,
                     'label' => $item->name
@@ -120,7 +115,7 @@ class CommunicationCampaignController extends Controller
                 ];
             }),
             'templates' => CommunicationTemplate::where('is_system', 0)->get(),
-            'member_id' => \request('member_id'),
+            'client_id' => \request('client_id'),
             'campaign_type' => \request('campaign_type'),
             'user_id' => \request('user_id'),
             'course_id' => \request('course_id'),
@@ -139,7 +134,7 @@ class CommunicationCampaignController extends Controller
             'sms_gateway_id' => ['required_if:campaign_type,sms'],
             'scheduled_date' => ['required_if:trigger_type,schedule'],
             'scheduled_time' => ['required_if:trigger_type,schedule'],
-            'member_id' => ['required_if:communication_campaign_business_rule_id,9'],
+            'client_id' => ['required_if:communication_campaign_business_rule_id,9'],
             'user_id' => ['required_if:communication_campaign_business_rule_id,10'],
             'description' => ['required'],
             'status' => ['required_if:trigger_type,schedule,triggered'],
@@ -152,11 +147,8 @@ class CommunicationCampaignController extends Controller
         $communicationCampaign->communication_campaign_business_rule_id = $request->communication_campaign_business_rule_id;
         $communicationCampaign->communication_campaign_attachment_type_id = $request->communication_campaign_attachment_type_id;
         $communicationCampaign->branch_id = $request->branch_id;
-        $communicationCampaign->tutor_id = $request->tutor_id;
-        $communicationCampaign->member_id = $request->member_id;
-        $communicationCampaign->loan_category_id = $request->loan_category_id;
-        $communicationCampaign->course_category_id = $request->course_category_id;
-        $communicationCampaign->course_id = $request->course_id;
+        $communicationCampaign->client_id = $request->client_id;
+        $communicationCampaign->loan_product_id = $request->loan_product_id;
         $communicationCampaign->province_id = $request->province_id;
         $communicationCampaign->district_id = $request->district_id;
         $communicationCampaign->ward_id = $request->ward_id;
@@ -227,13 +219,7 @@ class CommunicationCampaignController extends Controller
                     'label' => $item->name
                 ];
             }),
-            'loanCategories' => LoanProductCategory::get()->map(function ($item) {
-                return [
-                    'value' => $item->id,
-                    'label' => $item->name
-                ];
-            }),
-            'courseCategories' => CourseCategory::get()->map(function ($item) {
+            'products' => LoanProduct::get()->map(function ($item) {
                 return [
                     'value' => $item->id,
                     'label' => $item->name
@@ -283,7 +269,7 @@ class CommunicationCampaignController extends Controller
             'sms_gateway_id' => ['required_if:campaign_type,sms'],
             'scheduled_date' => ['required_if:trigger_type,schedule'],
             'scheduled_time' => ['required_if:trigger_type,schedule'],
-            'member_id' => ['required_if:communication_campaign_business_rule_id,9'],
+            'client_id' => ['required_if:communication_campaign_business_rule_id,9'],
             'user_id' => ['required_if:communication_campaign_business_rule_id,10'],
             'description' => ['required'],
             'status' => ['required_if:trigger_type,schedule,triggered'],
@@ -294,11 +280,8 @@ class CommunicationCampaignController extends Controller
         $communicationCampaign->communication_campaign_business_rule_id = $request->communication_campaign_business_rule_id;
         $communicationCampaign->communication_campaign_attachment_type_id = $request->communication_campaign_attachment_type_id;
         $communicationCampaign->branch_id = $request->branch_id;
-        $communicationCampaign->tutor_id = $request->tutor_id;
-        $communicationCampaign->member_id = $request->member_id;
-        $communicationCampaign->loan_category_id = $request->loan_category_id;
-        $communicationCampaign->course_category_id = $request->course_category_id;
-        $communicationCampaign->course_id = $request->course_id;
+        $communicationCampaign->client_id = $request->client_id;
+        $communicationCampaign->loan_product_id = $request->loan_product_id;
         $communicationCampaign->province_id = $request->province_id;
         $communicationCampaign->district_id = $request->district_id;
         $communicationCampaign->ward_id = $request->ward_id;

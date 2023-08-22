@@ -76,7 +76,6 @@
                                         <select
                                             class="border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 rounded-md shadow-sm w-full"
                                             v-model="field.value" :id="'field_'+parentIndex+'_'+index"
-                                            v-if="field.attribute.field_type==='dropdown'"
                                             :required="field.attribute.required">
                                             <option v-for="option in field.attribute.options" :value="option.name">
                                                 {{ option.name }}

@@ -20,12 +20,9 @@ class CreateCommunicationCampaignsTable extends Migration
             $table->bigInteger('communication_campaign_business_rule_id')->unsigned()->nullable();
             $table->bigInteger('communication_campaign_attachment_type_id')->unsigned()->nullable();
             $table->bigInteger('branch_id')->unsigned()->nullable();
-            $table->bigInteger('tutor_id')->unsigned()->nullable();
             $table->bigInteger('user_id')->unsigned()->nullable();
-            $table->bigInteger('member_id')->unsigned()->nullable();
-            $table->bigInteger('loan_category_id')->unsigned()->nullable();
-            $table->bigInteger('course_category_id')->unsigned()->nullable();
-            $table->bigInteger('course_id')->unsigned()->nullable();
+            $table->bigInteger('client_id')->unsigned()->nullable();
+            $table->bigInteger('loan_product_id')->unsigned()->nullable();
             $table->bigInteger('province_id')->unsigned()->nullable();
             $table->bigInteger('district_id')->unsigned()->nullable();
             $table->bigInteger('ward_id')->unsigned()->nullable();

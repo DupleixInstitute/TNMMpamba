@@ -161,7 +161,7 @@ class LoanApplicationsController extends Controller
                 if ($field['attribute']['field_type'] === 'dropdown' || $field['attribute']['field_type'] === 'radio' || $field['attribute']['field_type'] === 'checkbox') {
                     foreach ($field['attribute']['options'] as $key) {
                         if ($key['name'] == $field['value']) {
-                            $score->value = $key['weight'];
+                            $score->score = $key['weight'];
                         }
                     }
                 } else {
@@ -305,15 +305,47 @@ class LoanApplicationsController extends Controller
             'amount' => ['required'],
             'date' => ['required'],
         ]);
+        $attributes = $request->json('attributes');
+        $client = $application->client_id;
+        $product = $application->product;
         $application->staff_id = $request->staff_id;
         $application->date = $request->date;
         $application->amount = $request->amount;
         $application->description = $request->description;
         $application->save();
+        //save scores
+        LoanApplicationScore::where('loan_application_id', $application->id)->delete();
+        foreach ($attributes as $group) {
+            foreach ($group['attributes'] as $field) {
+                $score = new LoanApplicationScore();
+                $score->created_by_id = Auth::id();
+                $score->loan_application_id = $application->id;
+                $score->scoring_attribute_id = $field['scoring_attribute_id'];
+                $score->loan_product_scoring_attribute_id = $field['id'];
+                $score->weight = $field['weight'];
+                $score->effective_weight = $field['effective_weight'];
+                $score->weighted_score = $field['weighted_score'];
+                $score->value = $field['value'];
+                //determine the score
+                if ($field['attribute']['field_type'] === 'dropdown' || $field['attribute']['field_type'] === 'radio' || $field['attribute']['field_type'] === 'checkbox') {
+                    foreach ($field['attribute']['options'] as $key) {
+                        if ($key['name'] == $field['value']) {
+                            $score->score = $key['weight'];
+                        }
+                    }
+                } else {
+                    $score->score = $field['score'];
+                }
+                $score->save();
+            }
+        }
+        $application->score = LoanApplicationScore::where('loan_application_id', $application->id)->sum('score');
+        $application->score_percentage = $application->score * 100 / $product->score;
+        $application->save();
         activity()
             ->performedOn($application)
             ->log('Update Loan Application');
-        return redirect()->route('loan_applications.show', $application->id)->with('success', 'Loan updated successfully.');
+        return redirect()->route('loan_applications.show', $application->id)->with('success', 'Loan application updated successfully.');
     }
 
     public function changeStatus(Request $request, LoanApplication $application)
@@ -347,6 +379,7 @@ class LoanApplicationsController extends Controller
      */
     public function destroy(LoanApplication $application)
     {
+        $application->scores->each->delete();
         $application->delete();
         activity()
             ->performedOn($application)
