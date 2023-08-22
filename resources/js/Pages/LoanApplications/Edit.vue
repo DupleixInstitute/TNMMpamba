@@ -2,7 +2,8 @@
     <app-layout>
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                <inertia-link class="text-indigo-400 hover:text-indigo-600" :href="route('loans.index')">Loans
+                <inertia-link class="text-indigo-400 hover:text-indigo-600" :href="route('loan_applications.index')">
+                    Loan Applications
                 </inertia-link>
                 <span class="text-indigo-400 font-medium">/</span> Edit
             </h2>
@@ -10,32 +11,15 @@
         <div class=" mx-auto">
             <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg p-4">
                 <form @submit.prevent="submit" enctype="multipart/form-data">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mt-4">
+                    <div class="grid grid-cols-1 md:grid-cols-1 gap-2 mt-4">
                         <div>
-                            <jet-label for="member_id" value="Member"/>
-                            <Multiselect
-                                v-model="form.member_id"
-                                v-bind="membersMultiSelect"
-                                :required="true"
-                                :disabled="true"
-                            />
+                            Client:{{application.client.name}}
+
                         </div>
                         <div>
-                            <jet-label for="staff_id" value="Staff"/>
-                            <Multiselect
-                                v-model="form.staff_id"
-                                v-bind="usersMultiSelect"
-                            />
+                            Product:{{application.product.name}}
+
                         </div>
-                    </div>
-                    <div class="mt-4">
-                        <jet-label for="loan_category_id" value="Category"/>
-                        <Multiselect
-                            id="loan_category_id"
-                            v-model="form.loan_category_id"
-                            :options="categories"
-                        />
-                        <jet-input-error :message="form.errors.loan_category_id" class="mt-2"/>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mt-4">
                         <div>
@@ -93,10 +77,10 @@ import JetLabel from "@/Jetstream/Label.vue";
 import Select from "@/Jetstream/Select.vue";
 import FileInput from "@/Jetstream/FileInput.vue";
 import TextareaInput from "@/Jetstream/TextareaInput.vue";
-const fetchMembers = async (query) => {
+const fetchClients = async (query) => {
     let where = ''
     const response = await fetch(
-        route('members.search') + '?s=' + query,
+        route('clients.search') + '?s=' + query,
         {}
     );
 
@@ -121,7 +105,7 @@ const fetchUsers = async (query) => {
 export default {
     props: {
         categories: Object,
-        loan: Object,
+        application: Object,
     },
     components: {
         Select,
@@ -139,13 +123,13 @@ export default {
         return {
             form: this.$inertia.form({
                 '_method': 'PUT',
-                member_id: this.loan.member_id,
-                staff_id: this.loan.staff_id,
-                loan_category_id: this.loan.loan_category_id,
-                amount: this.loan.amount,
-                description: this.loan.description,
-                date: this.loan.date,
-                status: this.loan.status,
+                client_id: this.application.client_id,
+                staff_id: this.application.staff_id,
+                loan_category_id: this.application.loan_category_id,
+                amount: this.application.amount,
+                description: this.application.description,
+                date: this.application.date,
+                status: this.application.status,
             }),
             usersMultiSelect: {
                 value: null,
@@ -153,35 +137,21 @@ export default {
                 placeholder: 'Search for Employee',
                 filterResults: false,
                 minChars: 2,
-                resolveOnLoad: true,
+                resolveOnLoad: false,
                 delay: 4,
                 searchable: true,
                 options: async (query) => {
                     return await fetchUsers(query||this.loan.staff_id)
                 }
             },
-            membersMultiSelect: {
-                valueProp: 'id',
-                label: 'name',
-                selected_patient: null,
-                placeholder: 'Search for Member',
-                filterResults: false,
-                minChars: 2,
-                resolveOnLoad: true,
-                delay: 4,
-                searchable: true,
-                options: async (query) => {
-                    return await fetchMembers(query || this.loan.member_id)
-                }
-            },
-            pageTitle: "Edit Loan",
-            pageDescription: "Edit Loan",
+            pageTitle: "Edit Application",
+            pageDescription: "Edit Application",
         }
 
     },
     methods: {
         submit() {
-            this.form.post(this.route('loans.update', this.loan.id), {})
+            this.form.post(this.route('loan_applications.update', this.application.id), {})
         },
 
     },

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Events\LoanApplicationCreated;
+use App\Events\LoanApplicationStatusChanged;
 use App\Events\LoanCreated;
 use App\Events\LoanStatusChanged;
 use App\Models\LoanApplication;
@@ -188,6 +189,48 @@ class LoanApplicationsController extends Controller
     public function show(LoanApplication $application)
     {
         $application->load(['staff', 'client', 'product']);
+        $groups = LoanProductScoringAttribute::where('is_group', 1)->where('loan_product_id', $application->product->id)->get();
+        $groups->transform(function ($group) use ($application) {
+            $attributes = LoanProductScoringAttribute::with(['attribute'])->where('is_group', 0)->where('scoring_attribute_group_id', $group->scoring_attribute_group_id)->where('loan_product_id', $application->product->id)->orderBy('order_position')->get();
+            $attributes->transform(function ($item) use ($application) {
+                if (!empty($item->attribute)) {
+                    if ($item->attribute->field_type === 'dropdown' || $item->attribute->field_type === 'radio' || $item->attribute->field_type === 'checkbox') {
+                        $options = json_decode($item->attribute->options);
+                        $optionsArray = [];
+                        foreach ($options as $option) {
+                            if ($opt = LoanProductScoringAttributeOptionValue::where('loan_product_scoring_attribute_id', $item->id)->where('name', $option)->first()) {
+                                $optionsArray[] = $opt;
+                            } else {
+                                $optionsArray[] = [
+                                    'id' => '',
+                                    'loan_product_scoring_attribute_id' => '',
+                                    'scoring_attribute_id' => $item->id,
+                                    'name' => $option,
+                                    'weight' => '',
+                                    'score' => '',
+                                    'effective_weight' => '',
+                                    'weighted_score' => '',
+                                    'description' => '',
+                                    'active' => true,
+                                ];
+                            }
+                        }
+                        $item->attribute->options = $optionsArray;
+                    }
+                }
+                //get value
+                $score = LoanApplicationScore::where('loan_application_id', $application->id)->where('loan_product_scoring_attribute_id', $item->id)->first();
+                if (!empty($score)) {
+                    $item->value = $score->value;
+                } else {
+                    $item->value = '';
+                }
+                return $item;
+            });
+            $group->attributes = $attributes;
+            return $group;
+        });
+        $application->product->scoring_attributes = $groups;
         return Inertia::render('LoanApplications/Show', [
             'application' => $application,
         ]);
@@ -201,14 +244,51 @@ class LoanApplicationsController extends Controller
      */
     public function edit(LoanApplication $application)
     {
+        $application->load(['staff', 'client', 'product']);
+        $groups = LoanProductScoringAttribute::where('is_group', 1)->where('loan_product_id', $application->product->id)->get();
+        $groups->transform(function ($group) use ($application) {
+            $attributes = LoanProductScoringAttribute::with(['attribute'])->where('is_group', 0)->where('scoring_attribute_group_id', $group->scoring_attribute_group_id)->where('loan_product_id', $application->product->id)->orderBy('order_position')->get();
+            $attributes->transform(function ($item) use ($application) {
+                if (!empty($item->attribute)) {
+                    if ($item->attribute->field_type === 'dropdown' || $item->attribute->field_type === 'radio' || $item->attribute->field_type === 'checkbox') {
+                        $options = json_decode($item->attribute->options);
+                        $optionsArray = [];
+                        foreach ($options as $option) {
+                            if ($opt = LoanProductScoringAttributeOptionValue::where('loan_product_scoring_attribute_id', $item->id)->where('name', $option)->first()) {
+                                $optionsArray[] = $opt;
+                            } else {
+                                $optionsArray[] = [
+                                    'id' => '',
+                                    'loan_product_scoring_attribute_id' => '',
+                                    'scoring_attribute_id' => $item->id,
+                                    'name' => $option,
+                                    'weight' => '',
+                                    'score' => '',
+                                    'effective_weight' => '',
+                                    'weighted_score' => '',
+                                    'description' => '',
+                                    'active' => true,
+                                ];
+                            }
+                        }
+                        $item->attribute->options = $optionsArray;
+                    }
+                }
+                //get value
+                $score = LoanApplicationScore::where('loan_application_id', $application->id)->where('loan_product_scoring_attribute_id', $item->id)->first();
+                if (!empty($score)) {
+                    $item->value = $score->value;
+                } else {
+                    $item->value = '';
+                }
+                return $item;
+            });
+            $group->attributes = $attributes;
+            return $group;
+        });
+        $application->product->scoring_attributes = $groups;
         return Inertia::render('LoanApplications/Edit', [
             'application' => $application,
-            'categories' => LoanProductCategory::get()->map(function ($item) {
-                return [
-                    'value' => $item->id,
-                    'label' => $item->name
-                ];
-            }),
         ]);
     }
 
@@ -233,7 +313,7 @@ class LoanApplicationsController extends Controller
         activity()
             ->performedOn($application)
             ->log('Update Loan Application');
-        return redirect()->route('applications.show', $application->id)->with('success', 'Loan updated successfully.');
+        return redirect()->route('loan_applications.show', $application->id)->with('success', 'Loan updated successfully.');
     }
 
     public function changeStatus(Request $request, LoanApplication $application)
@@ -242,11 +322,11 @@ class LoanApplicationsController extends Controller
         $application->approved_by_id = Auth::id();
         if ($application->isDirty('status')) {
             if ($application->status == 'approved') {
-                $application->approved_date = $request->approved_date ?? date('Y-m-d');
+                $application->approved_at =Carbon::now();
                 $application->amount = $request->amount ?? $application->applied_amount;
             }
             if ($application->status == 'rejected') {
-                $application->approved_date = $request->approved_date ?? date('Y-m-d');
+                $application->approved_at = Carbon::now();
             }
         }
         $application->save();
@@ -254,9 +334,9 @@ class LoanApplicationsController extends Controller
             ->performedOn($application)
             ->log('Change Loan Application status');
         if ($application->wasChanged('status')) {
-            event(new LoanStatusChanged($application));
+            event(new LoanApplicationStatusChanged($application));
         }
-        return redirect()->route('applications.show', $application->id)->with('success', 'Loan updated successfully.');
+        return redirect()->route('loan_applications.show', $application->id)->with('success', 'Loan updated successfully.');
     }
 
     /**
@@ -271,6 +351,6 @@ class LoanApplicationsController extends Controller
         activity()
             ->performedOn($application)
             ->log('Delete Loan Application');
-        return redirect()->route('applications.index')->with('success', 'Loan deleted successfully.');
+        return redirect()->route('loan_applications.index')->with('success', 'Loan deleted successfully.');
     }
 }
