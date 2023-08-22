@@ -24,6 +24,7 @@ class DatabaseSeeder extends Seeder
             SettingsTableSeeder::class,
             BranchesTableSeeder::class,
             SmsGatewaysTableSeeder::class,
+            CommunicationCampaignBusinessRulesTableSeederTableSeeder::class,
         ]);
     }
 }
