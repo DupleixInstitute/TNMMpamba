@@ -952,7 +952,7 @@ $connect=mysqli_connect("localhost","admin","password",$db_name);
                   Generated Data</font></em></td>
               </tr>
  <tr>
-          <td><strong><font color="#000000">Omang/Passport</font></strong></td>
+          <td><strong><font color="#000000">ID/Passport</font></strong></td>
           <td></td><td>
 <input type="text" name="one" id ="one" onchange = "check_record_exist();"></td> </tr>
 <tr>
