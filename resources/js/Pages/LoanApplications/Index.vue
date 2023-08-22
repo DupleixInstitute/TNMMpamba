@@ -82,7 +82,7 @@
                         </td>
                         <td class="border-t">
                             <span class="px-6 py-4 flex items-center">
-                                 {{ $filters.formatNumber(application.score) }}
+                                 {{ $filters.formatNumber(application.score) }} ({{$filters.formatNumber(application.score_percentage)}}%)
                             </span>
                         </td>
                         <td class="border-t">

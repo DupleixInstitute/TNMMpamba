@@ -130,12 +130,8 @@ class LoanApplicationsController extends Controller
         ]);
 
         $attributes = $request->json('attributes');
-
         $client = Client::find($request->client_id);
-        dump($client);
-        dump($attributes);
-        dd($request);
-        $totalScore = 0;
+        $product = LoanProduct::find($request->loan_product_id);
         $application = new LoanApplication();
         $application->created_by_id = Auth::id();
         $application->loan_product_id = $request->loan_product_id;
@@ -156,12 +152,30 @@ class LoanApplicationsController extends Controller
                 $score->loan_application_id = $application->id;
                 $score->scoring_attribute_id = $field['scoring_attribute_id'];
                 $score->loan_product_scoring_attribute_id = $field['id'];
+                $score->weight = $field['weight'];
+                $score->effective_weight = $field['effective_weight'];
+                $score->weighted_score = $field['weighted_score'];
+                $score->value = $field['value'];
+                //determine the score
+                if ($field['attribute']['field_type'] === 'dropdown' || $field['attribute']['field_type'] === 'radio' || $field['attribute']['field_type'] === 'checkbox') {
+                    foreach ($field['attribute']['options'] as $key) {
+                        if ($key['name'] == $field['value']) {
+                            $score->value = $key['weight'];
+                        }
+                    }
+                } else {
+                    $score->score = $field['score'];
+                }
+                $score->save();
             }
         }
+        $application->score = LoanApplicationScore::where('loan_application_id', $application->id)->sum('score');
+        $application->score_percentage = $application->score * 100 / $product->score;
+        $application->save();
         event(new LoanApplicationCreated($application));
         activity()
             ->performedOn($application)
-            ->log('Create Loan');
+            ->log('Create Loan Application');
         return redirect()->route('loan_applications.show', $application->id)->with('success', 'Loan application created successfully.');
     }
 
@@ -211,12 +225,14 @@ class LoanApplicationsController extends Controller
             'amount' => ['required'],
             'date' => ['required'],
         ]);
-        $application->application_category_id = $request->application_category_id;
         $application->staff_id = $request->staff_id;
         $application->date = $request->date;
         $application->amount = $request->amount;
         $application->description = $request->description;
         $application->save();
+        activity()
+            ->performedOn($application)
+            ->log('Update Loan Application');
         return redirect()->route('applications.show', $application->id)->with('success', 'Loan updated successfully.');
     }
 
@@ -236,7 +252,7 @@ class LoanApplicationsController extends Controller
         $application->save();
         activity()
             ->performedOn($application)
-            ->log('Change Loan status');
+            ->log('Change Loan Application status');
         if ($application->wasChanged('status')) {
             event(new LoanStatusChanged($application));
         }
@@ -254,7 +270,7 @@ class LoanApplicationsController extends Controller
         $application->delete();
         activity()
             ->performedOn($application)
-            ->log('Delete Loan');
+            ->log('Delete Loan Application');
         return redirect()->route('applications.index')->with('success', 'Loan deleted successfully.');
     }
 }
