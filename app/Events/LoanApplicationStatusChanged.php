@@ -2,6 +2,7 @@
 
 namespace App\Events;
 
+use App\Models\LoanApplication;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -13,13 +14,14 @@ use Illuminate\Queue\SerializesModels;
 class LoanApplicationStatusChanged
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
+    public LoanApplication $application;
 
     /**
      * Create a new event instance.
      */
-    public function __construct()
+    public function __construct(LoanApplication $application)
     {
-        //
+        $this->application = $application;
     }
 
     /**

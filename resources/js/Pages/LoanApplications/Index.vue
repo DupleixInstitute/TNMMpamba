@@ -2,7 +2,7 @@
     <app-layout>
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                Loans
+                Loan Applications
             </h2>
         </template>
         <div class=" mx-auto  mb-4 flex justify-between items-center">
@@ -13,24 +13,24 @@
                         <select v-model="form.status"
                                 class="mt-1 w-full border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 rounded-md shadow-sm">
                             <option :value="null"/>
-                            <option value="received">Received</option>
+                            <option value="pending">Pending</option>
                             <option value="approved">Approved</option>
                             <option value="rejected">Rejected</option>
                         </select>
                     </div>
                     <div class="mb-2">
-                        <jet-label for="loan_category_id" value="Category"/>
+                        <jet-label for="loan_product_id" value="Product"/>
                         <Multiselect
-                            id="loan_category_id"
-                            v-model="form.loan_category_id"
-                            :options="categories"
+                            id="loan_product_id"
+                            v-model="form.loan_product_id"
+                            :options="products"
                         />
                     </div>
                 </div>
             </filter-search>
-            <inertia-link class="btn btn-blue" v-if="can('loans.create')" :href="route('loans.create')">
+            <inertia-link class="btn btn-blue" v-if="can('loans.applications.create')" :href="route('loan_applications.create')">
                 <span>Create </span>
-                <span class="hidden md:inline">Loan</span>
+                <span class="hidden md:inline">Application</span>
             </inertia-link>
         </div>
         <div class=" mx-auto">
@@ -39,69 +39,75 @@
                     <thead class="bg-gray-50">
                     <tr class="text-left font-bold">
                         <th class="px-6 pt-4 pb-4 font-medium text-gray-500">ID</th>
-                        <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Member</th>
-                        <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Category</th>
+                        <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Client</th>
+                        <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Product</th>
                         <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Amount</th>
+                        <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Score</th>
                         <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Status</th>
                         <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Date</th>
                         <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Action</th>
                     </tr>
                     </thead>
                     <tbody>
-                    <tr v-if="!loans.data.length">
+                    <tr v-if="!applications.data.length">
                         <td colspan="7" class="px-6 py-4 text-center">
-                            No Loans yet
+                            No applications yet
                         </td>
                     </tr>
-                    <tr v-for="loan in loans.data" :key="loan.id"
+                    <tr v-for="application in applications.data" :key="application.id"
                         class="hover:bg-gray-100 focus-within:bg-gray-100">
                         <td class="border-t">
-                            <inertia-link class="px-6 py-4 flex items-center" :href="route('loans.show', loan.id)"
+                            <inertia-link class="px-6 py-4 flex items-center" :href="route('loan_applications.show', application.id)"
                                           tabindex="-1">
-                                {{ loan.id }}
+                                {{ application.id }}
                             </inertia-link>
                         </td>
                         <td class="border-t">
                             <inertia-link class="px-6 py-4 flex items-center focus:text-indigo-500"
-                                          :href="route('members.show', loan.member_id)" v-if="loan.member">
-                                <img v-if="loan.member.profile_photo_url" class="block w-5 h-5 rounded-full mr-2 -my-2"
-                                     :src="loan.member.profile_photo_url">
-                                {{ loan.member.name }}
+                                          :href="route('clients.show', application.client_id)" v-if="application.client">
+                                <img v-if="application.client.profile_photo_url" class="block w-5 h-5 rounded-full mr-2 -my-2"
+                                     :src="application.client.profile_photo_url">
+                                {{ application.client.name }}
                             </inertia-link>
                         </td>
                         <td class="border-t">
-                            <span class="px-6 py-4 flex items-center" v-if="loan.category">
-                                {{loan.category.name}}
+                            <span class="px-6 py-4 flex items-center" v-if="application.product">
+                                {{application.product.name}}
                             </span>
                         </td>
                         <td class="border-t">
                             <span class="px-6 py-4 flex items-center">
-                                 {{ $filters.formatNumber(loan.amount) }}
+                                 {{ $filters.formatNumber(application.amount) }}
+                            </span>
+                        </td>
+                        <td class="border-t">
+                            <span class="px-6 py-4 flex items-center">
+                                 {{ $filters.formatNumber(application.score) }}
                             </span>
                         </td>
                         <td class="border-t">
                                  <span class="px-6 py-4 flex items-center">
-                                    <span v-if="loan.status=='received'"
+                                    <span v-if="application.status=='pending'"
                                           class="px-2 rounded-full bg-yellow-100 text-yellow-800">
-                                        received
+                                        pending
                                     </span>
-                                    <span v-if="loan.status=='in_progress'"
+                                    <span v-if="application.status=='in_progress'"
                                           class="px-2 rounded-full bg-blue-100 text-blue-800">
                                         in progress
                                     </span>
-                                     <span v-if="loan.status=='approved'"
+                                     <span v-if="application.status=='approved'"
                                            class="px-2 rounded-full bg-green-100 text-green-800">
                                         approved
                                     </span>
-                                    <span v-if="loan.status=='done'"
+                                    <span v-if="application.status=='done'"
                                           class="px-2 rounded-full bg-green-100 text-green-800">
                                         done
                                     </span>
-                                    <span v-if="loan.status=='cancelled'"
+                                    <span v-if="application.status=='cancelled'"
                                           class="px-2 rounded-full bg-red-100 text-red-800">
                                         cancelled
                                     </span>
-                                     <span v-if="loan.status=='rejected'"
+                                     <span v-if="application.status=='rejected'"
                                            class="px-2 rounded-full bg-red-100 text-red-800">
                                         rejected
                                     </span>
@@ -109,22 +115,22 @@
                         </td>
                         <td class="border-t">
                             <span class="px-6 py-4 flex items-center">
-                                 {{ loan.date }}
+                                 {{ application.date }}
                             </span>
                         </td>
 
                         <td class="border-t w-px pr-2">
                             <div class=" flex items-center gap-4">
-                                <inertia-link :href="route('loans.show', loan.id)"
+                                <inertia-link :href="route('loan_applications.show', application.id)"
                                               tabindex="-1" class="text-green-600 hover:text-green-900" title="View">
                                     <font-awesome-icon icon="search"/>
                                 </inertia-link>
-                                <inertia-link v-if="can('loans.update')"
-                                              :href="route('loans.edit', loan.id)"
+                                <inertia-link v-if="can('loans.applications.update')"
+                                              :href="route('loan_applications.edit', application.id)"
                                               tabindex="-1" class="text-indigo-600 hover:text-indigo-900" title="Edit">
                                     <font-awesome-icon icon="edit"/>
                                 </inertia-link>
-                                <a href="#" v-if="can('loans.destroy')" @click="deleteAction(loan.id)"
+                                <a href="#" v-if="can('loan_applications.destroy')" @click="deleteAction(application.id)"
                                    class="text-red-600 hover:text-red-900" title="Delete">
                                     <font-awesome-icon icon="trash"/>
                                 </a>
@@ -135,7 +141,7 @@
                 </table>
 
             </div>
-            <pagination :links="loans.links"/>
+            <pagination :links="applications.links"/>
         </div>
         <jet-confirmation-modal :show="confirmingLoanDeletion" @close="confirmingLoanDeletion = false">
             <template #title>
@@ -193,9 +199,9 @@ export default {
         JetSecondaryButton,
     },
     props: {
-        loans: Object,
+        applications: Object,
         filters: Object,
-        categories: Object,
+        products: Object,
 
     },
     data() {
@@ -207,15 +213,15 @@ export default {
                 district_id: this.filters.district_id,
                 ward_id: this.filters.ward_id,
                 village_id: this.filters.village_id,
-                loan_category_id: this.filters.loan_category_id,
-                member_id: this.filters.member_id,
+                loan_product_id: this.filters.loan_product_id,
+                client_id: this.filters.client_id,
                 status: this.filters.status,
                 processing: false
             },
             confirmingLoanDeletion: false,
             selectedRecord: null,
-            pageTitle: "Loans",
-            pageDescription: "Manage Loans",
+            pageTitle: "Loan Applications",
+            pageDescription: "Manage Loan Applications",
 
         }
     },
@@ -223,7 +229,7 @@ export default {
         form: {
             handler: _.debounce(function () {
                 let query = pickBy(this.form)
-                this.$inertia.get(this.route('loans.index', Object.keys(query).length ? query : {}))
+                this.$inertia.get(this.route('loan_applications.index', Object.keys(query).length ? query : {}))
             }, 500),
             deep: true,
         },
@@ -237,7 +243,7 @@ export default {
             this.selectedRecord = id
         },
         destroy() {
-            this.$inertia.delete(this.route('loans.destroy', this.selectedRecord))
+            this.$inertia.delete(this.route('loan_applications.destroy', this.selectedRecord))
             this.confirmingLoanDeletion = false
         },
     },

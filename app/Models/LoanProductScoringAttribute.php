@@ -16,6 +16,10 @@ class LoanProductScoringAttribute extends Model
     {
         return $this->belongsTo(ScoringAttribute::class, 'scoring_attribute_id', 'id');
     }
+    public function options()
+    {
+        return $this->hasMany(LoanProductScoringAttributeOptionValue::class, 'loan_product_scoring_attribute_id', 'id');
+    }
 
     public function loan()
     {

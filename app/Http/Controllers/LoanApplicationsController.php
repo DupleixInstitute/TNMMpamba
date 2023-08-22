@@ -2,15 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\LoanApplicationCreated;
 use App\Events\LoanCreated;
 use App\Events\LoanStatusChanged;
 use App\Models\LoanApplication;
 use App\Models\Currency;
 use App\Models\Invoice;
 use App\Models\InvoiceItem;
+use App\Models\LoanApplicationScore;
 use App\Models\LoanProduct;
 use App\Models\LoanProductCategory;
 use App\Models\Client;
+use App\Models\LoanProductScoringAttribute;
+use App\Models\LoanProductScoringAttributeOptionValue;
 use App\Models\Setting;
 use App\Models\Tariff;
 use Carbon\Carbon;
@@ -25,11 +29,11 @@ class LoanApplicationsController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
-        $this->middleware(['permission:applications.applications.index'])->only(['index', 'show']);
-        $this->middleware(['permission:applications.applications.create'])->only(['create', 'store']);
-        $this->middleware(['permission:applications.applications.update'])->only(['edit', 'update']);
-        $this->middleware(['permission:applications.applications.destroy'])->only(['destroy']);
-        $this->middleware(['permission:applications.applications.approve'])->only(['changeStatus']);
+        $this->middleware(['permission:loans.applications.index'])->only(['index', 'show']);
+        $this->middleware(['permission:loans.applications.create'])->only(['create', 'store']);
+        $this->middleware(['permission:loans.applications.update'])->only(['edit', 'update']);
+        $this->middleware(['permission:loans.applications.destroy'])->only(['destroy']);
+        $this->middleware(['permission:loans.applications.approve'])->only(['changeStatus']);
     }
 
     /**
@@ -42,7 +46,7 @@ class LoanApplicationsController extends Controller
         $staffID = null;
         $nurseID = null;
         $receptionistID = null;
-        $applications = LoanApplication::with(['staff', 'client', 'category'])
+        $applications = LoanApplication::with(['staff', 'client', 'product'])
             ->filter(\request()->only('search', 'client_id', 'loan_product_id', 'province_id', 'branch_id', 'district_id', 'ward_id', 'date_range', 'village_id', 'staff_id', 'status'))
             ->orderBy('created_at', 'desc')
             ->paginate(20);
@@ -67,13 +71,47 @@ class LoanApplicationsController extends Controller
      */
     public function create()
     {
+        $products = LoanProduct::with(['attributes', 'attributes.attribute', 'attributes.options'])->get();
+        $products->each(function (&$product) {
+            $groups = LoanProductScoringAttribute::where('is_group', 1)->where('loan_product_id', $product->id)->get();
+            $groups->transform(function ($group) use ($product) {
+                $attributes = LoanProductScoringAttribute::with(['attribute'])->where('is_group', 0)->where('scoring_attribute_group_id', $group->scoring_attribute_group_id)->where('loan_product_id', $product->id)->orderBy('order_position')->get();
+                $attributes->transform(function ($item) {
+                    if (!empty($item->attribute)) {
+                        if ($item->attribute->field_type === 'dropdown' || $item->attribute->field_type === 'radio' || $item->attribute->field_type === 'checkbox') {
+                            $options = json_decode($item->attribute->options);
+                            $optionsArray = [];
+                            foreach ($options as $option) {
+                                if ($opt = LoanProductScoringAttributeOptionValue::where('loan_product_scoring_attribute_id', $item->id)->where('name', $option)->first()) {
+                                    $optionsArray[] = $opt;
+                                } else {
+                                    $optionsArray[] = [
+                                        'id' => '',
+                                        'loan_product_scoring_attribute_id' => '',
+                                        'scoring_attribute_id' => $item->id,
+                                        'name' => $option,
+                                        'weight' => '',
+                                        'score' => '',
+                                        'effective_weight' => '',
+                                        'weighted_score' => '',
+                                        'description' => '',
+                                        'active' => true,
+                                    ];
+                                }
+                            }
+                            $item->attribute->options = $optionsArray;
+                        }
+                    }
+                    $item->value = '';
+                    return $item;
+                });
+                $group->attributes = $attributes;
+                return $group;
+            });
+            $product->scoring_attributes = $groups;
+        });
         return Inertia::render('LoanApplications/Create', [
-            'products' => LoanProductCategory::get()->map(function ($item) {
-                return [
-                    'value' => $item->id,
-                    'label' => $item->name
-                ];
-            }),
+            'products' => $products,
         ]);
     }
 
@@ -90,28 +128,41 @@ class LoanApplicationsController extends Controller
             'amount' => ['required'],
             'date' => ['required'],
         ]);
+
+        $attributes = $request->json('attributes');
+
         $client = Client::find($request->client_id);
+        dump($client);
+        dump($attributes);
+        dd($request);
+        $totalScore = 0;
         $application = new LoanApplication();
         $application->created_by_id = Auth::id();
-        $application->application_category_id = $request->application_category_id;
+        $application->loan_product_id = $request->loan_product_id;
         $application->currency_id = Setting::where('setting_key', 'currency')->first()->setting_value;
         $application->client_id = $client->id;
-        $application->province_id = $client->province_id;
         $application->branch_id = $client->branch_id;
-        $application->district_id = $client->district_id;
-        $application->ward_id = $client->ward_id;
-        $application->village_id = $client->village_id;
         $application->staff_id = $request->staff_id;
         $application->date = $request->date;
         $application->amount = $request->amount;
         $application->applied_amount = $request->amount;
         $application->description = $request->description;
         $application->save();
-        event(new LoanCreated($application));
+        //save scores
+        foreach ($attributes as $group) {
+            foreach ($group['attributes'] as $field) {
+                $score = new LoanApplicationScore();
+                $score->created_by_id = Auth::id();
+                $score->loan_application_id = $application->id;
+                $score->scoring_attribute_id = $field['scoring_attribute_id'];
+                $score->loan_product_scoring_attribute_id = $field['id'];
+            }
+        }
+        event(new LoanApplicationCreated($application));
         activity()
             ->performedOn($application)
             ->log('Create Loan');
-        return redirect()->route('applications.show', $application->id)->with('success', 'Loan created successfully.');
+        return redirect()->route('loan_applications.show', $application->id)->with('success', 'Loan application created successfully.');
     }
 
     /**
@@ -122,7 +173,7 @@ class LoanApplicationsController extends Controller
      */
     public function show(LoanApplication $application)
     {
-        $application->load(['client','client.province', 'client.branch','client.district','client.ward','client.village','category','staff']);
+        $application->load(['staff', 'client', 'product']);
         return Inertia::render('LoanApplications/Show', [
             'application' => $application,
         ]);
@@ -174,12 +225,12 @@ class LoanApplicationsController extends Controller
         $application->status = $request->status;
         $application->approved_by_id = Auth::id();
         if ($application->isDirty('status')) {
-            if($application->status=='approved'){
-                $application->approved_date=$request->approved_date??date('Y-m-d');
-                $application->amount=$request->amount??$application->applied_amount;
+            if ($application->status == 'approved') {
+                $application->approved_date = $request->approved_date ?? date('Y-m-d');
+                $application->amount = $request->amount ?? $application->applied_amount;
             }
-            if($application->status=='rejected'){
-                $application->approved_date=$request->approved_date??date('Y-m-d');
+            if ($application->status == 'rejected') {
+                $application->approved_date = $request->approved_date ?? date('Y-m-d');
             }
         }
         $application->save();

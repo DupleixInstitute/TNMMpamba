@@ -15,7 +15,7 @@ return new class extends Migration {
             $table->unsignedBigInteger('created_by_id')->nullable();
             $table->unsignedBigInteger('loan_application_id')->nullable();
             $table->unsignedBigInteger('scoring_attribute_id')->nullable();
-            $table->unsignedBigInteger('loan_product_scoring_attribute_option_value_id')->nullable();
+            $table->unsignedBigInteger('loan_product_scoring_attribute_id')->nullable();
             $table->decimal('weight')->default(0.0)->nullable();
             $table->decimal('effective_weight')->default(0.0)->nullable();
             $table->decimal('score')->default(0.0)->nullable();

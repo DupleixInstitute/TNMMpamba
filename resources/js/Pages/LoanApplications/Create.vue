@@ -2,7 +2,8 @@
     <app-layout>
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                <inertia-link class="text-indigo-400 hover:text-indigo-600" :href="route('loans.index')">Loans
+                <inertia-link class="text-indigo-400 hover:text-indigo-600" :href="route('loan_applications.index')">
+                    Loan Applications
                 </inertia-link>
                 <span class="text-indigo-400 font-medium">/</span> Create
             </h2>
@@ -10,31 +11,24 @@
         <div class=" mx-auto">
             <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg p-4">
                 <form @submit.prevent="submit" enctype="multipart/form-data">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mt-4">
+                    <div class="grid grid-cols-1 md:grid-cols-1 gap-2 mt-4">
                         <div>
-                            <jet-label for="member_id" value="Member"/>
+                            <jet-label for="client_id" value="Client"/>
                             <Multiselect
-                                v-model="form.member_id"
-                                v-bind="membersMultiSelect"
+                                v-model="form.client_id"
+                                v-bind="clientsMultiSelect"
                                 :required="true"
-                            />
-                        </div>
-                        <div>
-                            <jet-label for="staff_id" value="Staff"/>
-                            <Multiselect
-                                v-model="form.staff_id"
-                                v-bind="usersMultiSelect"
                             />
                         </div>
                     </div>
                     <div class="mt-4">
-                        <jet-label for="loan_category_id" value="Category"/>
+                        <jet-label for="loan_product_id" value="Product"/>
                         <Multiselect
-                            id="loan_category_id"
-                            v-model="form.loan_category_id"
-                            :options="categories"
+                            id="loan_product_id"
+                            v-model="form.loan_product_id"
+                            :options="availableProducts"
                         />
-                        <jet-input-error :message="form.errors.loan_category_id" class="mt-2"/>
+                        <jet-input-error :message="form.errors.loan_product_id" class="mt-2"/>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mt-4">
                         <div>
@@ -56,6 +50,68 @@
                             </flat-pickr>
                             <jet-input-error :message="form.errors.date" class="mt-2"/>
 
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <div v-for="(group,parentIndex) in form.attributes" class="mb-4">
+                            <h4 class="font-bold">{{ group.name }}</h4>
+                            <div class="grid grid-cols-1 gap-4">
+                                <div v-for="(field,index) in group.attributes">
+                                    <div
+                                        v-if="field.attribute.field_type==='text'||field.attribute.field_type==='number'">
+                                        <jet-label :for="'field_'+parentIndex+'_'+index" :value="field.name"/>
+                                        <jet-input :id="'field_'+parentIndex+'_'+index"
+                                                   :type="field.attribute.field_type"
+                                                   class=" block w-full" :required="field.attribute.required"
+                                                   v-model="field.value"/>
+                                    </div>
+                                    <div v-if="field.attribute.field_type==='textarea'">
+                                        <jet-label :for="'field_'+parentIndex+'_'+index" :value="field.name"/>
+                                        <textarea-input :id="'field_'+parentIndex+'_'+index" class=" block w-full"
+                                                        v-if="field.attribute.field_type==='textarea'"
+                                                        v-model="field.value" :required="field.attribute.required"/>
+                                    </div>
+                                    <div v-if="field.attribute.field_type==='dropdown'">
+                                        <jet-label :for="'field_'+parentIndex+'_'+index" :value="field.name"/>
+                                        <select
+                                            class="border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 rounded-md shadow-sm w-full"
+                                            v-model="field.value" :id="'field_'+parentIndex+'_'+index"
+                                            v-if="field.attribute.field_type==='dropdown'"
+                                            :required="field.attribute.required">
+                                            <option v-for="option in field.attribute.options" :value="option.name">
+                                                {{ option.name }}
+                                            </option>
+                                        </select>
+                                    </div>
+                                    <div v-if="field.attribute.field_type==='date'">
+                                        <jet-label :for="'field_'+parentIndex+'_'+index" :value="field.name"/>
+                                        <textarea-input :id="'field_'+parentIndex+'_'+index" class=" block w-full"
+                                                        v-if="field.attribute.field_type==='textarea'"
+                                                        v-model="field.value"/>
+                                        <flat-pickr
+                                            v-model="field.value"
+                                            class="form-control w-full"
+                                            placeholder="Select date"
+                                            :required="field.attribute.required"
+                                            :id="'field_'+parentIndex+'_'+index">
+                                        </flat-pickr>
+                                    </div>
+                                    <div v-if="field.attribute.field_type==='radio'">
+                                        <jet-label :for="'field_'+parentIndex+'_'+index" :value="field.name"/>
+                                        <div v-for="option in field.attribute.options" class="flex items-center mb-4">
+                                            <input v-model="field.value" :id="'field_'+parentIndex+'_'+index+'_'+option" type="radio" :value="option" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                                            <label :for="'field_'+parentIndex+'_'+index+'_'+option"  class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">{{ option }}</label>
+                                        </div>
+                                    </div>
+                                    <div v-if="field.attribute.field_type==='checkbox'">
+                                        <jet-label :for="'field_'+parentIndex+'_'+index" :value="field.name"/>
+                                        <div v-for="option in field.attribute.options" class="flex items-center mb-4">
+                                            <input v-model="field.value" :id="'field_'+parentIndex+'_'+index+'_'+option" type="checkbox" :value="option" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                                            <label :for="'field_'+parentIndex+'_'+index+'_'+option"  class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">{{ option }}</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="mt-4">
@@ -92,10 +148,11 @@ import JetLabel from "@/Jetstream/Label.vue";
 import Select from "@/Jetstream/Select.vue";
 import FileInput from "@/Jetstream/FileInput.vue";
 import TextareaInput from "@/Jetstream/TextareaInput.vue";
-const fetchMembers = async (query) => {
+
+const fetchClients = async (query) => {
     let where = ''
     const response = await fetch(
-        route('members.search') + '?s=' + query,
+        route('clients.search') + '?s=' + query,
         {}
     );
 
@@ -119,7 +176,7 @@ const fetchUsers = async (query) => {
 
 export default {
     props: {
-        categories: Object,
+        products: Object,
         branches: Object,
         provinces: Object,
         districts: Object,
@@ -141,13 +198,14 @@ export default {
     data() {
         return {
             form: this.$inertia.form({
-                member_id: null,
+                client_id: null,
                 staff_id: null,
-                loan_category_id: null,
+                loan_product_id: null,
                 amount: null,
                 description: null,
                 date: moment().format("YYYY-MM-DD"),
-                status: 'received',
+                status: 'pending',
+                attributes: []
             }),
             usersMultiSelect: {
                 value: null,
@@ -162,33 +220,55 @@ export default {
                     return await fetchUsers(query)
                 }
             },
-            membersMultiSelect: {
+            clientsMultiSelect: {
                 valueProp: 'id',
                 label: 'name',
                 selected_patient: null,
-                placeholder: 'Search for Member',
+                placeholder: 'Search for Client',
                 filterResults: false,
                 minChars: 2,
                 resolveOnLoad: false,
                 delay: 4,
                 searchable: true,
                 options: async (query) => {
-                    return await fetchMembers(query)
+                    return await fetchClients(query)
                 }
             },
-            pageTitle: "Create Loan",
-            pageDescription: "Create Loan",
+            fields: [],
+            pageTitle: "Create Loan Application",
+            pageDescription: "Create Loan Application",
         }
 
     },
     methods: {
         submit() {
-            this.form.post(this.route('loans.store'), {})
-
+            this.form.post(this.route('loan_applications.store'), {})
         },
     },
     computed: {
-
+        availableProducts: function () {
+            let products = []
+            this.products.forEach(item => {
+                products.push({
+                    value: item.id,
+                    label: item.name
+                })
+            })
+            return products
+        }
+    },
+    watch: {
+        'form.loan_product_id': function (val) {
+            if (val) {
+                this.form.attributes = []
+                this.products.forEach(item => {
+                    if (item.id == val) {
+                        this.fields = item.scoring_attributes
+                        this.form.attributes= JSON.parse(JSON.stringify(item.scoring_attributes))
+                    }
+                })
+            }
+        }
     }
 }
 </script>
