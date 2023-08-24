@@ -393,9 +393,8 @@ export default {
     },
     methods: {
         addOption(id = null) {
-            if (!id) {
-                this.item.options.push('')
-            }
+            this.item.options.push('')
+
         },
         deleteAction(id) {
             this.confirmingDeletion = true
