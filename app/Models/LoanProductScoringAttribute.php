@@ -10,6 +10,7 @@ class LoanProductScoringAttribute extends Model
     use HasFactory;
 
     protected $casts = [
+        'accept_value'=>'array',
     ];
 
     public function attribute()

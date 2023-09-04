@@ -96,10 +96,10 @@ class LoanProductsController extends Controller
                 } else {
                     $item->used = false;
                 }
-
+                $optionsArray = [];
                 if ($item->field_type === 'dropdown' || $item->field_type === 'radio' || $item->field_type === 'checkbox') {
                     $options = json_decode($item->options);
-                    $optionsArray = [];
+
                     foreach ($options as $option) {
                         $optionsArray[] = [
                             'id' => '',
@@ -115,6 +115,10 @@ class LoanProductsController extends Controller
                         ];
                     }
                     $item->options = $optionsArray;
+                }elseif ($item->field_type === 'number' || $item->field_type === 'text') {
+                    $item->options = $optionsArray;
+                } else {
+                    $item->options = [];
                 }
                 return $item;
             });
@@ -122,7 +126,7 @@ class LoanProductsController extends Controller
             return $group;
         });
         $product->attributes->transform(function ($item) {
-            if(!empty($item->attribute)){
+            if (!empty($item->attribute)) {
                 if ($item->attribute->field_type === 'dropdown' || $item->attribute->field_type === 'radio' || $item->attribute->field_type === 'checkbox') {
                     $options = json_decode($item->attribute->options);
                     $optionsArray = [];
@@ -134,6 +138,7 @@ class LoanProductsController extends Controller
                                 'id' => '',
                                 'loan_product_scoring_attribute_id' => '',
                                 'scoring_attribute_id' => $item->id,
+                                'loan_product_id' => $item->loan_product_id,
                                 'name' => $option,
                                 'weight' => '',
                                 'score' => '',
@@ -145,6 +150,56 @@ class LoanProductsController extends Controller
                         }
                     }
                     $item->attribute->options = $optionsArray;
+                } elseif ($item->attribute->field_type === 'number' || $item->attribute->field_type === 'text') {
+                    $optionsArray = [];
+                    if ($item->option_type === 'greater_than_or_less_than') {
+                        if ($opt = LoanProductScoringAttributeOptionValue::where('loan_product_scoring_attribute_id', $item->id)->where('name', 'Greater Than or Equal To')->first()) {
+                            $optionsArray[] = $opt;
+                        } else {
+                            $optionsArray[] = [
+                                'id' => '',
+                                'loan_product_scoring_attribute_id' => '',
+                                'scoring_attribute_id' => $item->id,
+                                'loan_product_id' => $item->loan_product_id,
+                                'name' => 'Greater Than or Equal To',
+                                'weight' => '',
+                                'score' => '',
+                                'effective_weight' => '',
+                                'weighted_score' => '',
+                                'description' => '',
+                                'lower_value' => '',
+                                'upper_value' => '',
+                                'median_value' => '',
+                                'active' => true,
+                            ];
+                        }
+                        if ($opt = LoanProductScoringAttributeOptionValue::where('loan_product_scoring_attribute_id', $item->id)->where('name', 'Less Than')->first()) {
+                            $optionsArray[] = $opt;
+                        } else {
+                            $optionsArray[] = [
+                                'id' => '',
+                                'loan_product_scoring_attribute_id' => '',
+                                'scoring_attribute_id' => $item->id,
+                                'loan_product_id' => $item->loan_product_id,
+                                'name' => 'Less Than',
+                                'weight' => '',
+                                'score' => '',
+                                'effective_weight' => '',
+                                'weighted_score' => '',
+                                'description' => '',
+                                'lower_value' => '',
+                                'upper_value' => '',
+                                'median_value' => '',
+                                'active' => true,
+                            ];
+                        }
+                    }
+                    if ($item->option_type === 'range') {
+                        $optionsArray = LoanProductScoringAttributeOptionValue::where('loan_product_scoring_attribute_id', $item->id)->get();
+                    }
+                    $item->attribute->options = $optionsArray;
+                } else {
+                    $item->attribute->options = [];
                 }
             }
             return $item;
@@ -247,7 +302,14 @@ class LoanProductsController extends Controller
             $attribute->min_score = $key['min_score'] ?? 0.0;
             $attribute->max_score = $key['max_score'] ?? 0.0;
             $attribute->reject_value = $key['reject_value'];
-            $attribute->accept_value = $key['accept_value'];
+            if (is_array($key['accept_value'])) {
+                $attribute->accept_value = $key['accept_value'];
+            } else {
+                $attribute->accept_value = $key['accept_value'];
+            }
+            $attribute->accept_condition = $key['accept_condition'];
+            $attribute->option_type = $key['option_type'];
+            $attribute->median_value = $key['median_value'];
             $attribute->order_position = $key['order_position'];
             $attribute->active = $key['active'] ? 1 : 0;
             $attribute->is_group = $key['is_group'] ? 1 : 0;
@@ -273,11 +335,15 @@ class LoanProductsController extends Controller
                 $attribute->reject_value = $item['reject_value'];
                 $attribute->accept_value = $item['accept_value'];
                 $attribute->order_position = $item['order_position'];
+                $attribute->accept_condition = $key['accept_condition'];
+                $attribute->option_type = $item['option_type'];
+                $attribute->median_value = $item['median_value'];
+                $attribute->order_position = $item['order_position'];
                 $attribute->active = $item['active'] ? 1 : 0;
                 $attribute->is_group = $item['is_group'] ? 1 : 0;
                 $attribute->save();
                 //save options
-                if (($item['attribute']['field_type'] === 'dropdown' || $item['attribute']['field_type'] === 'radio' || $item['attribute']['field_type'] === 'checkbox') && !empty($item['attribute']['options'])) {
+                if (!empty($item['attribute']['options']) && is_array($item['attribute']['options'])) {
                     foreach ($item['attribute']['options'] as $option) {
                         if (!empty($option['id'])) {
                             $attributeOption = LoanProductScoringAttributeOptionValue::find($option['id']);
@@ -293,6 +359,9 @@ class LoanProductsController extends Controller
                         $attributeOption->score = $option['score'] ?? 0.0;
                         $attributeOption->weighted_score = $option['weighted_score'] ?? 0.0;
                         $attributeOption->name = $option['name'];
+                        $attributeOption->lower_value = $option['lower_value'];
+                        $attributeOption->upper_value = $option['upper_value'];
+                        $attributeOption->median_value = $option['median_value'];
                         $attributeOption->active = $option['active'] ? 1 : 0;
                         $attributeOption->save();
                     }

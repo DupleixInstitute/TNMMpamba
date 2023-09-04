@@ -101,6 +101,56 @@ class LoanApplicationsController extends Controller
                                 }
                             }
                             $item->attribute->options = $optionsArray;
+                        }elseif ($item->attribute->field_type === 'number' || $item->attribute->field_type === 'text') {
+                            $optionsArray = [];
+                            if ($item->option_type === 'greater_than_or_less_than') {
+                                if ($opt = LoanProductScoringAttributeOptionValue::where('loan_product_scoring_attribute_id', $item->id)->where('name', 'Greater Than or Equal To')->first()) {
+                                    $optionsArray[] = $opt;
+                                } else {
+                                    $optionsArray[] = [
+                                        'id' => '',
+                                        'loan_product_scoring_attribute_id' => '',
+                                        'scoring_attribute_id' => $item->id,
+                                        'loan_product_id' => $item->loan_product_id,
+                                        'name' => 'Greater Than or Equal To',
+                                        'weight' => '',
+                                        'score' => '',
+                                        'effective_weight' => '',
+                                        'weighted_score' => '',
+                                        'description' => '',
+                                        'lower_value' => '',
+                                        'upper_value' => '',
+                                        'median_value' => '',
+                                        'active' => true,
+                                    ];
+                                }
+                                if ($opt = LoanProductScoringAttributeOptionValue::where('loan_product_scoring_attribute_id', $item->id)->where('name', 'Less Than')->first()) {
+                                    $optionsArray[] = $opt;
+                                } else {
+                                    $optionsArray[] = [
+                                        'id' => '',
+                                        'loan_product_scoring_attribute_id' => '',
+                                        'scoring_attribute_id' => $item->id,
+                                        'loan_product_id' => $item->loan_product_id,
+                                        'name' => 'Less Than',
+                                        'weight' => '',
+                                        'score' => '',
+                                        'effective_weight' => '',
+                                        'weighted_score' => '',
+                                        'description' => '',
+                                        'lower_value' => '',
+                                        'upper_value' => '',
+                                        'median_value' => '',
+                                        'active' => true,
+                                    ];
+                                }
+                            }
+                            if ($item->option_type === 'range') {
+                                $optionsArray = LoanProductScoringAttributeOptionValue::where('loan_product_scoring_attribute_id', $item->id)->get();
+                            }
+                            $item->attribute->options = $optionsArray;
+                        } else {
+                            $item->attribute->options = [];
                         }
                     }
                     $item->value = '';
@@ -161,7 +211,41 @@ class LoanApplicationsController extends Controller
                 if ($field['attribute']['field_type'] === 'dropdown' || $field['attribute']['field_type'] === 'radio' || $field['attribute']['field_type'] === 'checkbox') {
                     foreach ($field['attribute']['options'] as $key) {
                         if ($key['name'] == $field['value']) {
-                            $score->score = $key['weight'];
+                            $score->score = $key['score'];
+                            //check if score is accepted
+                            if(in_array($key['name'],$field['accept_value'])){
+                                $score->accepted = 1;
+                            }
+                        }
+                    }
+                }elseif ($field['attribute']['field_type'] === 'text' || $field['attribute']['field_type'] === 'number') {
+                    if($field['option_type']==='range'){
+                        foreach ($field['attribute']['options'] as $key) {
+                            if ($field['value']>=$key['lower_value'] && $field['value']<=$key['upper_value']) {
+                                $score->score = $key['score'];
+                                //check if score is accepted
+                                if(in_array($key['name'],$field['accept_value'])){
+                                    $score->accepted = 1;
+                                }
+                            }
+                        }
+                    }
+                    if($field['option_type']==='greater_than_or_less_than'){
+                        foreach ($field['attribute']['options'] as $key) {
+                            if($key['name']==='Greater Than or Equal To' && $field['value']>=$field['median_value']){
+                                $score->score = $key['score'];
+                                //check if score is accepted
+                                if(in_array($key['name'],$field['accept_value'])){
+                                    $score->accepted = 1;
+                                }
+                            }
+                            if($key['name']==='Less Than' && $field['value']<$field['median_value']){
+                                $score->score = $key['score'];
+                                //check if score is accepted
+                                if(in_array($key['name'],$field['accept_value'])){
+                                    $score->accepted = 1;
+                                }
+                            }
                         }
                     }
                 } else {
@@ -222,8 +306,10 @@ class LoanApplicationsController extends Controller
                 $score = LoanApplicationScore::where('loan_application_id', $application->id)->where('loan_product_scoring_attribute_id', $item->id)->first();
                 if (!empty($score)) {
                     $item->value = $score->value;
+                    $item->accepted = $score->accepted;
                 } else {
                     $item->value = '';
+                    $item->accepted = false;
                 }
                 return $item;
             });
@@ -272,6 +358,56 @@ class LoanApplicationsController extends Controller
                             }
                         }
                         $item->attribute->options = $optionsArray;
+                    }elseif ($item->attribute->field_type === 'number' || $item->attribute->field_type === 'text') {
+                        $optionsArray = [];
+                        if ($item->option_type === 'greater_than_or_less_than') {
+                            if ($opt = LoanProductScoringAttributeOptionValue::where('loan_product_scoring_attribute_id', $item->id)->where('name', 'Greater Than or Equal To')->first()) {
+                                $optionsArray[] = $opt;
+                            } else {
+                                $optionsArray[] = [
+                                    'id' => '',
+                                    'loan_product_scoring_attribute_id' => '',
+                                    'scoring_attribute_id' => $item->id,
+                                    'loan_product_id' => $item->loan_product_id,
+                                    'name' => 'Greater Than or Equal To',
+                                    'weight' => '',
+                                    'score' => '',
+                                    'effective_weight' => '',
+                                    'weighted_score' => '',
+                                    'description' => '',
+                                    'lower_value' => '',
+                                    'upper_value' => '',
+                                    'median_value' => '',
+                                    'active' => true,
+                                ];
+                            }
+                            if ($opt = LoanProductScoringAttributeOptionValue::where('loan_product_scoring_attribute_id', $item->id)->where('name', 'Less Than')->first()) {
+                                $optionsArray[] = $opt;
+                            } else {
+                                $optionsArray[] = [
+                                    'id' => '',
+                                    'loan_product_scoring_attribute_id' => '',
+                                    'scoring_attribute_id' => $item->id,
+                                    'loan_product_id' => $item->loan_product_id,
+                                    'name' => 'Less Than',
+                                    'weight' => '',
+                                    'score' => '',
+                                    'effective_weight' => '',
+                                    'weighted_score' => '',
+                                    'description' => '',
+                                    'lower_value' => '',
+                                    'upper_value' => '',
+                                    'median_value' => '',
+                                    'active' => true,
+                                ];
+                            }
+                        }
+                        if ($item->option_type === 'range') {
+                            $optionsArray = LoanProductScoringAttributeOptionValue::where('loan_product_scoring_attribute_id', $item->id)->get();
+                        }
+                        $item->attribute->options = $optionsArray;
+                    } else {
+                        $item->attribute->options = [];
                     }
                 }
                 //get value
@@ -330,7 +466,41 @@ class LoanApplicationsController extends Controller
                 if ($field['attribute']['field_type'] === 'dropdown' || $field['attribute']['field_type'] === 'radio' || $field['attribute']['field_type'] === 'checkbox') {
                     foreach ($field['attribute']['options'] as $key) {
                         if ($key['name'] == $field['value']) {
-                            $score->score = $key['weight'];
+                            $score->score = $key['score'];
+                            //check if score is accepted
+                            if(in_array($key['name'],$field['accept_value'])){
+                                $score->accepted = 1;
+                            }
+                        }
+                    }
+                }elseif ($field['attribute']['field_type'] === 'text' || $field['attribute']['field_type'] === 'number') {
+                    if($field['option_type']==='range'){
+                        foreach ($field['attribute']['options'] as $key) {
+                            if ($field['value']>=$key['lower_value'] && $field['value']<=$key['upper_value']) {
+                                $score->score = $key['score'];
+                                //check if score is accepted
+                                if(in_array($key['name'],$field['accept_value'])){
+                                    $score->accepted = 1;
+                                }
+                            }
+                        }
+                    }
+                    if($field['option_type']==='greater_than_or_less_than'){
+                        foreach ($field['attribute']['options'] as $key) {
+                            if($key['name']==='Greater Than or Equal To' && $field['value']>=$field['median_value']){
+                                $score->score = $key['score'];
+                                //check if score is accepted
+                                if(in_array($key['name'],$field['accept_value'])){
+                                    $score->accepted = 1;
+                                }
+                            }
+                            if($key['name']==='Less Than' && $field['value']<$field['median_value']){
+                                $score->score = $key['score'];
+                                //check if score is accepted
+                                if(in_array($key['name'],$field['accept_value'])){
+                                    $score->accepted = 1;
+                                }
+                            }
                         }
                     }
                 } else {

@@ -147,6 +147,8 @@
                                     </td>
                                     <td class="border-t px-6 py-4">
                                         {{ attribute.value }}
+                                        <span class="ml-2 text-green-600" v-if="attribute.accepted"><font-awesome-icon icon="check-circle"/></span>
+                                        <span class="ml-2 text-red-600" v-else><font-awesome-icon icon="times-circle"/></span>
                                     </td>
                                 </tr>
                                 </tbody>
@@ -234,6 +236,7 @@ import JetSuccessButton from '@/Jetstream/SuccessButton.vue'
 import JetConfirmationModal from '@/Jetstream/ConfirmationModal.vue'
 import JetDangerButton from '@/Jetstream/DangerButton.vue'
 import Button from "../../Jetstream/Button.vue";
+import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
 
 export default {
     props: {
@@ -241,6 +244,7 @@ export default {
         groups: Object,
     },
     components: {
+        FontAwesomeIcon,
         Button,
         Select,
         AppLayout,

@@ -150,6 +150,114 @@
                                         </tbody>
                                     </table>
                                 </div>
+                                <div
+                                    v-if="item.attribute.field_type==='number'||item.attribute.field_type==='text'">
+                                    <div class="mb-4">
+                                        <jet-label for="option_type" value="Option Type"/>
+                                        <select
+                                            class="mt-1 border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 rounded-md shadow-sm w-full"
+                                            name="option_type" v-model="item.option_type" id="option_type" @change="updateItemOptionType(item)">
+                                            <option value="range">Range</option>
+                                            <option value="greater_than_or_less_than">Greater than/Less than</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-4" v-if="item.option_type==='greater_than_or_less_than'">
+                                        <div class="mb-4">
+                                            <jet-label for="median_value" value="Greater than/Less than Value"/>
+                                            <jet-input type="text" class="mt-1 w-full" v-model="item.median_value"/>
+                                        </div>
+                                        <div class="mb-4">
+                                            <h4>Option Weights</h4>
+                                            <table class="w-full whitespace-no-wrap table-auto">
+                                                <thead class="bg-gray-50">
+                                                <tr class="text-left font-bold">
+                                                    <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Name</th>
+                                                    <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Weight</th>
+                                                    <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Score</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                <tr v-for="option in item.attribute.options"
+                                                    class="hover:bg-gray-100 focus-within:bg-gray-100">
+                                                    <td class="border-t px-6 py-4">
+                                                        {{ option.name }} {{item.median_value}}
+                                                    </td>
+                                                    <td class="border-t px-6 py-4">
+                                                        <jet-input type="text" class="w-16" v-model="option.weight"
+                                                                   @blur="updateItems"/>
+                                                        <span class="ml-2">%</span>
+                                                    </td>
+                                                    <td class="border-t px-6 py-4">
+                                                        {{ option.score }}
+                                                    </td>
+                                                </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <div class="mb-4" v-if="item.option_type==='range'">
+                                        <div class="mb-4">
+                                            <h4>Option Weights</h4>
+                                            <table class="w-full whitespace-no-wrap table-auto">
+                                                <thead class="bg-gray-50">
+                                                <tr class="text-left font-bold">
+                                                    <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Lower Value</th>
+                                                    <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Upper Value</th>
+                                                    <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Weight</th>
+                                                    <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Score</th>
+                                                    <th class="px-6 pt-4 pb-4 font-medium text-gray-500">
+                                                        <button class="btn btn-green"
+                                                                @click="addRangeOption(item)">
+                                                            <span>Add Range </span>
+                                                        </button>
+                                                    </th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                <tr v-for="(option,ky) in item.attribute.options"
+                                                    class="hover:bg-gray-100 focus-within:bg-gray-100">
+                                                    <td class="border-t px-6 py-4">
+                                                        <jet-input type="text" class="w-24" v-model="option.lower_value" @blur="updateItems"/>
+                                                    </td>
+                                                    <td class="border-t px-6 py-4">
+                                                        <jet-input type="text" class="w-24" v-model="option.upper_value" @blur="updateItems"/>
+                                                    </td>
+                                                    <td class="border-t px-6 py-4">
+                                                        <jet-input type="text" class="w-24" v-model="option.weight"
+                                                                   @blur="updateItems"/>
+                                                        <span class="ml-2">%</span>
+                                                    </td>
+                                                    <td class="border-t px-6 py-4">
+                                                        {{ option.score }}
+                                                    </td>
+                                                    <td class="border-t px-6 py-4">
+                                                        <button href="#" v-if="can('loans.products.destroy')"
+                                                                @click="deleteAttributeOption(item,ky)"
+                                                                class="  text-red-600 hover:text-red-900"
+                                                                title="Delete">
+                                                            <font-awesome-icon icon="trash"/>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mt-4">
+                                    <div class="grid grid-cols-1 gap-2 mt-2 mb-4 ">
+                                        <div>
+                                            <jet-label for="accept_value" value="Accepted Option(s)"/>
+                                            <Multiselect class="bg-white"
+                                                         mode="tags"
+                                                v-model="item.accept_value"
+                                                :options="item.attribute.options"
+                                                label="name"
+                                                valueProp="name"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
                                 <button href="#" v-if="can('loans.products.destroy')"
                                         @click="deleteItem('attribute',parent_index,index)"
                                         class="absolute bottom-0 right-2  text-red-600 hover:text-red-900"
@@ -246,7 +354,6 @@
                 </jet-success-button>
             </template>
         </jet-dialog-modal>
-
         <jet-confirmation-modal :show="confirmingDeletion" @close="confirmingDeletion = false">
             <template #title>
                 Delete Record
@@ -375,7 +482,9 @@ export default {
                         min_score: '',
                         max_score: '',
                         reject_value: '',
-                        accept_value: '',
+                        accept_value: [],
+                        accept_condition: '',
+                        median_value: '',
                         active: true,
                         is_group: true,
                         order_position: this.form.attributes.length + 1,
@@ -423,7 +532,10 @@ export default {
                                 min_score: '',
                                 max_score: '',
                                 reject_value: '',
-                                accept_value: '',
+                                accept_value: [],
+                                accept_condition: '',
+                                option_type: '',
+                                median_value: '',
                                 active: true,
                                 is_group: false,
                                 order_position: item.attributes.length + 1,
@@ -434,10 +546,23 @@ export default {
             }
             this.showAddAttributeModal = false
         },
-        addOption(id = null) {
-            if (!id) {
-                this.item.options.push('')
-            }
+        addRangeOption(item) {
+            item.attribute.options.push({
+                id: '',
+                loan_product_scoring_attribute_id: item.id,
+                loan_product_id: item.loan_product_id,
+                scoring_attribute_id: item.scoring_attribute_id,
+                weight: '',
+                effective_weight: '',
+                score: '',
+                weighted_score: '',
+                name: '',
+                description: '',
+                lower_value: '',
+                upper_value: '',
+                median_value: '',
+                active: true,
+            })
         },
         updateItems() {
             this.errors = []
@@ -449,12 +574,17 @@ export default {
                 item.score = parseFloat(this.product.score||0) * parseFloat(item.weight) / 100
                 this.groupPercentagesTotal += parseFloat(item.weight || 0)
                 Object.keys(item.attributes).forEach(k => {
+
                     let attr=item.attributes[k]
+
                     attr.score = parseFloat(this.product.score||0) * parseFloat(attr.weight) / 100
                     this.attributePercentagesTotal += parseFloat(attr.weight || 0)
                     if (attr.attribute.options && attr.attribute.options.length) {
                         attr.attribute.options.forEach(opt => {
-                            opt.score = parseFloat(attr.score) * parseFloat(opt.weight) / 100
+                            opt.score = parseFloat(attr.score||0) * parseFloat(opt.weight||0) / 100
+                            if(attr.option_type==='range'){
+                                opt.name=opt.lower_value+' to '+opt.upper_value
+                            }
                         })
                     }
                 })
@@ -481,6 +611,44 @@ export default {
             }
             this.readyToSave = formGood
         },
+        updateItemOptionType(item){
+            if(item.option_type==='greater_than_or_less_than' &&  item.attribute.options.length===0){
+                item.attribute.options=[
+                    {
+                        id:'',
+                        loan_product_scoring_attribute_id:item.id,
+                        scoring_attribute_id:item.scoring_attribute_id,
+                        loan_product_id: item.loan_product_id,
+                        weight:'',
+                        effective_weight:'',
+                        score:'',
+                        weighted_score:'',
+                        name:'Greater Than or Equal To',
+                        description:'',
+                        lower_value:'',
+                        upper_value:'',
+                        median_value:'',
+                        active: true,
+                    },
+                    {
+                        id:'',
+                        loan_product_scoring_attribute_id:item.id,
+                        loan_product_id: item.loan_product_id,
+                        scoring_attribute_id:item.scoring_attribute_id,
+                        weight:'',
+                        effective_weight:'',
+                        score:'',
+                        weighted_score:'',
+                        name:'Less Than',
+                        description:'',
+                        lower_value:'',
+                        upper_value:'',
+                        median_value:'',
+                        active: true,
+                    }
+                ]
+            }
+        },
         submit() {
             this.form.post(this.route('loan_products.sync_attributes', this.product.id), {
                 preserveScroll: true,
@@ -506,6 +674,22 @@ export default {
                     if (type === 'attribute') {
                         this.form.attributes[parentIndex].attributes.splice(index, 1);
                     }
+                    this.updateItems()
+                }
+            })
+        },
+        deleteAttributeOption(item, index) {
+            this.$swal({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    item.attribute.options.splice(index, 1)
                     this.updateItems()
                 }
             })
@@ -552,7 +736,9 @@ export default {
             return attributes
         }
     },
-    watch: {}
+    watch: {
+
+    }
 }
 </script>
 <style scoped>
