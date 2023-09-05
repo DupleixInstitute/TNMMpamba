@@ -63,6 +63,7 @@ class ClientsController extends Controller
             }),
             'provinces' => Province::get()->transform(function ($item) {
                 return [
+                    'country_id' => $item->country_id,
                     'value' => $item->id,
                     'label' => $item->name,
                 ];
@@ -159,12 +160,14 @@ class ClientsController extends Controller
             }),
             'branches' => Branch::get()->map(function ($item) {
                 return [
+
                     'value' => $item->id,
                     'label' => $item->name
                 ];
             }),
             'provinces' => Province::get()->transform(function ($item) {
                 return [
+                    'country_id' => $item->country_id,
                     'value' => $item->id,
                     'label' => $item->name,
                 ];

@@ -25,6 +25,7 @@
                                     v-model="form.country_id"
                                     mode="single"
                                     :required="true"
+                                    :searchable="true"
                                     :options="countries"
                                 />
                                 <jet-input-error :message="form.errors.country_id" class="mt-2"/>
