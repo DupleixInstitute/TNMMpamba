@@ -1156,20 +1156,20 @@ case "0":
 		break;
 case "1":
        $judgement_score=200;
-	    $judgement_score_comment='OK';
-		break;
+	   $judgement_score_comment='OK';
+	   break;
 case "2":
        $judgement_score=100;
-	      $judgement_score_comment='OK';
-		break;
+	   $judgement_score_comment='OK';
+	   break;
 case "3":
        $judgement_score=0;
 	   $judgement_score_comment='REJECT';
-		break;
+	   break;
 case $judgement>"3":
        $judgement_score=0;
 	   $judgement_score_comment='REJECT';
-		break;
+	   break;
  }
 
 $w_judgement_score=$judgement_score * 0.09;
