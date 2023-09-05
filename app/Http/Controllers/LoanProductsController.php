@@ -334,7 +334,6 @@ class LoanProductsController extends Controller
                 $attribute->max_score = $item['max_score'] ?? 0.0;
                 $attribute->reject_value = $item['reject_value'];
                 $attribute->accept_value = $item['accept_value'];
-                $attribute->order_position = $item['order_position'];
                 $attribute->accept_condition = $key['accept_condition'];
                 $attribute->option_type = $item['option_type'];
                 $attribute->median_value = $item['median_value'];
@@ -359,9 +358,9 @@ class LoanProductsController extends Controller
                         $attributeOption->score = $option['score'] ?? 0.0;
                         $attributeOption->weighted_score = $option['weighted_score'] ?? 0.0;
                         $attributeOption->name = $option['name'];
-                        $attributeOption->lower_value = $option['lower_value'];
-                        $attributeOption->upper_value = $option['upper_value'];
-                        $attributeOption->median_value = $option['median_value'];
+                        $attributeOption->lower_value = $option['lower_value'] ?? null;
+                        $attributeOption->upper_value = $option['upper_value'] ?? null;
+                        $attributeOption->median_value = $option['median_value'] ?? null;
                         $attributeOption->active = $option['active'] ? 1 : 0;
                         $attributeOption->save();
                     }
