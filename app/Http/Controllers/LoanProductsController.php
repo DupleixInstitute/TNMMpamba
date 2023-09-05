@@ -288,7 +288,8 @@ class LoanProductsController extends Controller
             if (!empty($key['id'])) {
                 $existingAttributes[] = $key['id'];
                 $attribute = LoanProductScoringAttribute::find($key['id']);
-            } else {
+            }
+            if(empty($attribute)){
                 $attribute = new LoanProductScoringAttribute();
                 $attribute->created_by_id = Auth::id();
                 $attribute->loan_product_id = $product->id;
