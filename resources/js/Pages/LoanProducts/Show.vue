@@ -484,6 +484,7 @@ export default {
                         reject_value: '',
                         accept_value: [],
                         accept_condition: '',
+                        option_type: '',
                         median_value: '',
                         active: true,
                         is_group: true,
