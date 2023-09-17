@@ -211,6 +211,7 @@ class LoanProductsController extends Controller
 
             return $score;
         });
+        $product->form_attributes = $product->form_attributes->values();
         return Inertia::render('LoanProducts/Show', [
             'product' => $product->toArray(),
             'groups' => $groups
