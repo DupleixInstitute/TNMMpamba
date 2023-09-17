@@ -160,7 +160,7 @@
                                         </div>
                                     </td>
                                 </tr>
-                                <tr v-if="attribute.attributes.length === 0">
+                                <tr v-if="attribute.scoring_attributes.length === 0">
                                     <td class="border-t px-6 py-4 text-center" colspan="5">No records found.</td>
                                 </tr>
                                 </tbody>
