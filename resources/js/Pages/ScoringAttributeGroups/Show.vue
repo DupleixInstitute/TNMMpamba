@@ -417,7 +417,7 @@ export default {
         },
         editItem(id) {
             this.editingItem = true
-            this.attribute.attributes.forEach(item => {
+            this.attribute.scoring_attributes.forEach(item => {
                 if (item.id == id) {
                     this.item = item
                     this.showItemModal = true
