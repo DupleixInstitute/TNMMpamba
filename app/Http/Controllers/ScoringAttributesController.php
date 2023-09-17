@@ -97,7 +97,7 @@ class ScoringAttributesController extends Controller
     public function show(ScoringAttributeGroup $attribute)
     {
         $attribute->load(['scoringAttributes','createdBy']);
-        $attribute->attributes->transform(function ($item){
+        $attribute->scoringAttributes->transform(function ($item){
             if($item->field_type==='dropdown'||$item->field_type==='radio'||$item->field_type==='checkbox'){
                 $item->options=json_decode($item->options);
             }

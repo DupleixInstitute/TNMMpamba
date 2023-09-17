@@ -92,7 +92,7 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <tr v-for="item in attribute.attributes"
+                                <tr v-for="item in attribute.scoring_attributes"
                                     :key="item.id"
                                     class="hover:bg-gray-100 focus-within:bg-gray-100">
                                     <td class="border-t">
