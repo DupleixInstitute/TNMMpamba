@@ -76,22 +76,22 @@ class LoanProductsController extends Controller
         activity()
             ->performedOn($product)
             ->log('Create Loan Product');
-        return redirect()->route('loan_products.index')->with('success', 'Loan Product created successfully.');
+        return redirect()->route('loan_products.show', $product->id)->with('success', 'Loan Product created successfully.');
     }
 
 
     public function show(LoanProduct $product)
     {
-        $product->load(['category', 'createdBy', 'attributes', 'attributes.attribute']);
-        $groups = ScoringAttributeGroup::with(['attributes'])->get();
+        $product->load(['category', 'createdBy', 'scoringAttributes', 'scoringAttributes.attribute']);
+        $groups = ScoringAttributeGroup::with(['scoringAttributes'])->get();
         $groups->transform(function ($group) use ($product) {
-            if ($product->attributes->where('scoring_attribute_group_id', $group->id)->count()) {
+            if ($product->scoringAttributes->where('scoring_attribute_group_id', $group->id)->count()) {
                 $group->used = true;
             } else {
                 $group->used = false;
             }
-            $group->attributes->transform(function ($item) use ($product) {
-                if ($product->attributes->where('scoring_attribute_id', $item->id)->count()) {
+            $group->scoringAttributes->transform(function ($item) use ($product) {
+                if ($product->scoringAttributes->where('scoring_attribute_id', $item->id)->count()) {
                     $item->used = true;
                 } else {
                     $item->used = false;
@@ -115,7 +115,7 @@ class LoanProductsController extends Controller
                         ];
                     }
                     $item->options = $optionsArray;
-                }elseif ($item->field_type === 'number' || $item->field_type === 'text') {
+                } elseif ($item->field_type === 'number' || $item->field_type === 'text') {
                     $item->options = $optionsArray;
                 } else {
                     $item->options = [];
@@ -125,7 +125,7 @@ class LoanProductsController extends Controller
 
             return $group;
         });
-        $product->attributes->transform(function ($item) {
+        $product->scoringAttributes->transform(function ($item) {
             if (!empty($item->attribute)) {
                 if ($item->attribute->field_type === 'dropdown' || $item->attribute->field_type === 'radio' || $item->attribute->field_type === 'checkbox') {
                     $options = json_decode($item->attribute->options);
@@ -150,7 +150,7 @@ class LoanProductsController extends Controller
                         }
                     }
                     $item->attribute->options = $optionsArray;
-                } elseif ($item->attribute->field_type === 'number' || $item->attribute->field_type === 'text') {
+                } elseif ($item->attribute->field_type === 'number' || $item->attribute->field_type === 'text' || $item->attribute->field_type === 'formula') {
                     $optionsArray = [];
                     if ($item->option_type === 'greater_than_or_less_than') {
                         if ($opt = LoanProductScoringAttributeOptionValue::where('loan_product_scoring_attribute_id', $item->id)->where('name', 'Greater Than or Equal To')->first()) {
@@ -204,10 +204,10 @@ class LoanProductsController extends Controller
             }
             return $item;
         });
-        $product->score_attributes = $product->attributes->where('is_group', 1);
+        $product->form_attributes = $product->scoringAttributes->where('is_group', 1);
 
-        $product->score_attributes->transform(function ($score) use ($product) {
-            $score->attributes = $product->attributes->where('scoring_attribute_group_id', $score->scoring_attribute_group_id)->where('is_group', 0)->toArray();
+        $product->form_attributes->transform(function ($score) use ($product) {
+            $score->attributes = $product->scoringAttributes->where('scoring_attribute_group_id', $score->scoring_attribute_group_id)->where('is_group', 0)->values();
 
             return $score;
         });
@@ -247,12 +247,12 @@ class LoanProductsController extends Controller
         activity()
             ->performedOn($product)
             ->log('Update Loan Product');
-        return redirect()->route('loan_products.index')->with('success', 'LoanProduct updated successfully.');
+        return redirect()->route('loan_products.show', $product->id)->with('success', 'LoanProduct updated successfully.');
     }
 
     public function destroy(LoanProduct $product)
     {
-
+        $product->scoringAttributes->each->delete();
         $product->delete();
         activity()
             ->performedOn($product)
@@ -285,11 +285,12 @@ class LoanProductsController extends Controller
         $allAttributes = LoanProductScoringAttribute::where('loan_product_id', $product->id)->get();
         $allOptions = LoanProductScoringAttributeOptionValue::where('loan_product_id', $product->id)->pluck('id');
         foreach ($attributes as $key) {
+            $attribute = null;
             if (!empty($key['id'])) {
                 $existingAttributes[] = $key['id'];
                 $attribute = LoanProductScoringAttribute::find($key['id']);
             }
-            if(empty($attribute)){
+            if (empty($attribute)) {
                 $attribute = new LoanProductScoringAttribute();
                 $attribute->created_by_id = Auth::id();
                 $attribute->loan_product_id = $product->id;
@@ -307,11 +308,12 @@ class LoanProductsController extends Controller
             $attribute->is_group = $key['is_group'] ? 1 : 0;
             $attribute->save();
             foreach ($key['attributes'] as $item) {
+                $childAttribute = null;
                 if (!empty($item['id'])) {
                     $existingAttributes[] = $item['id'];
                     $childAttribute = LoanProductScoringAttribute::find($item['id']);
                 }
-                if(empty($childAttribute)){
+                if (empty($childAttribute)) {
                     $childAttribute = new LoanProductScoringAttribute();
                     $childAttribute->created_by_id = Auth::id();
                     $childAttribute->loan_product_id = $product->id;
@@ -330,6 +332,7 @@ class LoanProductsController extends Controller
                 $childAttribute->accept_condition = $key['accept_condition'];
                 $childAttribute->option_type = $item['option_type'];
                 $childAttribute->median_value = $item['median_value'];
+                $childAttribute->data = $item['data'];
                 $childAttribute->order_position = $item['order_position'];
                 $childAttribute->active = $item['active'] ? 1 : 0;
                 $childAttribute->is_group = $item['is_group'] ? 1 : 0;
@@ -363,7 +366,7 @@ class LoanProductsController extends Controller
         //delete attributes that have been removed
         $newAttributes = LoanProductScoringAttribute::where('loan_product_id', $product->id)->pluck('id');
         $allAttributes->each(function ($item) use ($newAttributes) {
-            if($newAttributes->has($item->id)){
+            if (!$newAttributes->contains($item->id)) {
                 LoanProductScoringAttribute::where('id', $item->id)->delete();
                 if ($item->is_group) {
                     LoanProductScoringAttribute::where('scoring_attribute_group_id', $item->id)->delete();
@@ -371,10 +374,9 @@ class LoanProductsController extends Controller
             }
         });
         $newOptions = LoanProductScoringAttributeOptionValue::where('loan_product_id', $product->id)->pluck('id');
-
         $allOptions->each(function ($item) use ($newOptions) {
-            if($newOptions->has($item)){
-                LoanProductScoringAttributeOptionValue::where('id', $item->id)->delete();
+            if (!$newOptions->contains($item)) {
+                LoanProductScoringAttributeOptionValue::where('id', $item)->delete();
 
             }
         });

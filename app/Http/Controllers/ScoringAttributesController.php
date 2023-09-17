@@ -24,7 +24,7 @@ class ScoringAttributesController extends Controller
     {
 
         $attributes = ScoringAttributeGroup::filter(\request()->only('search'))
-            ->with(['attributes', 'createdBy'])
+            ->with(['scoringAttributes', 'createdBy'])
             ->orderBy('created_at', 'desc')
             ->paginate(20);
         return Inertia::render('ScoringAttributeGroups/Index', [
@@ -96,7 +96,7 @@ class ScoringAttributesController extends Controller
 
     public function show(ScoringAttributeGroup $attribute)
     {
-        $attribute->load(['attributes','createdBy']);
+        $attribute->load(['scoringAttributes','createdBy']);
         $attribute->attributes->transform(function ($item){
             if($item->field_type==='dropdown'||$item->field_type==='radio'||$item->field_type==='checkbox'){
                 $item->options=json_decode($item->options);

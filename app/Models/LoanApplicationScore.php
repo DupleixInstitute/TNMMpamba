@@ -18,14 +18,22 @@ class LoanApplicationScore extends Model
     {
         return $this->belongsTo(LoanApplication::class);
     }
-    public function category()
+
+    public function scoringAttribute()
     {
-        return $this->belongsTo(LoanProductCategory::class,'loan_category_id');
+        return $this->belongsTo(ScoringAttribute::class, 'scoring_attribute_id');
     }
+
+    public function productAttribute()
+    {
+        return $this->belongsTo(LoanProductScoringAttribute::class, 'loan_product_scoring_attribute_id');
+    }
+
     public function staff()
     {
         return $this->belongsTo(User::class);
     }
+
     public function scopeFilter($query, array $filters)
     {
         $query->when($filters['search'] ?? null, function ($query, $search) {

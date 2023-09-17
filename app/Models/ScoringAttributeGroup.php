@@ -31,7 +31,7 @@ class ScoringAttributeGroup extends Model
         return $this->belongsTo(User::class, 'created_by_id');
     }
 
-    public function attributes()
+    public function scoringAttributes()
     {
         return $this->hasMany(ScoringAttribute::class, 'scoring_attribute_group_id');
     }

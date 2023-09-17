@@ -19,11 +19,13 @@ use App\Models\LoanProductScoringAttributeOptionValue;
 use App\Models\Setting;
 use App\Models\Tariff;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Spatie\Permission\Models\Role;
+use Webit\Util\EvalMath\EvalMath;
 
 class LoanApplicationsController extends Controller
 {
@@ -72,7 +74,8 @@ class LoanApplicationsController extends Controller
      */
     public function create()
     {
-        $products = LoanProduct::with(['attributes', 'attributes.attribute', 'attributes.options'])->get();
+        $products = LoanProduct::with(['scoringAttributes', 'scoringAttributes.attribute', 'scoringAttributes.options'])->get();
+
         $products->each(function (&$product) {
             $groups = LoanProductScoringAttribute::where('is_group', 1)->where('loan_product_id', $product->id)->get();
             $groups->transform(function ($group) use ($product) {
@@ -101,7 +104,7 @@ class LoanApplicationsController extends Controller
                                 }
                             }
                             $item->attribute->options = $optionsArray;
-                        }elseif ($item->attribute->field_type === 'number' || $item->attribute->field_type === 'text') {
+                        } elseif ($item->attribute->field_type === 'number' || $item->attribute->field_type === 'text') {
                             $optionsArray = [];
                             if ($item->option_type === 'greater_than_or_less_than') {
                                 if ($opt = LoanProductScoringAttributeOptionValue::where('loan_product_scoring_attribute_id', $item->id)->where('name', 'Greater Than or Equal To')->first()) {
@@ -159,7 +162,7 @@ class LoanApplicationsController extends Controller
                 $group->attributes = $attributes;
                 return $group;
             });
-            $product->scoring_attributes = $groups;
+            $product->form_attributes = $groups;
         });
         return Inertia::render('LoanApplications/Create', [
             'products' => $products,
@@ -213,36 +216,36 @@ class LoanApplicationsController extends Controller
                         if ($key['name'] == $field['value']) {
                             $score->score = $key['score'];
                             //check if score is accepted
-                            if(in_array($key['name'],$field['accept_value'])){
+                            if (in_array($key['name'], $field['accept_value'])) {
                                 $score->accepted = 1;
                             }
                         }
                     }
-                }elseif ($field['attribute']['field_type'] === 'text' || $field['attribute']['field_type'] === 'number') {
-                    if($field['option_type']==='range'){
+                } elseif ($field['attribute']['field_type'] === 'text' || $field['attribute']['field_type'] === 'number') {
+                    if ($field['option_type'] === 'range') {
                         foreach ($field['attribute']['options'] as $key) {
-                            if ($field['value']>=$key['lower_value'] && $field['value']<=$key['upper_value']) {
+                            if ($field['value'] >= $key['lower_value'] && $field['value'] <= $key['upper_value']) {
                                 $score->score = $key['score'];
                                 //check if score is accepted
-                                if(in_array($key['name'],$field['accept_value'])){
+                                if (in_array($key['name'], $field['accept_value'])) {
                                     $score->accepted = 1;
                                 }
                             }
                         }
                     }
-                    if($field['option_type']==='greater_than_or_less_than'){
+                    if ($field['option_type'] === 'greater_than_or_less_than') {
                         foreach ($field['attribute']['options'] as $key) {
-                            if($key['name']==='Greater Than or Equal To' && $field['value']>=$field['median_value']){
+                            if ($key['name'] === 'Greater Than or Equal To' && $field['value'] >= $field['median_value']) {
                                 $score->score = $key['score'];
                                 //check if score is accepted
-                                if(in_array($key['name'],$field['accept_value'])){
+                                if (in_array($key['name'], $field['accept_value'])) {
                                     $score->accepted = 1;
                                 }
                             }
-                            if($key['name']==='Less Than' && $field['value']<$field['median_value']){
+                            if ($key['name'] === 'Less Than' && $field['value'] < $field['median_value']) {
                                 $score->score = $key['score'];
                                 //check if score is accepted
-                                if(in_array($key['name'],$field['accept_value'])){
+                                if (in_array($key['name'], $field['accept_value'])) {
                                     $score->accepted = 1;
                                 }
                             }
@@ -253,6 +256,67 @@ class LoanApplicationsController extends Controller
                 }
                 $score->save();
             }
+        }
+        //let's update fields of type formula
+        $formulaAttributes = LoanApplicationScore::with(['productAttribute'])
+            ->where('loan_application_id', $application->id)
+            ->whereHas('scoringAttribute', function (Builder $query) {
+                $query->where('field_type', 'formula');
+            })->get();
+        foreach ($formulaAttributes as $attribute) {
+            $formula = $attribute->productAttribute->data;
+            preg_match_all(
+                '/\{\{field_(\d)+}}/',
+                $formula,
+                $matches,
+                PREG_PATTERN_ORDER
+            );
+            if (!empty($matches[0])) {
+                foreach ($matches[0] as $match) {
+                    //find the value of that field
+                    $score = LoanApplicationScore::where('loan_product_scoring_attribute_id', explode('_', $match)[1])->where('loan_application_id', $application->id)->first();
+                    if (empty($score)) {
+                        //throw error
+                    }
+                    $formula = str_replace($match, $score->value, $formula);
+                }
+                //at this point our formula is ready
+                $math = new EvalMath;
+                $value = $math->evaluate($formula);
+                $attribute->value = round($value, 2);
+            }
+            //update the score now that we have a value
+            $options = LoanProductScoringAttributeOptionValue::where('loan_product_id', $product->id)->where('loan_product_scoring_attribute_id', $attribute->productAttribute->id)->get();
+            if ($attribute->productAttribute->option_type === 'range') {
+                foreach ($options as $key) {
+                    if ($attribute->value >= $key->lower_value && $attribute->value <= $key->upper_value) {
+                        $attribute->score = $key->score;
+                        //check if score is accepted
+                        if (in_array($key->name, $attribute->productAttribute->accept_value)) {
+                            $attribute->accepted = 1;
+                        }
+                    }
+                }
+            }
+            if ($attribute->productAttribute->option_type === 'greater_than_or_less_than') {
+                foreach ($options as $key) {
+                    if ($key->name === 'Greater Than or Equal To' && $attribute->value >= $attribute->productAttribute->median_value) {
+                        $score->score = $key->score;
+                        //check if score is accepted
+                        if (in_array($key->name, $attribute->productAttribute->accept_value)) {
+                            $attribute->accepted = 1;
+                        }
+                    }
+                    if ($key->name === 'Less Than' && $attribute->value < $attribute->productAttribute->median_value) {
+                        $attribute->score = $key->score;
+                        //check if score is accepted
+                        if (in_array($key->name, $attribute->productAttribute->accept_value)) {
+                            $attribute->accepted = 1;
+                        }
+                    }
+                }
+            }
+            $attribute->save();
         }
         $application->score = LoanApplicationScore::where('loan_application_id', $application->id)->sum('score');
         $application->score_percentage = $application->score * 100 / $product->score;
@@ -358,7 +422,7 @@ class LoanApplicationsController extends Controller
                             }
                         }
                         $item->attribute->options = $optionsArray;
-                    }elseif ($item->attribute->field_type === 'number' || $item->attribute->field_type === 'text') {
+                    } elseif ($item->attribute->field_type === 'number' || $item->attribute->field_type === 'text') {
                         $optionsArray = [];
                         if ($item->option_type === 'greater_than_or_less_than') {
                             if ($opt = LoanProductScoringAttributeOptionValue::where('loan_product_scoring_attribute_id', $item->id)->where('name', 'Greater Than or Equal To')->first()) {
@@ -422,7 +486,7 @@ class LoanApplicationsController extends Controller
             $group->attributes = $attributes;
             return $group;
         });
-        $application->product->scoring_attributes = $groups;
+        $application->product->form_attributes = $groups;
         return Inertia::render('LoanApplications/Edit', [
             'application' => $application,
         ]);
@@ -468,36 +532,36 @@ class LoanApplicationsController extends Controller
                         if ($key['name'] == $field['value']) {
                             $score->score = $key['score'];
                             //check if score is accepted
-                            if(in_array($key['name'],$field['accept_value'])){
+                            if (in_array($key['name'], $field['accept_value'])) {
                                 $score->accepted = 1;
                             }
                         }
                     }
-                }elseif ($field['attribute']['field_type'] === 'text' || $field['attribute']['field_type'] === 'number') {
-                    if($field['option_type']==='range'){
+                } elseif ($field['attribute']['field_type'] === 'text' || $field['attribute']['field_type'] === 'number') {
+                    if ($field['option_type'] === 'range') {
                         foreach ($field['attribute']['options'] as $key) {
-                            if ($field['value']>=$key['lower_value'] && $field['value']<=$key['upper_value']) {
+                            if ($field['value'] >= $key['lower_value'] && $field['value'] <= $key['upper_value']) {
                                 $score->score = $key['score'];
                                 //check if score is accepted
-                                if(in_array($key['name'],$field['accept_value'])){
+                                if (in_array($key['name'], $field['accept_value'])) {
                                     $score->accepted = 1;
                                 }
                             }
                         }
                     }
-                    if($field['option_type']==='greater_than_or_less_than'){
+                    if ($field['option_type'] === 'greater_than_or_less_than') {
                         foreach ($field['attribute']['options'] as $key) {
-                            if($key['name']==='Greater Than or Equal To' && $field['value']>=$field['median_value']){
+                            if ($key['name'] === 'Greater Than or Equal To' && $field['value'] >= $field['median_value']) {
                                 $score->score = $key['score'];
                                 //check if score is accepted
-                                if(in_array($key['name'],$field['accept_value'])){
+                                if (in_array($key['name'], $field['accept_value'])) {
                                     $score->accepted = 1;
                                 }
                             }
-                            if($key['name']==='Less Than' && $field['value']<$field['median_value']){
+                            if ($key['name'] === 'Less Than' && $field['value'] < $field['median_value']) {
                                 $score->score = $key['score'];
                                 //check if score is accepted
-                                if(in_array($key['name'],$field['accept_value'])){
+                                if (in_array($key['name'], $field['accept_value'])) {
                                     $score->accepted = 1;
                                 }
                             }
@@ -508,6 +572,67 @@ class LoanApplicationsController extends Controller
                 }
                 $score->save();
             }
+        }
+        //let's update fields of type formula
+        $formulaAttributes = LoanApplicationScore::with(['productAttribute'])
+            ->where('loan_application_id', $application->id)
+            ->whereHas('scoringAttribute', function (Builder $query) {
+                $query->where('field_type', 'formula');
+            })->get();
+        foreach ($formulaAttributes as $attribute) {
+            $formula = $attribute->productAttribute->data;
+            preg_match_all(
+                '/\{\{field_(\d)+}}/',
+                $formula,
+                $matches,
+                PREG_PATTERN_ORDER
+            );
+            if (!empty($matches[0])) {
+                foreach ($matches[0] as $match) {
+                    //find the value of that field
+                    $score = LoanApplicationScore::where('loan_product_scoring_attribute_id', explode('_', $match)[1])->where('loan_application_id', $application->id)->first();
+                    if (empty($score)) {
+                        //throw error
+                    }
+                    $formula = str_replace($match, $score->value, $formula);
+                }
+                //at this point our formula is ready
+                $math = new EvalMath;
+                $value = $math->evaluate($formula);
+                $attribute->value = round($value, 2);
+            }
+            //update the score now that we have a value
+            $options = LoanProductScoringAttributeOptionValue::where('loan_product_id', $product->id)->where('loan_product_scoring_attribute_id', $attribute->productAttribute->id)->get();
+            if ($attribute->productAttribute->option_type === 'range') {
+                foreach ($options as $key) {
+                    if ($attribute->value >= $key->lower_value && $attribute->value <= $key->upper_value) {
+                        $attribute->score = $key->score;
+                        //check if score is accepted
+                        if (in_array($key->name, $attribute->productAttribute->accept_value)) {
+                            $attribute->accepted = 1;
+                        }
+                    }
+                }
+            }
+            if ($attribute->productAttribute->option_type === 'greater_than_or_less_than') {
+                foreach ($options as $key) {
+                    if ($key->name === 'Greater Than or Equal To' && $attribute->value >= $attribute->productAttribute->median_value) {
+                        $score->score = $key->score;
+                        //check if score is accepted
+                        if (in_array($key->name, $attribute->productAttribute->accept_value)) {
+                            $attribute->accepted = 1;
+                        }
+                    }
+                    if ($key->name === 'Less Than' && $attribute->value < $attribute->productAttribute->median_value) {
+                        $attribute->score = $key->score;
+                        //check if score is accepted
+                        if (in_array($key->name, $attribute->productAttribute->accept_value)) {
+                            $attribute->accepted = 1;
+                        }
+                    }
+                }
+            }
+            $attribute->save();
         }
         $application->score = LoanApplicationScore::where('loan_application_id', $application->id)->sum('score');
         $application->score_percentage = $application->score * 100 / $product->score;
@@ -524,7 +649,7 @@ class LoanApplicationsController extends Controller
         $application->approved_by_id = Auth::id();
         if ($application->isDirty('status')) {
             if ($application->status == 'approved') {
-                $application->approved_at =Carbon::now();
+                $application->approved_at = Carbon::now();
                 $application->amount = $request->amount ?? $application->applied_amount;
             }
             if ($application->status == 'rejected') {

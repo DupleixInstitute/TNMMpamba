@@ -30,7 +30,8 @@
         "spatie/laravel-activitylog": "^4.7",
         "spatie/laravel-permission": "^5.10",
         "tightenco/ziggy": "^1.4",
-        "tjmugova/bluedot-sms": "^1.0"
+        "tjmugova/bluedot-sms": "^1.0",
+        "webit/eval-math": "^1.0"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.7",

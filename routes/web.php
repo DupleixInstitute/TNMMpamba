@@ -55,6 +55,7 @@ use App\Http\Controllers\UsersController;
 use App\Http\Controllers\VillagesController;
 use App\Http\Controllers\WardsController;
 use Illuminate\Support\Facades\Route;
+use Webit\Util\EvalMath\EvalMath;
 
 /*
 |--------------------------------------------------------------------------
@@ -127,7 +128,7 @@ Route::prefix('scoring_attribute')->name('scoring_attributes.')->group(function 
 });
 
 //clients
-Route::group(['prefix' => 'client','as'=>'clients.'], function () {
+Route::group(['prefix' => 'client', 'as' => 'clients.'], function () {
     Route::get('/', [ClientsController::class, 'index'])->name('index');
     Route::get('/create', [ClientsController::class, 'create'])->name('create');
     Route::get('/search', [ClientsController::class, 'search'])->name('search');
@@ -436,7 +437,7 @@ Route::group(['prefix' => 'portal', 'as' => 'portal.'], function () {
     Route::prefix('article')->name('articles.')->group(function () {
         Route::get('/', [MemberPortalArticlesController::class, 'index'])->name('index');
         Route::get('/{article}/show', [MemberPortalArticlesController::class, 'show'])->name('show');
-      //comments
+        //comments
         Route::post('/{article}/comment/store', [MemberPortalArticlesController::class, 'storeComment'])->name('comments.store');
         Route::delete('/comment/{comment}/destroy', [MemberPortalArticlesController::class, 'destroyComment'])->name('comments.destroy');
 
@@ -447,3 +448,23 @@ Route::group(['prefix' => 'portal', 'as' => 'portal.'], function () {
         Route::get('/compose', [PatientPortalAppointmentsController::class, 'compose'])->name('compose');
     });
 });
+Route::get('/test', function () {
+    $formula="{{field_33}}+{{field_34}}/12";
+    preg_match_all(
+        '/\{\{field_(\d)+}}/',
+        $formula,
+        $matches,
+        PREG_PATTERN_ORDER
+    );
+    foreach ($matches[0] as $match) {
+        //find the value of that field
+        $formula = str_replace($match, rand(12,100),$formula);
+    }
+    dump($formula);
+    $math = new EvalMath;
+    $result = $math->evaluate($formula);
+    dump($result);
+    print_r($matches[0]);
+    dd('test');
+});
+

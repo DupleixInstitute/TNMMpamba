@@ -110,7 +110,12 @@
                             </div>
                             <div class="bg-gray-50 p-4 mb-4 relative" v-for="(item,index) in attribute.attributes">
                                 <div class="grid grid-cols-1 md:grid-cols-3">
-                                    <div>{{ item.name }}</div>
+                                    <div>{{ item.name }} <span v-if="item.id" title="Click to copy"
+                                                               class="p-1 text-xs bg-blue-400 text-white cursor-pointer"
+                                                               @click="copy('{{field_'+item.id+'}}')"> field_{{
+                                            item.id
+                                        }}</span>
+                                    </div>
                                     <div>
                                         <span class="mr-2">Weight</span>
                                         <jet-input type="text" class="w-16" v-model="item.weight" @blur="updateItems"/>
@@ -119,6 +124,12 @@
                                     <div>
                                         <span class="mr-2">Score</span>
                                         <span class="ml-2">{{ item.score }}</span>
+                                    </div>
+                                </div>
+                                <div class="mb-4" v-if="item.attribute.field_type==='formula'">
+                                    <div class="mb-4">
+                                        <jet-label for="data" value="Formula"/>
+                                        <textarea-input type="text" placeholder="{{field_1}}+{{field_2}}/12" class="mt-1 w-full" v-model="item.data"/>
                                     </div>
                                 </div>
                                 <div
@@ -151,12 +162,13 @@
                                     </table>
                                 </div>
                                 <div
-                                    v-if="item.attribute.field_type==='number'||item.attribute.field_type==='text'">
+                                    v-if="item.attribute.field_type==='number'||item.attribute.field_type==='text'||item.attribute.field_type==='formula'">
                                     <div class="mb-4">
                                         <jet-label for="option_type" value="Option Type"/>
                                         <select
                                             class="mt-1 border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 rounded-md shadow-sm w-full"
-                                            name="option_type" v-model="item.option_type" id="option_type" @change="updateItemOptionType(item)">
+                                            name="option_type" v-model="item.option_type" id="option_type"
+                                            @change="updateItemOptionType(item)">
                                             <option value="range">Range</option>
                                             <option value="greater_than_or_less_than">Greater than/Less than</option>
                                         </select>
@@ -180,7 +192,7 @@
                                                 <tr v-for="option in item.attribute.options"
                                                     class="hover:bg-gray-100 focus-within:bg-gray-100">
                                                     <td class="border-t px-6 py-4">
-                                                        {{ option.name }} {{item.median_value}}
+                                                        {{ option.name }} {{ item.median_value }}
                                                     </td>
                                                     <td class="border-t px-6 py-4">
                                                         <jet-input type="text" class="w-16" v-model="option.weight"
@@ -201,8 +213,10 @@
                                             <table class="w-full whitespace-no-wrap table-auto">
                                                 <thead class="bg-gray-50">
                                                 <tr class="text-left font-bold">
-                                                    <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Lower Value</th>
-                                                    <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Upper Value</th>
+                                                    <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Lower Value
+                                                    </th>
+                                                    <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Upper Value
+                                                    </th>
                                                     <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Weight</th>
                                                     <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Score</th>
                                                     <th class="px-6 pt-4 pb-4 font-medium text-gray-500">
@@ -217,10 +231,12 @@
                                                 <tr v-for="(option,ky) in item.attribute.options"
                                                     class="hover:bg-gray-100 focus-within:bg-gray-100">
                                                     <td class="border-t px-6 py-4">
-                                                        <jet-input type="text" class="w-24" v-model="option.lower_value" @blur="updateItems"/>
+                                                        <jet-input type="text" class="w-24" v-model="option.lower_value"
+                                                                   @blur="updateItems"/>
                                                     </td>
                                                     <td class="border-t px-6 py-4">
-                                                        <jet-input type="text" class="w-24" v-model="option.upper_value" @blur="updateItems"/>
+                                                        <jet-input type="text" class="w-24" v-model="option.upper_value"
+                                                                   @blur="updateItems"/>
                                                     </td>
                                                     <td class="border-t px-6 py-4">
                                                         <jet-input type="text" class="w-24" v-model="option.weight"
@@ -250,10 +266,10 @@
                                             <jet-label for="accept_value" value="Accepted Option(s)"/>
                                             <Multiselect class="bg-white"
                                                          mode="tags"
-                                                v-model="item.accept_value"
-                                                :options="item.attribute.options"
-                                                label="name"
-                                                valueProp="name"
+                                                         v-model="item.accept_value"
+                                                         :options="item.attribute.options"
+                                                         label="name"
+                                                         valueProp="name"
                                             />
                                         </div>
                                     </div>
@@ -435,7 +451,7 @@ export default {
             group_id: '',
             attribute_id: '',
             form: this.$inertia.form({
-                attributes: JSON.parse(JSON.stringify(this.product.score_attributes)),
+                attributes: JSON.parse(JSON.stringify(this.product.form_attributes)),
             }),
             readyToSave: false,
             confirmingDeletion: false,
@@ -486,6 +502,7 @@ export default {
                         accept_condition: '',
                         option_type: '',
                         median_value: '',
+                        data: '',
                         active: true,
                         is_group: true,
                         order_position: this.form.attributes.length + 1,
@@ -510,7 +527,8 @@ export default {
                 })
                 this.form.attributes.forEach(item => {
                     if (item.scoring_attribute_group_id == this.selectedGroup.scoring_attribute_group_id) {
-                        item.attributes.forEach(attr => {
+                        Object.keys(item.attributes).forEach(key => {
+                            let attr = item.attributes[key]
                             if (attr.scoring_attribute_id == this.attribute_id) {
                                 attributeExists = true
                             }
@@ -537,6 +555,7 @@ export default {
                                 accept_condition: '',
                                 option_type: '',
                                 median_value: '',
+                                data: '',
                                 active: true,
                                 is_group: false,
                                 order_position: item.attributes.length + 1,
@@ -571,20 +590,20 @@ export default {
             this.groupPercentagesTotal = 0
             this.attributePercentagesTotal = 0
             Object.keys(this.form.attributes).forEach(key => {
-                let item=this.form.attributes[key]
-                item.score = parseFloat(this.product.score||0) * parseFloat(item.weight) / 100
+                let item = this.form.attributes[key]
+                item.score = parseFloat(this.product.score || 0) * parseFloat(item.weight) / 100
                 this.groupPercentagesTotal += parseFloat(item.weight || 0)
                 Object.keys(item.attributes).forEach(k => {
 
-                    let attr=item.attributes[k]
+                    let attr = item.attributes[k]
 
-                    attr.score = parseFloat(this.product.score||0) * parseFloat(attr.weight) / 100
+                    attr.score = parseFloat(this.product.score || 0) * parseFloat(attr.weight) / 100
                     this.attributePercentagesTotal += parseFloat(attr.weight || 0)
                     if (attr.attribute.options && attr.attribute.options.length) {
                         attr.attribute.options.forEach(opt => {
-                            opt.score = parseFloat(attr.score||0) * parseFloat(opt.weight||0) / 100
-                            if(attr.option_type==='range'){
-                                opt.name=opt.lower_value+' to '+opt.upper_value
+                            opt.score = parseFloat(attr.score || 0) * parseFloat(opt.weight || 0) / 100
+                            if (attr.option_type === 'range') {
+                                opt.name = opt.lower_value + ' to ' + opt.upper_value
                             }
                         })
                     }
@@ -612,39 +631,39 @@ export default {
             }
             this.readyToSave = formGood
         },
-        updateItemOptionType(item){
-            if(item.option_type==='greater_than_or_less_than' &&  item.attribute.options.length===0){
-                item.attribute.options=[
+        updateItemOptionType(item) {
+            if (item.option_type === 'greater_than_or_less_than' && item.attribute.options.length === 0) {
+                item.attribute.options = [
                     {
-                        id:'',
-                        loan_product_scoring_attribute_id:item.id,
-                        scoring_attribute_id:item.scoring_attribute_id,
+                        id: '',
+                        loan_product_scoring_attribute_id: item.id,
+                        scoring_attribute_id: item.scoring_attribute_id,
                         loan_product_id: item.loan_product_id,
-                        weight:'',
-                        effective_weight:'',
-                        score:'',
-                        weighted_score:'',
-                        name:'Greater Than or Equal To',
-                        description:'',
-                        lower_value:'',
-                        upper_value:'',
-                        median_value:'',
+                        weight: '',
+                        effective_weight: '',
+                        score: '',
+                        weighted_score: '',
+                        name: 'Greater Than or Equal To',
+                        description: '',
+                        lower_value: '',
+                        upper_value: '',
+                        median_value: '',
                         active: true,
                     },
                     {
-                        id:'',
-                        loan_product_scoring_attribute_id:item.id,
+                        id: '',
+                        loan_product_scoring_attribute_id: item.id,
                         loan_product_id: item.loan_product_id,
-                        scoring_attribute_id:item.scoring_attribute_id,
-                        weight:'',
-                        effective_weight:'',
-                        score:'',
-                        weighted_score:'',
-                        name:'Less Than',
-                        description:'',
-                        lower_value:'',
-                        upper_value:'',
-                        median_value:'',
+                        scoring_attribute_id: item.scoring_attribute_id,
+                        weight: '',
+                        effective_weight: '',
+                        score: '',
+                        weighted_score: '',
+                        name: 'Less Than',
+                        description: '',
+                        lower_value: '',
+                        upper_value: '',
+                        median_value: '',
                         active: true,
                     }
                 ]
@@ -652,9 +671,9 @@ export default {
         },
         submit() {
             this.form.post(this.route('loan_products.sync_attributes', this.product.id), {
-                preserveScroll: true,
+                preserveState: false,
                 onSuccess: () => {
-                    this.$inertia.reload()
+                    //this.$inertia.reload()
                 },
             })
         },
@@ -709,7 +728,9 @@ export default {
             this.confirmingDeletion = false
             window.location = route('loan_products.index')
         },
-
+        copy(text) {
+            navigator.clipboard.writeText(text);
+        }
     },
     computed: {
         availableGroups() {
@@ -737,9 +758,7 @@ export default {
             return attributes
         }
     },
-    watch: {
-
-    }
+    watch: {}
 }
 </script>
 <style scoped>

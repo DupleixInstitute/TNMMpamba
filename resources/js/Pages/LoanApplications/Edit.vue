@@ -192,7 +192,7 @@ export default {
                 description: this.application.description,
                 date: this.application.date,
                 status: this.application.status,
-                attributes:JSON.parse(JSON.stringify(this.application.product.scoring_attributes))
+                attributes:JSON.parse(JSON.stringify(this.application.product.form_attributes))
             }),
             usersMultiSelect: {
                 value: null,

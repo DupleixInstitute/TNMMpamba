@@ -36,7 +36,7 @@ class LoanProduct extends Model
         return $this->belongsTo(LoanProductCategory::class, 'loan_product_category_id', 'id');
     }
 
-    public function attributes()
+    public function scoringAttributes()
     {
         return $this->hasMany(LoanProductScoringAttribute::class, 'loan_product_id', 'id')->orderBy('order_position');
     }

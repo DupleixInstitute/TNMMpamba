@@ -108,6 +108,9 @@
                                              <span v-if="item.field_type=='dropdown'">
                                                 Dropdown
                                             </span>
+                                            <span v-if="item.field_type==='formula'">
+                                                Readonly(Formula)
+                                            </span>
                                             <span v-if="item.field_type=='text'">
                                                 Text
                                             </span>
@@ -146,8 +149,9 @@
                                     </td>
                                     <td class="border-t w-px pr-2">
                                         <div class=" flex items-center space-x-2">
-                                            <button v-if="can('loans.scoring_attributes.update')" @click="editItem( item.id)"
-                                                          tabindex="-1" class="text-indigo-600 hover:text-indigo-900">
+                                            <button v-if="can('loans.scoring_attributes.update')"
+                                                    @click="editItem( item.id)"
+                                                    tabindex="-1" class="text-indigo-600 hover:text-indigo-900">
                                                 Edit
                                             </button>
                                             <a href="#" v-if="can('loans.scoring_attributes.destroy')"
@@ -188,6 +192,7 @@
                             class="border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 rounded-md shadow-sm w-full"
                             name="field_type" v-model="item.field_type" id="field_type" required>
                             <option value="number">Number</option>
+                            <option value="formula">Formula</option>
                             <option value="dropdown">Dropdown</option>
                             <option value="text">Text</option>
                             <option value="textarea">Textarea</option>
@@ -401,9 +406,9 @@ export default {
             this.selectedRecord = id
         },
         destroy() {
-            this.$inertia.delete(this.route('scoring_attributes.destroy', this.attribute.id),{
-                preserveState:false,
-                onSuccess:()=>{
+            this.$inertia.delete(this.route('scoring_attributes.destroy', this.attribute.id), {
+                preserveState: false,
+                onSuccess: () => {
                     this.$inertia.visit(this.route('scoring_attributes.index'))
                 }
             })
@@ -412,10 +417,10 @@ export default {
         },
         editItem(id) {
             this.editingItem = true
-            this.attribute.attributes.forEach(item=>{
-                if(item.id==id){
-                    this.item=item
-                    this.showItemModal=true
+            this.attribute.attributes.forEach(item => {
+                if (item.id == id) {
+                    this.item = item
+                    this.showItemModal = true
                 }
             })
         },
@@ -428,12 +433,12 @@ export default {
             this.confirmItemDeletion = false
         },
         storeItem() {
-            this.processing=true
-            this.$inertia.post(this.route('scoring_attributes.items.store', this.attribute.id),this.item,{
-                onSuccess:()=>{
+            this.processing = true
+            this.$inertia.post(this.route('scoring_attributes.items.store', this.attribute.id), this.item, {
+                onSuccess: () => {
                     this.$inertia.reload()
                     this.showItemModal = false
-                    this.item={
+                    this.item = {
                         id: '',
                         scoring_attribute_group_id: this.attribute.id,
                         name: '',
@@ -449,23 +454,23 @@ export default {
                     }
                 }
             })
-            this.processing=false
+            this.processing = false
         },
 
     },
     watch: {
         'item.field_type': function (val) {
-            if (val==='dropdown'||val==='radio'||val==='checkbox') {
-                if(!this.item.options.length){
-                    this.item.options=[]
+            if (val === 'dropdown' || val === 'radio' || val === 'checkbox') {
+                if (!this.item.options.length) {
+                    this.item.options = []
                 }
-            }else {
-                this.item.options=''
+            } else {
+                this.item.options = ''
             }
         },
         showItemModal: function (val) {
             if (!val) {
-                this.item={
+                this.item = {
                     id: '',
                     scoring_attribute_group_id: this.attribute.id,
                     name: '',
