@@ -101,7 +101,6 @@
 
 <script>
 import AppLayout from '@/Layouts/AppLayout.vue'
-import Appointments from '@/Pages/Dashboard/Appointments.vue'
 import JetDialogModal from '@/Jetstream/DialogModal.vue'
 import JetDangerButton from '@/Jetstream/DangerButton.vue'
 import JetSuccessButton from '@/Jetstream/SuccessButton.vue'
