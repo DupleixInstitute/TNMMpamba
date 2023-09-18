@@ -155,16 +155,25 @@
                                     </td>
                                     <td class="border-t px-6 py-4">
                                         {{ attribute.value }}
-                                   </td>
+                                    </td>
                                     <td class="border-t px-6 py-4">
                                         {{ attribute.score }}
-                                      </td>
+                                    </td>
                                     <td class="border-t px-6 py-4">
-                                        <span class="ml-2 text-green-600" v-if="attribute.accepted"><font-awesome-icon icon="check-circle"/></span>
+                                        <span class="ml-2 text-green-600" v-if="attribute.accepted"><font-awesome-icon
+                                            icon="check-circle"/></span>
                                         <span class="ml-2 text-red-600" v-else><font-awesome-icon icon="times-circle"/></span>
                                     </td>
                                 </tr>
                                 </tbody>
+                                <tfoot>
+                                <tr class="text-left font-bold">
+                                    <th class="px-6 pt-4 pb-4 font-medium text-gray-500" colspan="2">Total</th>
+                                    <th class="px-6 pt-4 pb-4 font-bold text-gray-800" colspan="2">
+                                        {{ group.total_score }}
+                                    </th>
+                                </tr>
+                                </tfoot>
                             </table>
                         </div>
 
@@ -311,7 +320,7 @@ export default {
             this.form.post(this.route('loan_applications.change_status', this.application.id), {
                 preserveScroll: true,
                 onSuccess: () => {
-                    this.showChangeStatusModal=false
+                    this.showChangeStatusModal = false
                     this.$inertia.reload()
                 },
             })

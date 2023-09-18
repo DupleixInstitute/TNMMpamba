@@ -340,6 +340,7 @@ class LoanApplicationsController extends Controller
         $groups = LoanProductScoringAttribute::where('is_group', 1)->where('loan_product_id', $application->product->id)->get();
         $groups->transform(function ($group) use ($application) {
             $attributes = LoanProductScoringAttribute::with(['attribute'])->where('is_group', 0)->where('scoring_attribute_group_id', $group->scoring_attribute_group_id)->where('loan_product_id', $application->product->id)->orderBy('order_position')->get();
+            $group->total_score = (float)$attributes->sum('score');
             $attributes->transform(function ($item) use ($application) {
                 if (!empty($item->attribute)) {
                     if ($item->attribute->field_type === 'dropdown' || $item->attribute->field_type === 'radio' || $item->attribute->field_type === 'checkbox') {
