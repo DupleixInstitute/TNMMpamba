@@ -139,6 +139,14 @@
                         <div class="bg-gray-50 border p-4">
                             <h4 class="font-semibold text-xl text-gray-800 leading-tight">{{ group.name }}</h4>
                             <table class="w-full whitespace-no-wrap table-auto mt-4">
+                                <thead>
+                                <tr class="text-left font-bold">
+                                    <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Name</th>
+                                    <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Value</th>
+                                    <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Score</th>
+                                    <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Accepted</th>
+                                </tr>
+                                </thead>
                                 <tbody>
                                 <tr v-for="attribute in group.attributes"
                                     class="hover:bg-gray-100 focus-within:bg-gray-100">
@@ -147,6 +155,11 @@
                                     </td>
                                     <td class="border-t px-6 py-4">
                                         {{ attribute.value }}
+                                   </td>
+                                    <td class="border-t px-6 py-4">
+                                        {{ attribute.score }}
+                                      </td>
+                                    <td class="border-t px-6 py-4">
                                         <span class="ml-2 text-green-600" v-if="attribute.accepted"><font-awesome-icon icon="check-circle"/></span>
                                         <span class="ml-2 text-red-600" v-else><font-awesome-icon icon="times-circle"/></span>
                                     </td>
