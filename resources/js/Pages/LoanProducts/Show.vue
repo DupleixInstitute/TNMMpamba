@@ -518,7 +518,7 @@ export default {
                 let attribute = ''
                 this.groups.forEach(item => {
                     if (item.id == this.selectedGroup.scoring_attribute_group_id) {
-                        item.attributes.forEach(attr => {
+                        item.scoring_attributes.forEach(attr => {
                             if (attr.id == this.attribute_id) {
                                 attribute = attr
                             }
@@ -750,7 +750,7 @@ export default {
             if (this.selectedGroup) {
                 this.groups.forEach(item => {
                     if (item.id == this.selectedGroup.scoring_attribute_group_id) {
-                        attributes = item.attributes
+                        attributes = item.scoring_attributes
                     }
                 })
             }
