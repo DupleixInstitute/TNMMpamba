@@ -113,7 +113,6 @@ import SelectInput from '@/Jetstream/SelectInput.vue'
 export default {
     components: {
         AppLayout,
-        Appointments,
         JetDialogModal,
         JetDangerButton,
         JetSuccessButton,
@@ -121,7 +120,6 @@ export default {
         JetLabel,
         SelectInput,
         JetInfoButton,
-        FullCalendar,
     },
     props: {
 
