@@ -109,7 +109,6 @@ import JetInfoButton from '@/Jetstream/InfoButton.vue'
 import JetLabel from '@/Jetstream/Label.vue'
 import SelectInput from '@/Jetstream/SelectInput.vue'
 
-import FullCalendar from "@fullcalendar/vue3";
 
 export default {
     components: {
