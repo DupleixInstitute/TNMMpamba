@@ -67,6 +67,122 @@
                             <td class="w-1/2 border border-gray-300 font-semibold p-4 text-gray-900">External ID</td>
                             <td class="w-1/2 border border-gray-300 p-4 text-gray-500">{{ client.external_id }}</td>
                         </tr>
+                        <tr v-if="client.type==='corporate'">
+                            <td class="w-1/2 border border-gray-300 font-semibold p-4 text-gray-900">Trading Name</td>
+                            <td class="w-1/2 border border-gray-300 p-4 text-gray-500">{{ client.trading_name }}</td>
+                        </tr>
+                        <tr v-if="client.type==='corporate'">
+                            <td class="w-1/2 border border-gray-300 font-semibold p-4 text-gray-900">Customer Legal
+                                Type
+                            </td>
+                            <td class="w-1/2 border border-gray-300 p-4 text-gray-500">{{
+                                    client.legal_type?.name
+                                }}
+                            </td>
+                        </tr>
+                        <tr v-if="client.type==='corporate'">
+                            <td class="w-1/2 border border-gray-300 font-semibold p-4 text-gray-900">Certificate Of
+                                Registration No
+                            </td>
+                            <td class="w-1/2 border border-gray-300 p-4 text-gray-500">{{
+                                    client.registration_number
+                                }}
+                            </td>
+                        </tr>
+                        <tr v-if="client.type==='corporate'">
+                            <td class="w-1/2 border border-gray-300 font-semibold p-4 text-gray-900">Year Of Registration
+                            </td>
+                            <td class="w-1/2 border border-gray-300 p-4 text-gray-500">{{
+                                    client.registration_year
+                                }}
+                            </td>
+                        </tr>
+                        <tr v-if="client.type==='corporate'">
+                            <td class="w-1/2 border border-gray-300 font-semibold p-4 text-gray-900">Years In Business
+                            </td>
+                            <td class="w-1/2 border border-gray-300 p-4 text-gray-500">{{
+                                    client.years_in_business
+                                }}
+                            </td>
+                        </tr>
+                        <tr v-if="client.type==='corporate'">
+                            <td class="w-1/2 border border-gray-300 font-semibold p-4 text-gray-900">Country Of Registration
+                            </td>
+                            <td class="w-1/2 border border-gray-300 p-4 text-gray-500">{{
+                                    client.registration_country?.name
+                                }}
+                            </td>
+                        </tr>
+                        <tr v-if="client.type==='corporate'">
+                            <td class="w-1/2 border border-gray-300 font-semibold p-4 text-gray-900">Audit Status
+                            </td>
+                            <td class="w-1/2 border border-gray-300 p-4 text-gray-500">{{
+                                    client.audit_status
+                                }}
+                            </td>
+                        </tr>
+                        <tr v-if="client.type==='corporate'">
+                            <td class="w-1/2 border border-gray-300 font-semibold p-4 text-gray-900">Annual Inflation Rate - Real
+                            </td>
+                            <td class="w-1/2 border border-gray-300 p-4 text-gray-500">{{
+                                    client.real_annual_inflation_rate
+                                }}
+                            </td>
+                        </tr>
+                        <tr v-if="client.type==='corporate'">
+                            <td class="w-1/2 border border-gray-300 font-semibold p-4 text-gray-900">
+                                Annual Inflation Rate - Norminal
+                            </td>
+                            <td class="w-1/2 border border-gray-300 p-4 text-gray-500">{{
+                                    client.nominal_annual_inflation_rate
+                                }}
+                            </td>
+                        </tr>
+                        <tr v-if="client.type==='corporate'">
+                            <td class="w-1/2 border border-gray-300 font-semibold p-4 text-gray-900">
+                                Industrial Sector
+                            </td>
+                            <td class="w-1/2 border border-gray-300 p-4 text-gray-500">{{
+                                    client.industry_type?.name
+                                }}
+                            </td>
+                        </tr>
+                        <tr v-if="client.type==='corporate'">
+                            <td class="w-1/2 border border-gray-300 font-semibold p-4 text-gray-900">
+                                Years At Present Address
+                            </td>
+                            <td class="w-1/2 border border-gray-300 p-4 text-gray-500">{{
+                                    client.years_at_present_address
+                                }}
+                            </td>
+                        </tr>
+                        <tr v-if="client.type==='corporate'">
+                            <td class="w-1/2 border border-gray-300 font-semibold p-4 text-gray-900">
+                                Main Bank
+                            </td>
+                            <td class="w-1/2 border border-gray-300 p-4 text-gray-500">{{
+                                    client.main_bank?.name
+                                }}
+                            </td>
+                        </tr>
+                        <tr v-if="client.type==='corporate'">
+                            <td class="w-1/2 border border-gray-300 font-semibold p-4 text-gray-900">
+                                Second Bank
+                            </td>
+                            <td class="w-1/2 border border-gray-300 p-4 text-gray-500">{{
+                                    client.second_bank?.name
+                                }}
+                            </td>
+                        </tr>
+                        <tr v-if="client.type==='corporate'">
+                            <td class="w-1/2 border border-gray-300 font-semibold p-4 text-gray-900">
+                                Third Bank
+                            </td>
+                            <td class="w-1/2 border border-gray-300 p-4 text-gray-500">{{
+                                    client.third_bank?.name
+                                }}
+                            </td>
+                        </tr>
                         <tr>
                             <td class="w-1/2 border border-gray-300 font-semibold p-4 text-gray-900">Mobile</td>
                             <td class="w-1/2 border border-gray-300 p-4 text-gray-500">{{ client.mobile }}</td>

@@ -2,9 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\ClientCreated;
+use App\Models\Bank;
 use App\Models\Branch;
 use App\Models\Country;
 use App\Models\District;
+use App\Models\IndustryType;
+use App\Models\LegalType;
 use App\Models\LoanApplication;
 use App\Models\Client;
 use App\Models\Province;
@@ -29,12 +33,12 @@ class ClientsController extends Controller
     public function index()
     {
 
-        $clients = Client::with(['country','province', 'district', 'ward', 'village', 'branch'])
-        ->filter(\request()->only('search', 'province_id', 'gender', 'branch_id', 'district_id', 'ward_id', 'village_id'))
+        $clients = Client::with(['country', 'province', 'district', 'ward', 'village', 'branch'])
+            ->filter(\request()->only('search', 'province_id', 'gender', 'branch_id', 'district_id', 'ward_id', 'village_id', 'industry_type_id', 'type'))
             ->orderBy('created_at', 'desc')
             ->paginate(20);
         return Inertia::render('Clients/Index', [
-            'filters' => \request()->all('search', 'province_id', 'gender', 'branch_id', 'district_id', 'ward_id', 'village_id'),
+            'filters' => \request()->all('search', 'province_id', 'gender', 'branch_id', 'district_id', 'ward_id', 'village_id', 'industry_type_id', 'type'),
             'clients' => $clients,
             'countries' => Country::get()->map(function ($item) {
                 return [
@@ -89,6 +93,24 @@ class ClientsController extends Controller
                     'ward_id' => $item->ward_id,
                 ];
             }),
+            'industryTypes' => IndustryType::get()->transform(function ($item) {
+                return [
+                    'value' => $item->id,
+                    'label' => $item->name,
+                ];
+            }),
+            'legalTypes' => LegalType::get()->transform(function ($item) {
+                return [
+                    'value' => $item->id,
+                    'label' => $item->name,
+                ];
+            }),
+            'banks' => Bank::get()->transform(function ($item) {
+                return [
+                    'value' => $item->id,
+                    'label' => $item->name,
+                ];
+            }),
         ]);
     }
 
@@ -129,7 +151,22 @@ class ClientsController extends Controller
         $client->employer_address = $request->employer_address;
         $client->description = $request->description;
         $client->status = $request->status;
+        $client->industry_type_id = $request->industry_type_id;
+        $client->registration_country_id = $request->registration_country_id;
+        $client->main_bank_id = $request->main_bank_id;
+        $client->second_bank_id = $request->second_bank_id;
+        $client->third_bank_id = $request->third_bank_id;
+        $client->legal_type_id = $request->legal_type_id;
+        $client->registration_year = $request->registration_year;
+        $client->registration_number = $request->registration_number;
+        $client->years_in_business = $request->years_in_business;
+        $client->trading_name = $request->trading_name;
+        $client->audit_status = $request->audit_status;
+        $client->real_annual_inflation_rate = $request->real_annual_inflation_rate;
+        $client->nominal_annual_inflation_rate = $request->nominal_annual_inflation_rate;
+        $client->years_at_present_address = $request->years_at_present_address;
         $client->save();
+        event(new ClientCreated($client));
         if ($request->file('photo')) {
             $client->updateProfilePhoto($request->file('photo'));
         }
@@ -141,7 +178,7 @@ class ClientsController extends Controller
 
     public function show(Client $client)
     {
-        $client->load(['country','province', 'district', 'ward', 'village', 'branch']);
+        $client->load(['country', 'province', 'district', 'ward', 'village', 'branch','industryType','legalType','mainBank','secondBank','thirdBank','registrationCountry']);
         return Inertia::render('Clients/Show', [
             'client' => $client
         ]);
@@ -193,6 +230,24 @@ class ClientsController extends Controller
                     'ward_id' => $item->ward_id,
                 ];
             }),
+            'industryTypes' => IndustryType::get()->transform(function ($item) {
+                return [
+                    'value' => $item->id,
+                    'label' => $item->name,
+                ];
+            }),
+            'legalTypes' => LegalType::get()->transform(function ($item) {
+                return [
+                    'value' => $item->id,
+                    'label' => $item->name,
+                ];
+            }),
+            'banks' => Bank::get()->transform(function ($item) {
+                return [
+                    'value' => $item->id,
+                    'label' => $item->name,
+                ];
+            }),
         ]);
     }
 
@@ -231,6 +286,20 @@ class ClientsController extends Controller
         $client->employer_address = $request->employer_address;
         $client->description = $request->description;
         $client->status = $request->status;
+        $client->industry_type_id = $request->industry_type_id;
+        $client->registration_country_id = $request->registration_country_id;
+        $client->main_bank_id = $request->main_bank_id;
+        $client->second_bank_id = $request->second_bank_id;
+        $client->third_bank_id = $request->third_bank_id;
+        $client->legal_type_id = $request->legal_type_id;
+        $client->registration_year = $request->registration_year;
+        $client->registration_number = $request->registration_number;
+        $client->years_in_business = $request->years_in_business;
+        $client->trading_name = $request->trading_name;
+        $client->audit_status = $request->audit_status;
+        $client->real_annual_inflation_rate = $request->real_annual_inflation_rate;
+        $client->nominal_annual_inflation_rate = $request->nominal_annual_inflation_rate;
+        $client->years_at_present_address = $request->years_at_present_address;
         $client->save();
         if ($request->file('photo')) {
             $client->updateProfilePhoto($request->file('photo'));
@@ -256,7 +325,7 @@ class ClientsController extends Controller
         $search = $request->s;
         $id = $request->id;
         $branchID = $request->branch_id;
-        $data = Client::with(['country','province', 'branch', 'district', 'ward', 'village'])->where(function ($query) use ($search) {
+        $data = Client::with(['country', 'province', 'branch', 'district', 'ward', 'village'])->where(function ($query) use ($search) {
             $query->where('name', 'like', "%$search%");
             $query->orWhere('email', 'like', "%$search%");
             $query->orWhere('id', 'like', "%$search%");

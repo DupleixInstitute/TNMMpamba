@@ -20,8 +20,8 @@ return new class extends Migration
             $table->unsignedBigInteger('loan_product_id')->nullable();
             $table->unsignedBigInteger('branch_id')->nullable();
             $table->unsignedBigInteger('staff_id')->nullable();
-            $table->decimal('amount')->nullable();
-            $table->decimal('applied_amount')->nullable();
+            $table->decimal('amount',65)->nullable();
+            $table->decimal('applied_amount',65)->nullable();
             $table->decimal('score_percentage')->default(0.0)->nullable();
             $table->decimal('score')->nullable();
             $table->date('date')->nullable();

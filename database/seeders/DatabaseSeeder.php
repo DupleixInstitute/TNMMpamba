@@ -25,6 +25,9 @@ class DatabaseSeeder extends Seeder
             BranchesTableSeeder::class,
             SmsGatewaysTableSeeder::class,
             CommunicationCampaignBusinessRulesTableSeederTableSeeder::class,
+            LegalTypesTableSeeder::class,
+            IndustryTypesTableSeeder::class,
+            ChartOfAccountsTableSeeder::class,
         ]);
     }
 }

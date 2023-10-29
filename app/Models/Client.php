@@ -30,6 +30,7 @@ class Client extends Model
     {
         return $this->hasOne(User::class);
     }
+
     public function province()
     {
         return $this->belongsTo(Province::class);
@@ -39,10 +40,12 @@ class Client extends Model
     {
         return $this->belongsTo(District::class);
     }
+
     public function ward()
     {
         return $this->belongsTo(Ward::class);
     }
+
     public function village()
     {
         return $this->belongsTo(Village::class);
@@ -56,6 +59,34 @@ class Client extends Model
     public function country()
     {
         return $this->belongsTo(Country::class);
+    }  public function registrationCountry()
+    {
+        return $this->belongsTo(Country::class,'registration_country_id');
+    }
+
+    public function mainBank()
+    {
+        return $this->belongsTo(Bank::class, 'main_bank_id');
+    }
+
+    public function secondBank()
+    {
+        return $this->belongsTo(Bank::class, 'second_bank_id');
+    }
+
+    public function thirdBank()
+    {
+        return $this->belongsTo(Bank::class, 'third_bank_id');
+    }
+
+    public function industryType()
+    {
+        return $this->belongsTo(IndustryType::class);
+    }
+
+    public function legalType()
+    {
+        return $this->belongsTo(LegalType::class);
     }
 
     public function courses()
@@ -82,11 +113,11 @@ class Client extends Model
     {
         return $this->hasMany(File::class, 'record_id', 'id')->where('category', 'patients');
     }
+
     public function sales()
     {
         return $this->hasMany(InventoryProductSale::class);
     }
-
 
 
     public function getJoinDateAttribute()
@@ -201,8 +232,9 @@ class Client extends Model
 
     public function getTotalBalanceAttribute()
     {
-        return Invoice::where('patient_id',$this->id)->sum();
-}
+        return Invoice::where('patient_id', $this->id)->sum();
+    }
+
     public function isDemoPatient()
     {
         return $this->email === 'patient@localhost.com';

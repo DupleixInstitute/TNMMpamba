@@ -1,7 +1,12 @@
 <?php
 
 use App\Http\Controllers\ArticleCategoriesController;
+use App\Http\Controllers\BanksController;
 use App\Http\Controllers\ClientNotesController;
+use App\Http\Controllers\ClientPotersController;
+use App\Http\Controllers\ClientShareholdersController;
+use App\Http\Controllers\IndustryTypesController;
+use App\Http\Controllers\LegalTypesController;
 use App\Http\Controllers\LoanProductsController;
 use App\Http\Controllers\BranchesController;
 use App\Http\Controllers\ChartOfAccountController;
@@ -162,6 +167,38 @@ Route::group(['prefix' => 'client', 'as' => 'clients.'], function () {
     Route::get('note/{clientNote}/edit', [ClientNotesController::class, 'edit'])->name('notes.edit');
     Route::put('note/{clientNote}/update', [ClientNotesController::class, 'update'])->name('notes.update');
     Route::delete('note/{clientNote}/destroy', [ClientNotesController::class, 'destroy'])->name('notes.destroy');
+    //shareholders
+    Route::get('{client}/shareholder', [ClientShareholdersController::class, 'index'])->name('shareholders.index');
+    Route::get('{client}/shareholder/create', [ClientShareholdersController::class, 'create'])->name('shareholders.create');
+    Route::post('{client}/shareholder/store', [ClientShareholdersController::class, 'store'])->name('shareholders.store');
+    Route::get('shareholder/{shareholder}/show', [ClientShareholdersController::class, 'show'])->name('shareholders.show');
+    Route::get('shareholder/{shareholder}/edit', [ClientShareholdersController::class, 'edit'])->name('shareholders.edit');
+    Route::put('shareholder/{shareholder}/update', [ClientShareholdersController::class, 'update'])->name('shareholders.update');
+    Route::delete('shareholder/{shareholder}/destroy', [ClientShareholdersController::class, 'destroy'])->name('shareholders.destroy');
+    //balance sheet
+    Route::get('{client}/balance_sheet', [ClientNotesController::class, 'index'])->name('balance_sheet.index');
+    Route::get('{client}/balance_sheet/create', [ClientNotesController::class, 'create'])->name('balance_sheet.create');
+    Route::post('{client}/balance_sheet/store', [ClientNotesController::class, 'store'])->name('balance_sheet.store');
+    Route::get('balance_sheet/{balanceSheet}/show', [ClientNotesController::class, 'show'])->name('balance_sheet.show');
+    Route::get('balance_sheet/{balanceSheet}/edit', [ClientNotesController::class, 'edit'])->name('balance_sheet.edit');
+    Route::put('balance_sheet/{balanceSheet}/update', [ClientNotesController::class, 'update'])->name('balance_sheet.update');
+    Route::delete('balance_sheet/{balanceSheet}/destroy', [ClientNotesController::class, 'destroy'])->name('balance_sheet.destroy');
+    //income statement
+    Route::get('{client}/income_statement', [ClientNotesController::class, 'index'])->name('income_statement.index');
+    Route::get('{client}/income_statement/create', [ClientNotesController::class, 'create'])->name('income_statement.create');
+    Route::post('{client}/income_statement/store', [ClientNotesController::class, 'store'])->name('income_statement.store');
+    Route::get('income_statement/{incomeStatement}/show', [ClientNotesController::class, 'show'])->name('income_statement.show');
+    Route::get('income_statement/{incomeStatement}/edit', [ClientNotesController::class, 'edit'])->name('income_statement.edit');
+    Route::put('income_statement/{incomeStatement}/update', [ClientNotesController::class, 'update'])->name('income_statement.update');
+    Route::delete('income_statement/{incomeStatement}/destroy', [ClientNotesController::class, 'destroy'])->name('income_statement.destroy');
+    //poter
+    Route::get('{client}/poter', [ClientPotersController::class, 'index'])->name('poter.index');
+    Route::get('{client}/poter/create', [ClientPotersController::class, 'create'])->name('poter.create');
+    Route::post('{client}/poter/store', [ClientPotersController::class, 'store'])->name('poter.store');
+    Route::get('poter/{poter}/show', [ClientPotersController::class, 'show'])->name('poter.show');
+    Route::get('poter/{poter}/edit', [ClientPotersController::class, 'edit'])->name('poter.edit');
+    Route::put('poter/{poter}/update', [ClientPotersController::class, 'update'])->name('poter.update');
+    Route::delete('poter/{poter}/destroy', [ClientPotersController::class, 'destroy'])->name('poter.destroy');
 
 });
 
@@ -231,6 +268,46 @@ Route::group(['prefix' => 'branch'], function () {
     Route::get('/{branch}/edit', [BranchesController::class, 'edit'])->name('branches.edit');
     Route::put('/{branch}/update', [BranchesController::class, 'update'])->name('branches.update');
     Route::delete('/{branch}/destroy', [BranchesController::class, 'destroy'])->name('branches.destroy');
+});
+//industry_types
+Route::group(['prefix' => 'industry_type'], function () {
+    Route::get('/', [IndustryTypesController::class, 'index'])->name('industry_types.index');
+    Route::get('/create', [IndustryTypesController::class, 'create'])->name('industry_types.create');
+    Route::post('/store', [IndustryTypesController::class, 'store'])->name('industry_types.store');
+    Route::get('/{type}/show', [IndustryTypesController::class, 'show'])->name('industry_types.show');
+    Route::get('/{type}/edit', [IndustryTypesController::class, 'edit'])->name('industry_types.edit');
+    Route::put('/{type}/update', [IndustryTypesController::class, 'update'])->name('industry_types.update');
+    Route::delete('/{type}/destroy', [IndustryTypesController::class, 'destroy'])->name('industry_types.destroy');
+});
+//legal_types
+Route::group(['prefix' => 'legal_type'], function () {
+    Route::get('/', [LegalTypesController::class, 'index'])->name('legal_types.index');
+    Route::get('/create', [LegalTypesController::class, 'create'])->name('legal_types.create');
+    Route::post('/store', [LegalTypesController::class, 'store'])->name('legal_types.store');
+    Route::get('/{type}/show', [LegalTypesController::class, 'show'])->name('legal_types.show');
+    Route::get('/{type}/edit', [LegalTypesController::class, 'edit'])->name('legal_types.edit');
+    Route::put('/{type}/update', [LegalTypesController::class, 'update'])->name('legal_types.update');
+    Route::delete('/{type}/destroy', [LegalTypesController::class, 'destroy'])->name('legal_types.destroy');
+});
+//chart_of_accounts
+Route::group(['prefix' => 'chart_of_account'], function () {
+    Route::get('/', [ChartOfAccountController::class, 'index'])->name('chart_of_accounts.index');
+    Route::get('/create', [ChartOfAccountController::class, 'create'])->name('chart_of_accounts.create');
+    Route::post('/store', [ChartOfAccountController::class, 'store'])->name('chart_of_accounts.store');
+    Route::get('/{chartOfAccount}/show', [ChartOfAccountController::class, 'show'])->name('chart_of_accounts.show');
+    Route::get('/{chartOfAccount}/edit', [ChartOfAccountController::class, 'edit'])->name('chart_of_accounts.edit');
+    Route::put('/{chartOfAccount}/update', [ChartOfAccountController::class, 'update'])->name('chart_of_accounts.update');
+    Route::delete('/{chartOfAccount}/destroy', [ChartOfAccountController::class, 'destroy'])->name('chart_of_accounts.destroy');
+});
+//banks
+Route::group(['prefix' => 'bank'], function () {
+    Route::get('/', [BanksController::class, 'index'])->name('banks.index');
+    Route::get('/create', [BanksController::class, 'create'])->name('banks.create');
+    Route::post('/store', [BanksController::class, 'store'])->name('banks.store');
+    Route::get('/{bank}/show', [BanksController::class, 'show'])->name('banks.show');
+    Route::get('/{bank}/edit', [BanksController::class, 'edit'])->name('banks.edit');
+    Route::put('/{bank}/update', [BanksController::class, 'update'])->name('banks.update');
+    Route::delete('/{bank}/destroy', [BanksController::class, 'destroy'])->name('banks.destroy');
 });
 //locations
 Route::group(['prefix' => 'location', 'as' => 'locations.'], function () {
@@ -449,7 +526,7 @@ Route::group(['prefix' => 'portal', 'as' => 'portal.'], function () {
     });
 });
 Route::get('/test', function () {
-    $formula="{{field_33}}+{{field_34}}/12";
+    $formula = "{{field_33}}+{{field_34}}/12";
     preg_match_all(
         '/\{\{field_(\d)+}}/',
         $formula,
@@ -458,7 +535,7 @@ Route::get('/test', function () {
     );
     foreach ($matches[0] as $match) {
         //find the value of that field
-        $formula = str_replace($match, rand(12,100),$formula);
+        $formula = str_replace($match, rand(12, 100), $formula);
     }
     dump($formula);
     $math = new EvalMath;

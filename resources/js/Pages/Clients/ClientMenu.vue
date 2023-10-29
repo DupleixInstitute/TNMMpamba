@@ -16,11 +16,13 @@
                 {{ client.email }}
             </p>
             <div class="flex justify-center">
-                <inertia-link v-if="can('communication.campaigns.create')" :href="route('communication.campaigns.create',{client_id:client.id,campaign_type:'sms'})"
+                <inertia-link v-if="can('communication.campaigns.create')"
+                              :href="route('communication.campaigns.create',{client_id:client.id,campaign_type:'sms'})"
                               class="btn btn-success  mr-2" title="SMS">
                     <font-awesome-icon icon="sms" class="w-4 h-4"></font-awesome-icon>
                 </inertia-link>
-                <inertia-link v-if="can('communication.campaigns.create')" :href="route('communication.campaigns.create',{client_id:client.id,campaign_type:'email'})"
+                <inertia-link v-if="can('communication.campaigns.create')"
+                              :href="route('communication.campaigns.create',{client_id:client.id,campaign_type:'email'})"
                               class="btn btn-success" title="Email">
                     <font-awesome-icon icon="envelope" class="w-4 h-4"></font-awesome-icon>
                 </inertia-link>
@@ -33,6 +35,27 @@
                 :href="route('clients.show',client.id)">
                 <font-awesome-icon icon="user" class="w-4 h-4 mr-2"></font-awesome-icon>
                 Basic Profile
+            </inertia-link>
+            <inertia-link v-if="can('clients.shareholders.index')"
+                          class="w-full border-t border-gray-100 font-medium text-gray-600 py-2 px-4 w-full block hover:bg-gray-100 transition duration-150"
+                          :class="{'bg-gray-100': route().current('clients.shareholders.*')}"
+                          :href="route('clients.shareholders.index',client.id)">
+                <font-awesome-icon icon="users" class="w-4 h-4 mr-2"></font-awesome-icon>
+                Shareholders
+            </inertia-link>
+            <inertia-link v-if="can('clients.balance_sheet.index')"
+                          class="w-full border-t border-gray-100 font-medium text-gray-600 py-2 px-4 w-full block hover:bg-gray-100 transition duration-150"
+                          :class="{'bg-gray-100': route().current('clients.balance_sheet.*')}"
+                          :href="route('clients.balance_sheet.index',client.id)">
+                <font-awesome-icon icon="money-bill" class="w-4 h-4 mr-2"></font-awesome-icon>
+                Balance Sheet
+            </inertia-link>
+            <inertia-link v-if="can('clients.income_statement.index')"
+                          class="w-full border-t border-gray-100 font-medium text-gray-600 py-2 px-4 w-full block hover:bg-gray-100 transition duration-150"
+                          :class="{'bg-gray-100': route().current('clients.income_statement.*')}"
+                          :href="route('clients.income_statement.index',client.id)">
+                <font-awesome-icon icon="money-bill" class="w-4 h-4 mr-2"></font-awesome-icon>
+                Income Statement
             </inertia-link>
             <inertia-link v-if="can('loans.applications.index')"
                           class="w-full border-t border-gray-100 font-medium text-gray-600 py-2 px-4 w-full block hover:bg-gray-100 transition duration-150"
@@ -67,7 +90,8 @@
             <inertia-link v-if="can('clients.update')" :href="route('clients.edit',client.id)"
                           class="btn btn-primary py-1 px-2">Edit
             </inertia-link>
-            <button type="button" v-if="can('clients.destroy')" @click="deleteAction" class="btn btn-danger py-1 px-2 ml-auto">Delete
+            <button type="button" v-if="can('clients.destroy')" @click="deleteAction"
+                    class="btn btn-danger py-1 px-2 ml-auto">Delete
             </button>
         </div>
     </div>

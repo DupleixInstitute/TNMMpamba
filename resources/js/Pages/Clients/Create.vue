@@ -39,6 +39,121 @@
                             <jet-input-error :message="form.errors.name" class="mt-2"/>
                         </div>
                     </div>
+                    <div class="grid grid-cols-1 md:grid-cols-4 mt-4 gap-2" v-if="form.type==='corporate'">
+                        <div>
+                            <jet-label for="trading_name" value="Trading Name"/>
+                            <jet-input id="trading_name" type="text" class="block w-full" v-model="form.trading_name"/>
+                            <jet-input-error :message="form.errors.trading_name" class="mt-2"/>
+
+                        </div>
+                        <div>
+                            <jet-label for="legal_type_id" value="Customer Legal Type"/>
+                            <Multiselect
+                                id="legal_type_id"
+                                v-model="form.legal_type_id"
+                                :options="legalTypes"
+                            />
+                            <jet-input-error :message="form.errors.legal_type_id" class="mt-2"/>
+                        </div>
+                        <div>
+                            <jet-label for="registration_number" value="Certificate Of Registratio No"/>
+                            <jet-input id="registration_number" type="text" class="block w-full"
+                                       v-model="form.registration_number"/>
+                            <jet-input-error :message="form.errors.registration_number" class="mt-2"/>
+                        </div>
+                        <div>
+                            <jet-label for="registration_year" value="Year Of Registration (4 Digits)"/>
+                            <jet-input id="registration_year" type="text" class="block w-full"
+                                       v-model="form.registration_year"/>
+                            <jet-input-error :message="form.errors.registration_year" class="mt-2"/>
+                        </div>
+                        <div>
+                            <jet-label for="years_in_business" value="Years In Business"/>
+                            <jet-input id="years_in_business" type="text" class="block w-full"
+                                       v-model="form.years_in_business"/>
+                            <jet-input-error :message="form.errors.years_in_business" class="mt-2"/>
+                        </div>
+                        <div>
+                            <jet-label for="country_id" value="Country Of Registration"/>
+                            <Multiselect
+                                id="registration_country_id"
+                                v-model="form.registration_country_id"
+                                :options="countries"
+                            />
+                            <jet-input-error :message="form.errors.registration_country_id" class="mt-2"/>
+                        </div>
+                        <div>
+                            <jet-label for="industry_type_id" value="Industrial Sector"/>
+                            <Multiselect
+                                id="industry_type_id"
+                                v-model="form.industry_type_id"
+                                :options="industryTypes"
+                            />
+                            <jet-input-error :message="form.errors.industry_type_id" class="mt-2"/>
+                        </div>
+                        <div>
+                            <jet-label for="main_bank_id" value="Main Bank"/>
+                            <Multiselect
+                                id="main_bank_id"
+                                v-model="form.main_bank_id"
+                                :options="banks"
+                            />
+                            <jet-input-error :message="form.errors.main_bank_id" class="mt-2"/>
+                        </div>
+                        <div>
+                            <jet-label for="second_bank_id" value="Second Bank"/>
+                            <Multiselect
+                                id="second_bank_id"
+                                v-model="form.second_bank_id"
+                                :options="banks"
+                            />
+                            <jet-input-error :message="form.errors.second_bank_id" class="mt-2"/>
+                        </div>
+                        <div>
+                            <jet-label for="third_bank_id" value="Third Bank"/>
+                            <Multiselect
+                                id="third_bank_id"
+                                v-model="form.third_bank_id"
+                                :options="banks"
+                            />
+                            <jet-input-error :message="form.errors.third_bank_id" class="mt-2"/>
+                        </div>
+                        <div>
+                            <jet-label for="years_at_present_address" value="Years At Present Address"/>
+                            <select
+                                class="border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 rounded-md shadow-sm w-full"
+                                name="id_type" v-model="form.years_at_present_address" id="years_at_present_address">
+                                <option value="0 to 3">0 to 3</option>
+                                <option value="3 to 5">3 to 5</option>
+                                <option value="5 to 10">5 to 10</option>
+                                <option value="+10">+10</option>
+                            </select>
+                            <jet-input-error :message="form.errors.years_in_business" class="mt-2"/>
+                        </div>
+                        <div>
+                            <jet-label for="audit_status" value="Audit Status"/>
+                            <select
+                                class="border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 rounded-md shadow-sm w-full"
+                                name="audit_status" v-model="form.audit_status" id="audit_status">
+                                <option value="Audited">Audited</option>
+                                <option value="Registered Accountant">Registered Accountant</option>
+                                <option value="Management Accounts">Management Accounts</option>
+                            </select>
+                            <jet-input-error :message="form.errors.audit_status" class="mt-2"/>
+                        </div>
+                        <div>
+                            <jet-label for="real_annual_inflation_rate" value="Annual Inflation Rate - Real"/>
+                            <jet-input id="real_annual_inflation_rate" type="text" class="block w-full"
+                                       v-model="form.real_annual_inflation_rate"/>
+                            <jet-input-error :message="form.errors.real_annual_inflation_rate" class="mt-2"/>
+                        </div>
+                        <div>
+                            <jet-label for="nominal_annual_inflation_rate" value="Annual Inflation Rate - Norminal"/>
+                            <jet-input id="nominal_annual_inflation_rate" type="text" class="block w-full"
+                                       v-model="form.nominal_annual_inflation_rate"/>
+                            <jet-input-error :message="form.errors.nominal_annual_inflation_rate" class="mt-2"/>
+                        </div>
+                    </div>
                     <div class="grid grid-cols-1 md:grid-cols-3 mt-4 gap-2" v-if="form.type==='individual'">
                         <div>
                             <jet-label for="dob" value="Date of Birth"/>
@@ -172,7 +287,8 @@
                                 :options="availableWards"
                             />
                             <jet-input-error :message="form.errors.ward_id" class="mt-2"/>
-                        </div> <div>
+                        </div>
+                        <div>
                             <jet-label for="village_id" value="Village"/>
                             <Multiselect
                                 id="village_id"
@@ -247,7 +363,6 @@ import FileInput from "@/Jetstream/FileInput.vue";
 import TextareaInput from "@/Jetstream/TextareaInput.vue";
 
 
-
 export default {
     props: {
         countries: Object,
@@ -256,6 +371,9 @@ export default {
         districts: Object,
         wards: Object,
         villages: Object,
+        industryTypes: Object,
+        legalTypes: Object,
+        banks: Object,
     },
     components: {
         Select,
@@ -286,6 +404,20 @@ export default {
                 mobile: null,
                 id_type: null,
                 id_number: null,
+                industry_type_id: null,
+                registration_country_id: null,
+                main_bank_id: null,
+                second_bank_id: null,
+                third_bank_id: null,
+                registration_year: null,
+                years_in_business: null,
+                registration_number: null,
+                legal_type_id: null,
+                trading_name: null,
+                audit_status: null,
+                real_annual_inflation_rate: null,
+                nominal_annual_inflation_rate: null,
+                years_at_present_address: null,
                 tel: null,
                 zip: null,
                 external_id: null,
