@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\ArticleCategoriesController;
 use App\Http\Controllers\BanksController;
+use App\Http\Controllers\ClientBalanceSheetController;
+use App\Http\Controllers\ClientIncomeController;
 use App\Http\Controllers\ClientNotesController;
 use App\Http\Controllers\ClientPotersController;
 use App\Http\Controllers\ClientShareholdersController;
@@ -176,21 +178,21 @@ Route::group(['prefix' => 'client', 'as' => 'clients.'], function () {
     Route::put('shareholder/{shareholder}/update', [ClientShareholdersController::class, 'update'])->name('shareholders.update');
     Route::delete('shareholder/{shareholder}/destroy', [ClientShareholdersController::class, 'destroy'])->name('shareholders.destroy');
     //balance sheet
-    Route::get('{client}/balance_sheet', [ClientNotesController::class, 'index'])->name('balance_sheet.index');
-    Route::get('{client}/balance_sheet/create', [ClientNotesController::class, 'create'])->name('balance_sheet.create');
-    Route::post('{client}/balance_sheet/store', [ClientNotesController::class, 'store'])->name('balance_sheet.store');
-    Route::get('balance_sheet/{balanceSheet}/show', [ClientNotesController::class, 'show'])->name('balance_sheet.show');
-    Route::get('balance_sheet/{balanceSheet}/edit', [ClientNotesController::class, 'edit'])->name('balance_sheet.edit');
-    Route::put('balance_sheet/{balanceSheet}/update', [ClientNotesController::class, 'update'])->name('balance_sheet.update');
-    Route::delete('balance_sheet/{balanceSheet}/destroy', [ClientNotesController::class, 'destroy'])->name('balance_sheet.destroy');
+    Route::get('{client}/balance_sheet', [ClientBalanceSheetController::class, 'index'])->name('balance_sheets.index');
+    Route::get('{client}/balance_sheet/create', [ClientBalanceSheetController::class, 'create'])->name('balance_sheets.create');
+    Route::post('{client}/balance_sheet/store', [ClientBalanceSheetController::class, 'store'])->name('balance_sheets.store');
+    Route::get('balance_sheet/{balanceSheet}/show', [ClientBalanceSheetController::class, 'show'])->name('balance_sheets.show');
+    Route::get('balance_sheet/{balanceSheet}/edit', [ClientBalanceSheetController::class, 'edit'])->name('balance_sheets.edit');
+    Route::put('balance_sheet/{balanceSheet}/update', [ClientBalanceSheetController::class, 'update'])->name('balance_sheets.update');
+    Route::delete('balance_sheet/{balanceSheet}/destroy', [ClientBalanceSheetController::class, 'destroy'])->name('balance_sheets.destroy');
     //income statement
-    Route::get('{client}/income_statement', [ClientNotesController::class, 'index'])->name('income_statement.index');
-    Route::get('{client}/income_statement/create', [ClientNotesController::class, 'create'])->name('income_statement.create');
-    Route::post('{client}/income_statement/store', [ClientNotesController::class, 'store'])->name('income_statement.store');
-    Route::get('income_statement/{incomeStatement}/show', [ClientNotesController::class, 'show'])->name('income_statement.show');
-    Route::get('income_statement/{incomeStatement}/edit', [ClientNotesController::class, 'edit'])->name('income_statement.edit');
-    Route::put('income_statement/{incomeStatement}/update', [ClientNotesController::class, 'update'])->name('income_statement.update');
-    Route::delete('income_statement/{incomeStatement}/destroy', [ClientNotesController::class, 'destroy'])->name('income_statement.destroy');
+    Route::get('{client}/income_statement', [ClientIncomeController::class, 'index'])->name('income_statements.index');
+    Route::get('{client}/income_statement/create', [ClientIncomeController::class, 'create'])->name('income_statements.create');
+    Route::post('{client}/income_statement/store', [ClientNotesController::class, 'store'])->name('income_statements.store');
+    Route::get('income_statement/{incomeStatement}/show', [ClientIncomeController::class, 'show'])->name('income_statements.show');
+    Route::get('income_statement/{incomeStatement}/edit', [ClientIncomeController::class, 'edit'])->name('income_statements.edit');
+    Route::put('income_statement/{incomeStatement}/update', [ClientIncomeController::class, 'update'])->name('income_statements.update');
+    Route::delete('income_statement/{incomeStatement}/destroy', [ClientIncomeController::class, 'destroy'])->name('income_statements.destroy');
     //poter
     Route::get('{client}/poter', [ClientPotersController::class, 'index'])->name('poter.index');
     Route::get('{client}/poter/create', [ClientPotersController::class, 'create'])->name('poter.create');

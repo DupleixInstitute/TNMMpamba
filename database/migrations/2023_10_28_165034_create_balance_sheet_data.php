@@ -12,11 +12,11 @@ return new class extends Migration {
     {
         Schema::create('balance_sheet_data', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('client_id');
+            $table->unsignedBigInteger('client_id')->nullable();
             $table->unsignedBigInteger('chart_of_account_id')->nullable();
-            $table->string('year')->nullable();
+            $table->unsignedBigInteger('balance_sheet_id')->nullable();
             $table->string('name')->nullable();
-            $table->string('value')->nullable();
+            $table->string('amount')->nullable();
             $table->text('description')->nullable();
             $table->timestamps();
         });

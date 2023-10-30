@@ -6,7 +6,7 @@ use Cviebrock\EloquentSluggable\Sluggable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class IncomeStatementData extends Model
+class IncomeStatement extends Model
 {
     use HasFactory;
 
@@ -24,8 +24,14 @@ class IncomeStatementData extends Model
     {
         return $this->belongsTo(ChartOfAccount::class, 'chart_of_account_id');
     }
+
     public function client()
     {
         return $this->belongsTo(Client::class, 'client_id');
+    }
+
+    public function data()
+    {
+        return $this->hasMany(IncomeStatementData::class, 'income_statement_id');
     }
 }

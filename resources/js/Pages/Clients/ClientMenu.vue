@@ -45,15 +45,15 @@
             </inertia-link>
             <inertia-link v-if="can('clients.balance_sheet.index')"
                           class="w-full border-t border-gray-100 font-medium text-gray-600 py-2 px-4 w-full block hover:bg-gray-100 transition duration-150"
-                          :class="{'bg-gray-100': route().current('clients.balance_sheet.*')}"
-                          :href="route('clients.balance_sheet.index',client.id)">
+                          :class="{'bg-gray-100': route().current('clients.balance_sheets.*')}"
+                          :href="route('clients.balance_sheets.index',client.id)">
                 <font-awesome-icon icon="money-bill" class="w-4 h-4 mr-2"></font-awesome-icon>
                 Balance Sheet
             </inertia-link>
             <inertia-link v-if="can('clients.income_statement.index')"
                           class="w-full border-t border-gray-100 font-medium text-gray-600 py-2 px-4 w-full block hover:bg-gray-100 transition duration-150"
-                          :class="{'bg-gray-100': route().current('clients.income_statement.*')}"
-                          :href="route('clients.income_statement.index',client.id)">
+                          :class="{'bg-gray-100': route().current('clients.income_statements.*')}"
+                          :href="route('clients.income_statements.index',client.id)">
                 <font-awesome-icon icon="money-bill" class="w-4 h-4 mr-2"></font-awesome-icon>
                 Income Statement
             </inertia-link>
