@@ -61,7 +61,6 @@ class IndustryTypesTableSeeder extends Seeder
                 'gross_interest_debts' => '',
                 'total_assets_turnover' => '10',
                 'fixed_assets_turn_over' => '8',
-                'fixed_assets_turn_over' => '',
             ],
             [
                 'name' => 'Finance and Business Services',
@@ -134,7 +133,6 @@ class IndustryTypesTableSeeder extends Seeder
                 'gross_interest_debts' => '',
                 'total_assets_turnover' => '10',
                 'fixed_assets_turn_over' => '8',
-                'fixed_assets_turn_over' => '',
             ],
             [
                 'name' => 'Construction',
@@ -231,8 +229,6 @@ class IndustryTypesTableSeeder extends Seeder
                 'gross_interest_debts' => '',
                 'total_assets_turnover' => '10',
                 'fixed_assets_turn_over' => '8',
-                'total_assets_turnover' => '',
-                'fixed_assets_turn_over' => '',
             ],
         ]);
     }

@@ -83,13 +83,107 @@ class LoanProductsController extends Controller
     public function show(LoanProduct $product)
     {
         $product->load(['category', 'createdBy', 'scoringAttributes', 'scoringAttributes.attribute']);
+        $ratios = [
+            'Liquidity Ratios' => [
+                [
+                    'name' => 'Current Ratio',
+                    'system_name' => 'current_ratio'
+                ],
+                [
+                    'name' => 'Debtor Days',
+                    'system_name' => 'debtor_days'
+                ],
+                [
+                    'name' => 'Creditor Days',
+                    'system_name' => 'creditor_days'
+                ],
+                [
+                    'name' => 'Turnover/Working Capital',
+                    'system_name' => 'working_capital'
+                ],
+            ],
+            'Profitability Ratios' => [
+                [
+                    'name' => 'Turnover Growth',
+                    'system_name' => 'turnover_growth'
+                ],
+                [
+                    'name' => 'Gross Profit',
+                    'system_name' => 'gross_profit'
+                ],
+                [
+                    'name' => 'Operating Profit Margin',
+                    'system_name' => 'operating_profit_margin'
+                ],
+                [
+                    'name' => 'Net Profit Margin',
+                    'system_name' => 'net_profit_margin'
+                ],
+                [
+                    'name' => 'Return On Equity(ROE)',
+                    'system_name' => 'return_on_equity'
+                ],
+                [
+                    'name' => 'Return On Assets(ROA)',
+                    'system_name' => 'return_on_assets'
+                ],
+                [
+                    'name' => 'Return On Investments(ROI)',
+                    'system_name' => 'return_on_investment'
+                ],
+            ],
+            'Capital Structure Ratios' => [
+                [
+                    'name' => 'Gearing Ratio',
+                    'system_name' => 'gearing_ratio'
+                ],
+                [
+                    'name' => 'Long-term Debt/Equity',
+                    'system_name' => 'long_term_debt'
+                ],
+                [
+                    'name' => 'Debt/Tangible Net Worth',
+                    'system_name' => 'tangible_net_worth'
+                ],
+                [
+                    'name' => 'Equity/Total Assets',
+                    'system_name' => 'total_assets'
+                ],
+                [
+                    'name' => 'Solvency',
+                    'system_name' => 'solvency'
+                ],
+            ],
+            'Debt Service Ratios' => [
+                [
+                    'name' => 'Interest Cover',
+                    'system_name' => 'interest_cover'
+                ],
+                [
+                    'name' => 'EBITDA/Gross Interest Debts',
+                    'system_name' => 'gross_interest_debts'
+                ],
+            ],
+            'Activity Ratios' => [
+                [
+                    'name' => 'Total Assets/Turnover',
+                    'system_name' => 'total_assets_turnover'
+                ],
+                [
+                    'name' => 'Fixed Assets Turnover',
+                    'system_name' => 'fixed_assets_turn_over'
+                ],
+            ],
+        ];
         $groups = ScoringAttributeGroup::with(['scoringAttributes'])->get();
+
         $groups->transform(function ($group) use ($product) {
             if ($product->scoringAttributes->where('scoring_attribute_group_id', $group->id)->count()) {
                 $group->used = true;
             } else {
                 $group->used = false;
             }
+
             $group->scoringAttributes->transform(function ($item) use ($product) {
                 if ($product->scoringAttributes->where('scoring_attribute_id', $item->id)->count()) {
                     $item->used = true;
@@ -214,7 +308,8 @@ class LoanProductsController extends Controller
         $product->form_attributes = $product->form_attributes->values();
         return Inertia::render('LoanProducts/Show', [
             'product' => $product->toArray(),
-            'groups' => $groups
+            'groups' => $groups,
+            'ratios' => $ratios,
         ]);
     }
 
@@ -298,6 +393,7 @@ class LoanProductsController extends Controller
                 $attribute->scoring_attribute_group_id = $key['scoring_attribute_group_id'];
             }
             $attribute->name = $key['name'];
+            $attribute->system_name = $key['system_name'];
             $attribute->weight = $key['weight'] ?? 0.0;
             $attribute->effective_weight = $key['effective_weight'] ?? 0.0;
             $attribute->score = $key['score'] ?? 0.0;
@@ -307,6 +403,10 @@ class LoanProductsController extends Controller
             $attribute->order_position = $key['order_position'];
             $attribute->active = $key['active'] ? 1 : 0;
             $attribute->is_group = $key['is_group'] ? 1 : 0;
+            $attribute->is_ratio = $key['is_ratio'] ? 1 : 0;
+            $attribute->is_industry_analysis = $key['is_industry_analysis'] ? 1 : 0;
+            $attribute->is_shareholder_analysis = $key['is_shareholder_analysis'] ? 1 : 0;
+            $attribute->is_management_analysis = $key['is_management_analysis'] ? 1 : 0;
             $attribute->save();
             foreach ($key['attributes'] as $item) {
                 $childAttribute = null;
@@ -322,6 +422,7 @@ class LoanProductsController extends Controller
                     $childAttribute->scoring_attribute_group_id = $item['scoring_attribute_group_id'];
                 }
                 $childAttribute->name = $item['name'];
+                $childAttribute->system_name = $item['system_name'];
                 $childAttribute->weight = $item['weight'] ?? 0.0;
                 $childAttribute->effective_weight = $item['effective_weight'] ?? 0.0;
                 $childAttribute->score = $item['score'] ?? 0.0;
@@ -337,6 +438,10 @@ class LoanProductsController extends Controller
                 $childAttribute->order_position = $item['order_position'];
                 $childAttribute->active = $item['active'] ? 1 : 0;
                 $childAttribute->is_group = $item['is_group'] ? 1 : 0;
+                $childAttribute->is_ratio = $item['is_ratio'] ? 1 : 0;
+                $childAttribute->is_industry_analysis = $item['is_industry_analysis'] ? 1 : 0;
+                $childAttribute->is_shareholder_analysis = $item['is_shareholder_analysis'] ? 1 : 0;
+                $childAttribute->is_management_analysis = $item['is_management_analysis'] ? 1 : 0;
                 $childAttribute->save();
                 //save options
                 if (!empty($item['attribute']['options']) && is_array($item['attribute']['options'])) {

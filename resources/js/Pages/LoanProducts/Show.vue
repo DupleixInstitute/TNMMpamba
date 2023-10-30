@@ -129,7 +129,8 @@
                                 <div class="mb-4" v-if="item.attribute.field_type==='formula'">
                                     <div class="mb-4">
                                         <jet-label for="data" value="Formula"/>
-                                        <textarea-input type="text" placeholder="{{field_1}}+{{field_2}}/12" class="mt-1 w-full" v-model="item.data"/>
+                                        <textarea-input type="text" placeholder="{{field_1}}+{{field_2}}/12"
+                                                        class="mt-1 w-full" v-model="item.data"/>
                                     </div>
                                 </div>
                                 <div
@@ -260,7 +261,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="mt-4">
+                                <div class="mt-4" v-if="item.attribute.field_type!=='calculated'">
                                     <div class="grid grid-cols-1 gap-2 mt-2 mb-4 ">
                                         <div>
                                             <jet-label for="accept_value" value="Accepted Option(s)"/>
@@ -327,7 +328,9 @@
                         <select
                             class="border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 rounded-md shadow-sm w-full"
                             name="group" v-model="group_id" id="group" required>
-                            <option v-for="item in availableGroups" :value="item.id">{{ item.name }}</option>
+                            <option v-for="item in availableGroups" :value="item.id">
+                                {{ item.name }} <span v-if="item.is_corporate"><small>(corporate)</small></span>
+                            </option>
                         </select>
                     </div>
                 </div>
@@ -490,6 +493,11 @@ export default {
                         id: '',
                         scoring_attribute_group_id: group.id,
                         name: group.name,
+                        system_name: group.system_name,
+                        is_ratio: group.is_ratio,
+                        is_industry_analysis: group.is_industry_analysis,
+                        is_shareholder_analysis: group.is_shareholder_analysis,
+                        is_management_analysis: group.is_management_analysis,
                         scoring_attribute_id: '',
                         weight: '',
                         effective_weight: '',
@@ -543,7 +551,12 @@ export default {
                                 scoring_attribute_group_id: item.scoring_attribute_group_id,
                                 attribute: attribute,
                                 name: attribute.name,
+                                system_name: attribute.system_name,
                                 scoring_attribute_id: attribute.id,
+                                is_ratio: attribute.is_ratio,
+                                is_industry_analysis: attribute.is_industry_analysis,
+                                is_shareholder_analysis: attribute.is_shareholder_analysis,
+                                is_management_analysis: attribute.is_management_analysis,
                                 weight: '',
                                 effective_weight: '',
                                 score: '',
@@ -739,7 +752,8 @@ export default {
                 if (!item.used) {
                     groups.push({
                         id: item.id,
-                        name: item.name
+                        name: item.name,
+                        is_corporate: item.is_corporate,
                     })
                 }
             })

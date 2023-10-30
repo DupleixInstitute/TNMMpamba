@@ -28,6 +28,7 @@ class DatabaseSeeder extends Seeder
             LegalTypesTableSeeder::class,
             IndustryTypesTableSeeder::class,
             ChartOfAccountsTableSeeder::class,
+            ScoringAttributesTableSeeder::class,
         ]);
     }
 }

@@ -16,6 +16,12 @@ class ScoringAttribute extends Model
         'required'=>'boolean',
         'active'=>'boolean',
         'used'=>'boolean',
+        'is_system' => 'boolean',
+        'is_ratio' => 'boolean',
+        'is_corporate' => 'boolean',
+        'is_industry_analysis' => 'boolean',
+        'is_shareholder_analysis' => 'boolean',
+        'is_management_analysis' => 'boolean',
     ];
     public function createdBy()
     {
