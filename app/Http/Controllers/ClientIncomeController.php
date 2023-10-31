@@ -350,7 +350,7 @@ class ClientIncomeController extends Controller
         activity()
             ->performedOn($statement)
             ->log('Delete Income Statement');
-        return redirect()->route('clients.income_statements.index', [$statement->client_id])->with('success', 'Client deleted successfully.');
+        return redirect()->route('clients.income_statements.index', [$statement->client_id])->with('success', 'Client statement deleted successfully.');
 
     }
 }
