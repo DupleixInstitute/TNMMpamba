@@ -42,7 +42,8 @@ class ClientIncomeController extends Controller
     {
         $sales = ChartOfAccount::where('account_type', 'income')->get();
         $costsOfGoodsSold = ChartOfAccount::where('account_type', 'cost_of_goods_sold')->get();
-        $otherExpenses = ChartOfAccount::whereIn('account_type', ['other_expense', 'expense'])->get();
+        $expenses = ChartOfAccount::whereIn('account_type', ['expense'])->get();
+        $otherExpenses = ChartOfAccount::whereIn('account_type', ['other_expense'])->get();
         $otherIncome = ChartOfAccount::whereIn('account_type', ['other_income'])->get();
         $incomeTax = ChartOfAccount::whereIn('account_type', ['income_tax'])->get();
         return Inertia::render('Clients/IncomeStatements/Create', [
@@ -50,6 +51,7 @@ class ClientIncomeController extends Controller
             'sales' => $sales,
             'costsOfGoodsSold' => $costsOfGoodsSold,
             'otherExpenses' => $otherExpenses,
+            'expenses' => $expenses,
             'otherIncome' => $otherIncome,
             'incomeTax' => $incomeTax,
         ]);
@@ -64,34 +66,85 @@ class ClientIncomeController extends Controller
     public function store(Request $request, Client $client)
     {
         $request->validate([
-            'name' => ['required'],
+            'year' => ['required'],
         ]);
         $statement = new IncomeStatement();
         $statement->created_by_id = Auth::id();
         $statement->client_id = $client->id;
         $statement->year = $request->year;
         $statement->as_at_date = $request->as_at_date;
+        $statement->total_sales = $request->total_sales;
         $statement->total_operating_expenses = $request->total_operating_expenses;
         $statement->total_gross_margin = $request->total_gross_margin;
         $statement->total_other_income = $request->total_other_income;
         $statement->total_other_expenses = $request->total_other_expenses;
         $statement->total_income_before_tax = $request->total_income_before_tax;
+        $statement->total_income_tax = $request->total_income_tax;
+        $statement->total_cost_of_goods_sold = $request->total_cost_of_goods_sold;
+        $statement->total_operating_profit = $request->total_operating_profit;
         $statement->net_profit = $request->net_profit;
         $statement->description = $request->description;
         $statement->save();
         //save the charts
-        foreach ($request->charts as $key) {
+        foreach ($request->charts['sales'] as $item) {
             $statementData = new IncomeStatementData();
             $statementData->client_id = $client->id;
             $statementData->income_statement_id = $statement->id;
-            $statementData->chart_of_account_id = $key['chart_of_account_id'];
-            $statementData->amount = $key['amount'];
+            $statementData->chart_of_account_id = $item['chart_of_account_id'];
+            $statementData->name = $item['name'];
+            $statementData->amount = $item['amount'];
             $statementData->save();
         }
+        foreach ($request->charts['cost_of_goods_sold'] as $item) {
+            $statementData = new IncomeStatementData();
+            $statementData->client_id = $client->id;
+            $statementData->income_statement_id = $statement->id;
+            $statementData->chart_of_account_id = $item['chart_of_account_id'];
+            $statementData->name = $item['name'];
+            $statementData->amount = $item['amount'];
+            $statementData->save();
+        }
+        foreach ($request->charts['operating_expenses'] as $item) {
+            $statementData = new IncomeStatementData();
+            $statementData->client_id = $client->id;
+            $statementData->income_statement_id = $statement->id;
+            $statementData->chart_of_account_id = $item['chart_of_account_id'];
+            $statementData->name = $item['name'];
+            $statementData->amount = $item['amount'];
+            $statementData->save();
+        }
+        foreach ($request->charts['other_income'] as $item) {
+            $statementData = new IncomeStatementData();
+            $statementData->client_id = $client->id;
+            $statementData->income_statement_id = $statement->id;
+            $statementData->chart_of_account_id = $item['chart_of_account_id'];
+            $statementData->name = $item['name'];
+            $statementData->amount = $item['amount'];
+            $statementData->save();
+        }
+        foreach ($request->charts['other_expenses'] as $item) {
+            $statementData = new IncomeStatementData();
+            $statementData->client_id = $client->id;
+            $statementData->income_statement_id = $statement->id;
+            $statementData->chart_of_account_id = $item['chart_of_account_id'];
+            $statementData->name = $item['name'];
+            $statementData->amount = $item['amount'];
+            $statementData->save();
+        }
+        foreach ($request->charts['income_tax'] as $item) {
+            $statementData = new IncomeStatementData();
+            $statementData->client_id = $client->id;
+            $statementData->income_statement_id = $statement->id;
+            $statementData->chart_of_account_id = $item['chart_of_account_id'];
+            $statementData->name = $item['name'];
+            $statementData->amount = $item['amount'];
+            $statementData->save();
+        }
+
         activity()
             ->performedOn($client)
             ->log('Create Income Statement');
-        return redirect()->route('clients.statements.index', [$client->id])->with('success', 'Income Statement created successfully.');
+        return redirect()->route('clients.income_statements.index', [$client->id])->with('success', 'Income Statement created successfully.');
 
     }
 
@@ -116,9 +169,79 @@ class ClientIncomeController extends Controller
     {
         $client = $statement->client;
 
+        $sales = ChartOfAccount::where('account_type', 'income')->get();
+        $costsOfGoodsSold = ChartOfAccount::where('account_type', 'cost_of_goods_sold')->get();
+        $expenses = ChartOfAccount::whereIn('account_type', ['expense'])->get();
+        $otherExpenses = ChartOfAccount::whereIn('account_type', ['other_expense'])->get();
+        $otherIncome = ChartOfAccount::whereIn('account_type', ['other_income'])->get();
+        $incomeTax = ChartOfAccount::whereIn('account_type', ['income_tax'])->get();
+        $chartData = [
+            'sales' => [],
+            'cost_of_goods_sold' => [],
+            'operating_expenses' => [],
+            'other_income' => [],
+            'other_expenses' => [],
+            'income_tax' => [],
+        ];
+        foreach ($sales as $key) {
+            $chartData['sales'][] = [
+                'name' => $key->name,
+                'chart_of_account_id' => $key->id,
+                'id' => $statement->data->where('chart_of_account_id', $key->id)->first()->id ?? '',
+                'amount' => $statement->data->where('chart_of_account_id', $key->id)->first()->amount ?? '',
+            ];
+        }
+        foreach ($costsOfGoodsSold as $key) {
+            $chartData['cost_of_goods_sold'][] = [
+                'name' => $key->name,
+                'chart_of_account_id' => $key->id,
+                'id' => $statement->data->where('chart_of_account_id', $key->id)->first()->id ?? '',
+                'amount' => $statement->data->where('chart_of_account_id', $key->id)->first()->amount ?? '',
+            ];
+        }
+        foreach ($expenses as $key) {
+            $chartData['operating_expenses'][] = [
+                'name' => $key->name,
+                'chart_of_account_id' => $key->id,
+                'id' => $statement->data->where('chart_of_account_id', $key->id)->first()->id ?? '',
+                'amount' => $statement->data->where('chart_of_account_id', $key->id)->first()->amount ?? '',
+            ];
+        }
+        foreach ($otherExpenses as $key) {
+            $chartData['other_expenses'][] = [
+                'name' => $key->name,
+                'chart_of_account_id' => $key->id,
+                'id' => $statement->data->where('chart_of_account_id', $key->id)->first()->id ?? '',
+                'amount' => $statement->data->where('chart_of_account_id', $key->id)->first()->amount ?? '',
+            ];
+        }
+        foreach ($otherIncome as $key) {
+            $chartData['other_income'][] = [
+                'name' => $key->name,
+                'chart_of_account_id' => $key->id,
+                'id' => $statement->data->where('chart_of_account_id', $key->id)->first()->id ?? '',
+                'amount' => $statement->data->where('chart_of_account_id', $key->id)->first()->amount ?? '',
+            ];
+        }
+        foreach ($incomeTax as $key) {
+            $chartData['income_tax'][] = [
+                'name' => $key->name,
+                'chart_of_account_id' => $key->id,
+                'id' => $statement->data->where('chart_of_account_id', $key->id)->first()->id ?? '',
+                'amount' => $statement->data->where('chart_of_account_id', $key->id)->first()->amount ?? '',
+            ];
+
+        }
+        $statement->charts = $chartData;
         return Inertia::render('Clients/IncomeStatements/Edit', [
             'client' => $client,
             'statement' => $statement,
+            'sales' => $sales,
+            'costsOfGoodsSold' => $costsOfGoodsSold,
+            'otherExpenses' => $otherExpenses,
+            'expenses' => $expenses,
+            'otherIncome' => $otherIncome,
+            'incomeTax' => $incomeTax,
         ]);
     }
 
@@ -134,28 +257,83 @@ class ClientIncomeController extends Controller
 
         $client = $statement->client;
         $request->validate([
-            'name' => ['required'],
+            'year' => ['required'],
         ]);
-        $statement->name = $request->name;
-        $statement->gender = $request->gender;
-        $statement->itc_date = $request->itc_date;
-        $statement->dob = $request->dob;
-        $statement->shares = $request->shares;
-        $statement->itc_ref_no = $request->itc_ref_no;
-        $statement->itc_ref_date = $request->itc_ref_date;
-        $statement->number_of_paid_debts = $request->number_of_paid_debts;
-        $statement->number_of_defaulted_debts = $request->number_of_defaulted_debts;
-        $statement->number_of_judgements = $request->number_of_judgements;
-        $statement->number_of_trace_alerts = $request->number_of_trace_alerts;
-        $statement->blacklisted = $request->blacklisted ? 1 : 0;
-        $statement->fraud_alert = $request->fraud_alert ? 1 : 0;
+        $statement->year = $request->year;
+        $statement->as_at_date = $request->as_at_date;
+        $statement->total_sales = $request->total_sales;
+        $statement->total_operating_expenses = $request->total_operating_expenses;
+        $statement->total_gross_margin = $request->total_gross_margin;
+        $statement->total_other_income = $request->total_other_income;
+        $statement->total_other_expenses = $request->total_other_expenses;
+        $statement->total_income_before_tax = $request->total_income_before_tax;
+        $statement->total_income_tax = $request->total_income_tax;
+        $statement->total_cost_of_goods_sold = $request->total_cost_of_goods_sold;
+        $statement->total_operating_profit = $request->total_operating_profit;
+        $statement->net_profit = $request->net_profit;
         $statement->description = $request->description;
         $statement->save();
-
+        //delete current linked data
+        $statement->data->each->delete();
+        //save the charts
+        foreach ($request->charts['sales'] as $item) {
+            $statementData = new IncomeStatementData();
+            $statementData->client_id = $client->id;
+            $statementData->income_statement_id = $statement->id;
+            $statementData->chart_of_account_id = $item['chart_of_account_id'];
+            $statementData->name = $item['name'];
+            $statementData->amount = $item['amount'];
+            $statementData->save();
+        }
+        foreach ($request->charts['cost_of_goods_sold'] as $item) {
+            $statementData = new IncomeStatementData();
+            $statementData->client_id = $client->id;
+            $statementData->income_statement_id = $statement->id;
+            $statementData->chart_of_account_id = $item['chart_of_account_id'];
+            $statementData->name = $item['name'];
+            $statementData->amount = $item['amount'];
+            $statementData->save();
+        }
+        foreach ($request->charts['operating_expenses'] as $item) {
+            $statementData = new IncomeStatementData();
+            $statementData->client_id = $client->id;
+            $statementData->income_statement_id = $statement->id;
+            $statementData->chart_of_account_id = $item['chart_of_account_id'];
+            $statementData->name = $item['name'];
+            $statementData->amount = $item['amount'];
+            $statementData->save();
+        }
+        foreach ($request->charts['other_income'] as $item) {
+            $statementData = new IncomeStatementData();
+            $statementData->client_id = $client->id;
+            $statementData->income_statement_id = $statement->id;
+            $statementData->chart_of_account_id = $item['chart_of_account_id'];
+            $statementData->name = $item['name'];
+            $statementData->amount = $item['amount'];
+            $statementData->save();
+        }
+        foreach ($request->charts['other_expenses'] as $item) {
+            $statementData = new IncomeStatementData();
+            $statementData->client_id = $client->id;
+            $statementData->income_statement_id = $statement->id;
+            $statementData->chart_of_account_id = $item['chart_of_account_id'];
+            $statementData->name = $item['name'];
+            $statementData->amount = $item['amount'];
+            $statementData->save();
+        }
+        foreach ($request->charts['income_tax'] as $item) {
+            $statementData = new IncomeStatementData();
+            $statementData->client_id = $client->id;
+            $statementData->income_statement_id = $statement->id;
+            $statementData->chart_of_account_id = $item['chart_of_account_id'];
+            $statementData->name = $item['name'];
+            $statementData->amount = $item['amount'];
+            $statementData->save();
+        }
         activity()
             ->performedOn($client)
             ->log('Update Income Statement');
-        return redirect()->route('clients.statements.index', [$client->id])->with('success', 'Income Statement updated successfully.');
+        return redirect()->route('clients.income_statements.index', [$client->id])->with('success', 'Income Statement updated successfully.');
 
     }
 
@@ -172,7 +350,7 @@ class ClientIncomeController extends Controller
         activity()
             ->performedOn($statement)
             ->log('Delete Income Statement');
-        return redirect()->route('clients.statements.index', [$statement->client_id])->with('success', 'Client deleted successfully.');
+        return redirect()->route('clients.income_statements.index', [$statement->client_id])->with('success', 'Client deleted successfully.');
 
     }
 }

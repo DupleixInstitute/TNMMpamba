@@ -32,6 +32,6 @@ class IncomeStatement extends Model
 
     public function data()
     {
-        return $this->hasMany(IncomeStatementData::class, 'income_statement_id');
+        return $this->hasMany(IncomeStatementData::class);
     }
 }

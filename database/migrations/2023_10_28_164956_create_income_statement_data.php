@@ -15,7 +15,8 @@ return new class extends Migration {
             $table->unsignedBigInteger('client_id');
             $table->unsignedBigInteger('chart_of_account_id')->nullable();
             $table->unsignedBigInteger('income_statement_id')->nullable();
-            $table->string('amount')->nullable();
+            $table->decimal('amount',65)->nullable();
+            $table->string('name')->nullable();
             $table->text('description')->nullable();
             $table->timestamps();
         });

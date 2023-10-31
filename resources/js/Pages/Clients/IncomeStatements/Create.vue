@@ -26,119 +26,172 @@
                     </div>
                     <div class="mt-4">
                         <form @submit.prevent="submit" enctype="multipart/form-data">
-                            <div class="grid grid-cols-1 gap-4">
-                                <div>
-                                    <jet-label for="name" value="Name"/>
-                                    <jet-input id="name" type="text" class="mt-1 block w-full"
-                                               v-model="form.name"/>
-                                    <jet-input-error :message="form.errors.name" class="mt-2"/>
-
-                                </div>
-                                <div>
-                                    <jet-label for="gender" value="Gender"/>
-                                    <select
-                                        class="border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 rounded-md shadow-sm w-full"
-                                        name="gender" v-model="form.gender" id="gender" required>
-                                        <option value="male">Male</option>
-                                        <option value="female">Female</option>
-                                        <option value="other">Other</option>
-                                    </select>
-                                    <jet-input-error :message="form.errors.gender" class="mt-2"/>
-                                </div>
-                                <div>
-                                    <jet-label for="dob" value="Date of Birth"/>
-                                    <flat-pickr
-                                        v-model="form.dob"
-                                        class="form-control w-full"
-                                        placeholder="Select date"
-                                        id="dob"
-                                        name="dob">
-                                    </flat-pickr>
-                                    <jet-input-error :message="form.errors.dob" class="mt-2"/>
-
-                                </div>
-                                <div>
-                                    <jet-label for="shares" value="% Shares"/>
-                                    <jet-input id="shares" type="text" class="block w-full" v-model="form.shares"/>
-                                    <jet-input-error :message="form.errors.shares" class="mt-2"/>
-
-                                </div>
-                                <div>
-                                    <jet-label for="itc_ref_no" value="ITC Ref No"/>
-                                    <jet-input id="itc_ref_no" type="text" class="block w-full"
-                                               v-model="form.itc_ref_no"/>
-                                    <jet-input-error :message="form.errors.itc_ref_no" class="mt-2"/>
-                                </div>
-                                <div>
-                                    <jet-label for="itc_ref_date" value="ITC Date"/>
-                                    <flat-pickr
-                                        v-model="form.itc_ref_date"
-                                        class="form-control w-full"
-                                        placeholder="Select date"
-                                        id="itc_ref_date"
-                                        name="itc_ref_date">
-                                    </flat-pickr>
-                                    <jet-input-error :message="form.errors.itc_ref_date" class="mt-2"/>
-
-                                </div>
-                                <div>
-                                    <jet-label for="number_of_paid_debts" value="No of Paid Debts > Defauts"/>
-                                    <jet-input id="number_of_paid_debts" type="text" class="block w-full"
-                                               v-model="form.number_of_paid_debts"/>
-                                    <jet-input-error :message="form.errors.number_of_paid_debts" class="mt-2"/>
-
-                                </div>
-                                <div>
-                                    <jet-label for="number_of_defaulted_debts" value="No of Defaults"/>
-                                    <jet-input id="number_of_defaulted_debts" type="text" class="block w-full"
-                                               v-model="form.number_of_defaulted_debts"/>
-                                    <jet-input-error :message="form.errors.number_of_defaulted_debts" class="mt-2"/>
-
-                                </div>
-                                <div>
-                                    <jet-label for="number_of_judgements" value="No of Judgements"/>
-                                    <jet-input id="number_of_judgements" type="text" class="block w-full"
-                                               v-model="form.number_of_judgements"/>
-                                    <jet-input-error :message="form.errors.number_of_judgements" class="mt-2"/>
-
-                                </div>
-                                <div>
-                                    <jet-label for="number_of_trace_alerts" value="No of Trace Alerts"/>
-                                    <jet-input id="number_of_trace_alerts" type="text" class="block w-full"
-                                               v-model="form.number_of_trace_alerts"/>
-                                    <jet-input-error :message="form.errors.number_of_trace_alerts" class="mt-2"/>
-
-                                </div>
-                                <div>
-                                    <jet-label for="blacklisted">
-                                        <div class="flex items-center">
-                                            <jet-checkbox name="visible_to_client" :value="form.blacklisted"
-                                                          id="blacklisted" v-model:checked="form.blacklisted"/>
-                                            <div class="ml-2">
-                                                Blacklisted
-                                            </div>
-                                        </div>
-                                    </jet-label>
-                                </div>
-                                <div>
-                                    <jet-label for="fraud_alert">
-                                        <div class="flex items-center">
-                                            <jet-checkbox name="fraud_alert" :value="form.fraud_alert" id="fraud_alert"
-                                                          v-model:checked="form.fraud_alert"/>
-                                            <div class="ml-2">
-                                                Fraud Alert
-                                            </div>
-                                        </div>
-                                    </jet-label>
-                                </div>
-                                <div>
-                                    <jet-label for="description" value="Description"/>
-                                    <textarea-input id="description" class="mt-1 block w-full"
-                                                    v-model="form.description"/>
-                                    <jet-input-error :message="form.errors.description" class="mt-2"/>
-
-                                </div>
+                            <div>
+                                <jet-label for="year" value="Year(4 digits)"/>
+                                <jet-input id="year" type="number" required class="block w-full" v-model="form.year"/>
+                                <jet-input-error :message="form.errors.year" class="mt-2"/>
                             </div>
+                            <table class="mt-4 w-full whitespace-no-wrap table-auto">
+                                <tbody>
+                                <tr>
+                                    <td colspan="2" class="px-6 py-4">
+                                        <h1 class="font-bold">Sales</h1>
+                                    </td>
+                                </tr>
+                                <tr v-for="(item,index) in form.charts.sales" :key="index"
+                                    class="hover:bg-gray-100 focus-within:bg-gray-100">
+                                    <td class="border-t px-6 py-4">
+                                    <span class=" flex items-center">
+                                    {{ item.name }}
+                                    </span>
+                                    </td>
+                                    <td class="border-t px-6 py-4">
+                                        <jet-input id="name" @keyup="updateTotal" type="number"
+                                                   class="mt-1 block w-full"
+                                                   v-model="item.amount"/>
+                                    </td>
+                                </tr>
+                                <tr
+                                    class="hover:bg-gray-100 focus-within:bg-gray-100">
+                                    <td class="border-t px-6 py-4">
+                                    <span class="font-bold">
+                                   Net Sales
+                                    </span>
+                                    </td>
+                                    <td class="border-t px-6 py-4 text-right">
+                                        <span class="font-bold">{{ $filters.currency(form.total_sales) }}</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2" class="px-6 py-4">
+                                        <h1 class="font-bold">Cost of goods sold</h1>
+                                    </td>
+                                </tr>
+                                <tr v-for="(item,index) in form.charts.cost_of_goods_sold" :key="index"
+                                    class="hover:bg-gray-100 focus-within:bg-gray-100">
+                                    <td class="border-t px-8 py-4">
+                                    <span class=" flex items-center">
+                                    {{ item.name }}
+                                    </span>
+                                    </td>
+                                    <td class="border-t px-6 py-4">
+                                        <jet-input id="name" @keyup="updateTotal" type="number"
+                                                   class="mt-1 block w-full"
+                                                   v-model="item.amount"/>
+                                    </td>
+                                </tr>
+                                <tr
+                                    class="hover:bg-gray-100 focus-within:bg-gray-100">
+                                    <td class="border-t px-6 py-4">
+                                    <span class="font-bold">
+                                   Gross Margin
+                                    </span>
+                                    </td>
+                                    <td class="border-t px-6 py-4 text-right">
+                                        <span class="font-bold">{{ $filters.currency(form.total_gross_margin) }}</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2" class="px-6 py-4">
+                                        <h1 class="font-bold">Operating expenses</h1>
+                                    </td>
+                                </tr>
+                                <tr v-for="(item,index) in form.charts.operating_expenses" :key="index"
+                                    class="hover:bg-gray-100 focus-within:bg-gray-100">
+                                    <td class="border-t px-8 py-4">
+                                    <span class=" flex items-center">
+                                    {{ item.name }}
+                                    </span>
+                                    </td>
+                                    <td class="border-t px-6 py-4">
+                                        <jet-input id="name" @keyup="updateTotal" type="number"
+                                                   class="mt-1 block w-full"
+                                                   v-model="item.amount"/>
+                                    </td>
+                                </tr>
+                                <tr
+                                    class="hover:bg-gray-100 focus-within:bg-gray-100">
+                                    <td class="border-t px-6 py-4">
+                                    <span class="font-bold">
+                                   Operating Income
+                                    </span>
+                                    </td>
+                                    <td class="border-t px-6 py-4 text-right">
+                                        <span class="font-bold">{{
+                                                $filters.currency(form.total_operating_profit)
+                                            }}</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2" class="px-6 py-4">
+                                        <h1 class="font-bold">Other income and expenses</h1>
+                                    </td>
+                                </tr>
+                                <tr v-for="(item,index) in form.charts.other_expenses" :key="index"
+                                    class="hover:bg-gray-100 focus-within:bg-gray-100">
+                                    <td class="border-t px-8 py-4">
+                                    <span class=" flex items-center">
+                                    {{ item.name }}
+                                    </span>
+                                    </td>
+                                    <td class="border-t px-6 py-4">
+                                        <jet-input id="name" @keyup="updateTotal" type="number"
+                                                   class="mt-1 block w-full"
+                                                   v-model="item.amount"/>
+                                    </td>
+                                </tr>
+                                <tr v-for="(item,index) in form.charts.other_income" :key="index"
+                                    class="hover:bg-gray-100 focus-within:bg-gray-100">
+                                    <td class="border-t px-8 py-4">
+                                    <span class=" flex items-center">
+                                    {{ item.name }}
+                                    </span>
+                                    </td>
+                                    <td class="border-t px-6 py-4">
+                                        <jet-input id="name" @keyup="updateTotal" type="number"
+                                                   class="mt-1 block w-full"
+                                                   v-model="item.amount"/>
+                                    </td>
+                                </tr>
+                                <tr
+                                    class="hover:bg-gray-100 focus-within:bg-gray-100">
+                                    <td class="border-t px-6 py-4">
+                                    <span class="font-bold">
+                                        Income before tax
+                                    </span>
+                                    </td>
+                                    <td class="border-t px-6 py-4 text-right">
+                                        <span class="font-bold">{{
+                                                $filters.currency(form.total_income_before_tax)
+                                            }}</span>
+                                    </td>
+                                </tr>
+                                <tr v-for="(item,index) in form.charts.income_tax" :key="index"
+                                    class="hover:bg-gray-100 focus-within:bg-gray-100">
+                                    <td class="border-t px-8 py-4">
+                                    <span class=" flex items-center">
+                                    {{ item.name }}
+                                    </span>
+                                    </td>
+                                    <td class="border-t px-6 py-4">
+                                        <jet-input id="name" @keyup="updateTotal" type="number"
+                                                   class="mt-1 block w-full"
+                                                   v-model="item.amount"/>
+                                    </td>
+                                </tr>
+                                <tr
+                                    class="hover:bg-gray-100 focus-within:bg-gray-100">
+                                    <td class="border-t px-6 py-4">
+                                    <span class="font-bold">
+                                        Net Profit/(Loss)
+                                    </span>
+                                    </td>
+                                    <td class="border-t px-6 py-4 text-right">
+                                        <span class="font-bold">{{ $filters.currency(form.net_profit) }}</span>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
                             <div class="flex items-center justify-end mt-4">
                                 <jet-button class="ml-4" :class="{ 'opacity-25': form.processing }"
                                             :disabled="form.processing">
@@ -197,6 +250,7 @@ export default {
         client: Object,
         sales: Object,
         costsOfGoodsSold: Object,
+        expenses: Object,
         otherExpenses: Object,
         otherIncome: Object,
         incomeTax: Object,
@@ -219,12 +273,12 @@ export default {
                 total_cost_of_goods_sold: 0,
                 total_income_tax: 0,
                 charts: {
-                    sales:[],
-                    cost_of_goods_sold:[],
-                    operating_expenses:[],
-                    other_income:[],
-                    other_expenses:[],
-                    income_tax:[],
+                    sales: [],
+                    cost_of_goods_sold: [],
+                    operating_expenses: [],
+                    other_income: [],
+                    other_expenses: [],
+                    income_tax: [],
                 }
             }),
             pageTitle: "Create Income Statement",
@@ -233,12 +287,88 @@ export default {
         }
     },
     mounted() {
-
+        this.sales.forEach(item => {
+            this.form.charts.sales.push({
+                chart_of_account_id: item.id,
+                name: item.name,
+                amount: ''
+            })
+        });
+        this.costsOfGoodsSold.forEach(item => {
+            this.form.charts.cost_of_goods_sold.push({
+                chart_of_account_id: item.id,
+                name: item.name,
+                amount: ''
+            })
+        });
+        this.otherExpenses.forEach(item => {
+            this.form.charts.other_expenses.push({
+                chart_of_account_id: item.id,
+                name: item.name,
+                amount: ''
+            })
+        });
+        this.otherIncome.forEach(item => {
+            this.form.charts.other_income.push({
+                chart_of_account_id: item.id,
+                name: item.name,
+                amount: ''
+            })
+        });
+        this.incomeTax.forEach(item => {
+            this.form.charts.income_tax.push({
+                chart_of_account_id: item.id,
+                name: item.name,
+                amount: ''
+            })
+        });
+        this.expenses.forEach(item => {
+            this.form.charts.operating_expenses.push({
+                chart_of_account_id: item.id,
+                name: item.name,
+                amount: ''
+            })
+        });
     },
     methods: {
         submit() {
             this.form.post(this.route('clients.income_statements.store', this.client.id), {})
         },
+        updateTotal() {
+            this.form.total_sales = 0;
+            this.form.total_operating_expenses = 0;
+            this.form.total_gross_margin = 0;
+            this.form.total_other_income = 0;
+            this.form.total_other_expenses = 0;
+            this.form.total_income_before_tax = 0;
+            this.form.net_profit = 0;
+            this.form.total_operating_profit = 0;
+            this.form.total_cost_of_goods_sold = 0;
+            this.form.total_income_tax = 0;
+            this.form.charts.sales.forEach(item => {
+                this.form.total_sales += parseFloat(item.amount || '0')
+            })
+            this.form.charts.cost_of_goods_sold.forEach(item => {
+                this.form.total_cost_of_goods_sold += parseFloat(item.amount || '0')
+            })
+            this.form.total_gross_margin = this.form.total_sales - this.form.total_cost_of_goods_sold;
+            this.form.charts.operating_expenses.forEach(item => {
+                this.form.total_operating_expenses += parseFloat(item.amount || '0')
+            })
+            this.form.total_operating_profit = this.form.total_gross_margin - this.form.total_operating_expenses;
+            this.form.charts.other_income.forEach(item => {
+                this.form.total_other_income += parseFloat(item.amount || '0')
+            })
+            this.form.total_income_before_tax = this.form.total_operating_profit + this.form.total_other_income;
+            this.form.charts.other_expenses.forEach(item => {
+                this.form.total_other_expenses += parseFloat(item.amount || '0')
+            })
+            this.form.total_income_before_tax -= this.form.total_other_expenses;
+            this.form.charts.income_tax.forEach(item => {
+                this.form.total_income_tax += parseFloat(item.amount || '0')
+            })
+            this.form.net_profit = this.form.total_income_before_tax - this.form.total_income_tax;
+        }
     },
 }
 </script>

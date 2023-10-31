@@ -188,11 +188,11 @@ Route::group(['prefix' => 'client', 'as' => 'clients.'], function () {
     //income statement
     Route::get('{client}/income_statement', [ClientIncomeController::class, 'index'])->name('income_statements.index');
     Route::get('{client}/income_statement/create', [ClientIncomeController::class, 'create'])->name('income_statements.create');
-    Route::post('{client}/income_statement/store', [ClientNotesController::class, 'store'])->name('income_statements.store');
-    Route::get('income_statement/{incomeStatement}/show', [ClientIncomeController::class, 'show'])->name('income_statements.show');
-    Route::get('income_statement/{incomeStatement}/edit', [ClientIncomeController::class, 'edit'])->name('income_statements.edit');
-    Route::put('income_statement/{incomeStatement}/update', [ClientIncomeController::class, 'update'])->name('income_statements.update');
-    Route::delete('income_statement/{incomeStatement}/destroy', [ClientIncomeController::class, 'destroy'])->name('income_statements.destroy');
+    Route::post('{client}/income_statement/store', [ClientIncomeController::class, 'store'])->name('income_statements.store');
+    Route::get('income_statement/{statement}/show', [ClientIncomeController::class, 'show'])->name('income_statements.show');
+    Route::get('income_statement/{statement}/edit', [ClientIncomeController::class, 'edit'])->name('income_statements.edit');
+    Route::put('income_statement/{statement}/update', [ClientIncomeController::class, 'update'])->name('income_statements.update');
+    Route::delete('income_statement/{statement}/destroy', [ClientIncomeController::class, 'destroy'])->name('income_statements.destroy');
     //poter
     Route::get('{client}/poter', [ClientPotersController::class, 'index'])->name('poter.index');
     Route::get('{client}/poter/create', [ClientPotersController::class, 'create'])->name('poter.create');

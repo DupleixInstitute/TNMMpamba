@@ -38,6 +38,7 @@
                                 <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Operating Income</th>
                                 <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Other Expenses</th>
                                 <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Other Income</th>
+                                <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Income Before Tax</th>
                                 <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Income Tax</th>
                                 <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Net Profit</th>
                                 <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Action</th>
@@ -109,7 +110,7 @@
                                 <td class="border-t w-px pr-2">
                                     <div class=" flex items-center space-x-2">
                                         <inertia-link v-if="can('clients.income_statement.update')"
-                                                      :href="route('clients.income_statement.edit', statement.id)"
+                                                      :href="route('clients.income_statements.edit', statement.id)"
                                                       tabindex="-1" class="text-indigo-600 hover:text-indigo-900">
                                             Edit
                                         </inertia-link>

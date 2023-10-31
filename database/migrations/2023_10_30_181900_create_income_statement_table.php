@@ -24,6 +24,7 @@ return new class extends Migration {
             $table->decimal('total_other_income', 65)->nullable();
             $table->decimal('total_other_expenses', 65)->nullable();
             $table->decimal('total_income_before_tax', 65)->nullable();
+            $table->decimal('total_income_tax', 65)->nullable();
             $table->decimal('net_profit', 65)->nullable();
             $table->text('description')->nullable();
             $table->timestamps();
