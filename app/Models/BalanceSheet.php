@@ -10,7 +10,13 @@ class BalanceSheet extends Model
 {
     use HasFactory;
 
-
+protected $casts=[
+    'total_assets'=>'double',
+    'total_equity'=>'double',
+    'total_liabilities'=>'double',
+    'total_working_capital'=>'double',
+    'total_equity_liabilities'=>'double',
+];
     public function scopeFilter($query, array $filters)
     {
         $query->when($filters['search'] ?? null, function ($query, $search) {

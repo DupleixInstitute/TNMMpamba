@@ -48,6 +48,9 @@
                                 <td class="border-t">
                                     <span class="px-6 py-4 flex items-center">
                                     {{ sheet.year }}
+                                        <span v-if="sheet.total_assets!==sheet.total_liabilities"
+                                              class="ml-2 text-red-600" title="Not balanced"><font-awesome-icon
+                                            icon="times-circle"></font-awesome-icon></span>
                                     </span>
                                 </td>
                                 <td class="border-t">
@@ -129,9 +132,11 @@ import JetConfirmationModal from '@/Jetstream/ConfirmationModal.vue'
 import JetDangerButton from '@/Jetstream/DangerButton.vue'
 import JetSecondaryButton from '@/Jetstream/SecondaryButton.vue'
 import ClientMenu from '@/Pages/Clients/ClientMenu.vue'
+import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
 
 export default {
     components: {
+        FontAwesomeIcon,
         AppLayout,
         Icon,
         Pagination,
