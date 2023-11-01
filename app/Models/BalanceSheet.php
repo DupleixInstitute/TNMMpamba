@@ -15,9 +15,18 @@ class BalanceSheet extends Model
     {
         $query->when($filters['search'] ?? null, function ($query, $search) {
             $query->where(function ($query) use ($search) {
-                $query->where('name', 'like', '%' . $search . '%');
+                $query->where('year', 'like', '%' . $search . '%');
             });
         });
     }
 
+    public function client()
+    {
+        return $this->belongsTo(Client::class, 'client_id');
+    }
+
+    public function data()
+    {
+        return $this->hasMany(BalanceSheetData::class);
+    }
 }

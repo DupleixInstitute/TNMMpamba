@@ -19,11 +19,11 @@
                 </div>
                 <div class="w-full md:w-9/12 p-4 md:ml-4 bg-white sm:mt-4">
                     <div class="flex justify-between ">
-                        <h2 class="font-semibold text-xl text-gray-800 leading-tight">Income Statements</h2>
-                        <inertia-link class="btn btn-blue" v-if="can('clients.income_statement.create')"
-                                      :href="route('clients.income_statements.create',client.id)">
+                        <h2 class="font-semibold text-xl text-gray-800 leading-tight">Balance Sheets</h2>
+                        <inertia-link class="btn btn-blue" v-if="can('clients.balance_sheet.create')"
+                                      :href="route('clients.balance_sheets.create',client.id)">
                             <span>Create </span>
-                            <span class="hidden md:inline">Statement</span>
+                            <span class="hidden md:inline">Sheet</span>
                         </inertia-link>
                     </div>
                     <div class="mt-4 relative overflow-x-auto">
@@ -31,91 +31,85 @@
                             <thead class="bg-gray-50">
                             <tr class="text-left font-bold">
                                 <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Year</th>
-                                <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Sales</th>
-                                <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Costs Of Good Sold</th>
-                                <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Gross Profit</th>
-                                <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Operating Expenses</th>
-                                <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Operating Income</th>
-                                <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Other Expenses</th>
-                                <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Other Income</th>
-                                <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Income Before Tax</th>
-                                <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Income Tax</th>
-                                <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Net Profit</th>
+                                <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Total Assets</th>
+                                <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Total Liabilities</th>
+                                <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Total Shareholder’s Equity</th>
+                                <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Working Capital</th>
                                 <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Action</th>
                             </tr>
                             </thead>
                             <tbody>
-                            <tr v-if="!statements.data.length">
+                            <tr v-if="!sheets.data.length">
                                 <td colspan="11" class="px-6 py-4 text-center">
-                                    No Income Statements Yet
+                                    No Balance Sheets Yet
                                 </td>
                             </tr>
-                            <tr v-for="statement in statements.data" :key="statement.id"
+                            <tr v-for="sheet in sheets.data" :key="sheet.id"
                                 class="hover:bg-gray-100 focus-within:bg-gray-100">
                                 <td class="border-t">
                                     <span class="px-6 py-4 flex items-center">
-                                    {{ statement.year }}
+                                    {{ sheet.year }}
                                     </span>
                                 </td>
                                 <td class="border-t">
                                     <span class="px-6 py-4 flex items-center">
-                                    {{ $filters.currency(statement.total_sales) }}
+                                    {{ $filters.currency(sheet.total_sales) }}
                                     </span>
                                 </td>
                                 <td class="border-t">
                                     <span class="px-6 py-4 flex items-center">
-                                    {{ $filters.currency(statement.total_cost_of_goods_sold) }}
+                                    {{ $filters.currency(sheet.total_cost_of_goods_sold) }}
                                     </span>
                                 </td>
                                 <td class="border-t">
                                     <span class="px-6 py-4 flex items-center">
-                                    {{ $filters.currency(statement.total_gross_margin) }}
+                                    {{ $filters.currency(sheet.total_gross_margin) }}
                                     </span>
                                 </td>
                                 <td class="border-t">
                                     <span class="px-6 py-4 flex items-center">
-                                    {{ $filters.currency(statement.total_operating_expenses) }}
+                                    {{ $filters.currency(sheet.total_operating_expenses) }}
                                     </span>
                                 </td>
                                 <td class="border-t">
                                     <span class="px-6 py-4 flex items-center">
-                                    {{ $filters.currency(statement.total_operating_profit) }}
+                                    {{ $filters.currency(sheet.total_operating_profit) }}
                                     </span>
                                 </td>
                                 <td class="border-t">
                                     <span class="px-6 py-4 flex items-center">
-                                    {{ $filters.currency(statement.total_other_expenses) }}
+                                    {{ $filters.currency(sheet.total_other_expenses) }}
                                     </span>
                                 </td>
                                 <td class="border-t">
                                     <span class="px-6 py-4 flex items-center">
-                                    {{ $filters.currency(statement.total_other_income) }}
+                                    {{ $filters.currency(sheet.total_other_income) }}
                                     </span>
                                 </td>
                                 <td class="border-t">
                                     <span class="px-6 py-4 flex items-center">
-                                    {{ $filters.currency(statement.total_income_before_tax) }}
+                                    {{ $filters.currency(sheet.total_income_before_tax) }}
                                     </span>
                                 </td>
                                 <td class="border-t">
                                     <span class="px-6 py-4 flex items-center">
-                                    {{ $filters.currency(statement.total_income_tax) }}
+                                    {{ $filters.currency(sheet.total_income_tax) }}
                                     </span>
                                 </td>
                                 <td class="border-t">
                                     <span class="px-6 py-4 flex items-center">
-                                    {{ $filters.currency(statement.net_profit) }}
+                                    {{ $filters.currency(sheet.net_profit) }}
                                     </span>
                                 </td>
                                 <td class="border-t w-px pr-2">
                                     <div class=" flex items-center space-x-2">
-                                        <inertia-link v-if="can('clients.income_statement.update')"
-                                                      :href="route('clients.income_statements.edit', statement.id)"
+                                        <inertia-link v-if="can('clients.balance_sheet.update')"
+                                                      :href="route('clients.balance_sheets.edit', sheet.id)"
                                                       tabindex="-1" class="text-indigo-600 hover:text-indigo-900">
                                             Edit
                                         </inertia-link>
-                                        <a href="#" v-if="can('clients.income_statement.destroy')"
-                                           @click="deleteAction(statement.id)"
+                                        <a href="#" v-if="can('clients.balance_sheet.destroy')"
+                                           @click="deleteAction(sheet.id)"
                                            class="text-red-600 hover:text-red-900">Delete</a>
                                     </div>
                                 </td>
@@ -123,7 +117,7 @@
                             </tbody>
                         </table>
                     </div>
-                    <pagination v-if="statements.data.length" :links="statements.links"/>
+                    <pagination v-if="sheets.data.length" :links="sheets.links"/>
                 </div>
             </div>
         </div>
@@ -188,7 +182,7 @@ export default {
     },
     props: {
         client: Object,
-        statements: Object,
+        sheets: Object,
 
     },
     data() {
@@ -198,8 +192,8 @@ export default {
             },
             confirmingDeletion: false,
             selectedRecord: null,
-            pageTitle: "Client Income Statements",
-            pageDescription: "Client Income Statements",
+            pageTitle: "Client Balance Sheets",
+            pageDescription: "Client Balance Sheets",
 
         }
     },
@@ -210,7 +204,7 @@ export default {
         },
         destroy() {
 
-            this.$inertia.delete(this.route('clients.income_statements.destroy', this.selectedRecord))
+            this.$inertia.delete(this.route('clients.balance_sheets.destroy', this.selectedRecord))
             this.confirmingDeletion = false
         },
     },

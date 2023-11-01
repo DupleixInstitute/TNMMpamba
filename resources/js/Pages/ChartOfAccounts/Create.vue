@@ -52,7 +52,7 @@
                                     <option value="stock">Stock</option>
                                 </optgroup>
                                 <optgroup label="Liability">
-                                    <option value="other_current_liability">Other Current Liability</option>
+                                    <option value="current_liability">Current Liability</option>
                                     <option value="credit_card">Credit Card</option>
                                     <option value="long_term_liability">Long Term Liability</option>
                                     <option value="other_liability">Other Liability</option>
