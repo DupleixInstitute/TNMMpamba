@@ -37,14 +37,111 @@
                                         <h4>Assets</h4>
                                     </div>
                                     <div class="p-4">
-                                        <h2 class="mb-2 font-bold text-2xl">
-                                            Card Name
-                                        </h2>
+                                        <table class="mt-4 w-full whitespace-no-wrap table-auto">
+                                            <tbody>
+                                            <tr>
+                                                <td colspan="2" class="px-6 py-4">
+                                                    <h1 class="font-bold">Current Assets</h1>
+                                                </td>
+                                            </tr>
+                                            <tr v-for="(item,index) in form.charts.current_assets" :key="index"
+                                                class="hover:bg-gray-100 focus-within:bg-gray-100">
+                                                <td class="border-t px-6 py-4">
+                                                <span class=" flex items-center">
+                                                {{ item.name }}
+                                                </span>
+                                                </td>
+                                                <td class="border-t px-6 py-4">
+                                                    <jet-input id="name" @keyup="updateTotal" type="number"
+                                                               class="mt-1 block w-full"
+                                                               v-model="item.amount"/>
+                                                </td>
+                                            </tr>
+                                            <tr
+                                                class="hover:bg-gray-100 focus-within:bg-gray-100">
+                                                <td class="border-t px-6 py-4">
+                                                    <span class="font-bold">
+                                                   Total Current Assets
+                                                    </span>
+                                                </td>
+                                                <td class="border-t px-6 py-4 text-right">
+                                                    <span class="font-bold">{{
+                                                            $filters.currency(form.total_current_assets)
+                                                        }}</span>
+                                                </td>
+                                            </tr>
+                                            <tr v-for="(item,index) in form.charts.other_current_assets" :key="index"
+                                                class="hover:bg-gray-100 focus-within:bg-gray-100">
+                                                <td class="border-t px-6 py-4">
+                                                <span class=" flex items-center">
+                                                {{ item.name }}
+                                                </span>
+                                                </td>
+                                                <td class="border-t px-6 py-4">
+                                                    <jet-input id="name" @keyup="updateTotal" type="number"
+                                                               class="mt-1 block w-full"
+                                                               v-model="item.amount"/>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="2" class="px-6 py-4">
+                                                    <h1 class="font-bold">Non-current Assets</h1>
+                                                </td>
+                                            </tr>
+                                            <tr v-for="(item,index) in form.charts.fixed_assets" :key="index"
+                                                class="hover:bg-gray-100 focus-within:bg-gray-100">
+                                                <td class="border-t px-8 py-4">
+                                                    <span class=" flex items-center">
+                                                    {{ item.name }}
+                                                    </span>
+                                                </td>
+                                                <td class="border-t px-6 py-4">
+                                                    <jet-input id="name" @keyup="updateTotal" type="number"
+                                                               class="mt-1 block w-full"
+                                                               v-model="item.amount"/>
+                                                </td>
+                                            </tr>
+                                            <tr
+                                                class="hover:bg-gray-100 focus-within:bg-gray-100">
+                                                <td class="border-t px-6 py-4">
+                                                <span class="font-bold">
+                                               Total Non-current Assets
+                                                </span>
+                                                </td>
+                                                <td class="border-t px-6 py-4 text-right">
+                                                    <span class="font-bold">{{
+                                                            $filters.currency(form.total_fixed_assets)
+                                                        }}</span>
+                                                </td>
+                                            </tr>
+                                            <tr v-if="form.charts.other_assets.length">
+                                                <td colspan="2" class="px-6 py-4">
+                                                    <h1 class="font-bold">Other Assets</h1>
+                                                </td>
+                                            </tr>
+                                            <tr v-for="(item,index) in form.charts.other_assets" :key="index"
+                                                class="hover:bg-gray-100 focus-within:bg-gray-100">
+                                                <td class="border-t px-8 py-4">
+                                                <span class=" flex items-center">
+                                                {{ item.name }}
+                                                </span>
+                                                </td>
+                                                <td class="border-t px-6 py-4">
+                                                    <jet-input id="name" @keyup="updateTotal" type="number"
+                                                               class="mt-1 block w-full"
+                                                               v-model="item.amount"/>
+                                                </td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
 
                                     </div>
-                                    <div class="bg-blue-950 text-white p-4 grid grid-cols-2 font-bold absolute bottom-0 w-full">
+                                    <div
+                                        class="bg-blue-950 text-white p-4 grid grid-cols-2 font-bold absolute bottom-0 w-full">
                                         <h4>Total Assets</h4>
-                                        <h4 class="text-right">$200</h4>
+                                        <h4 class="text-right">{{
+                                                $filters.currency(form.total_assets)
+                                            }}</h4>
                                     </div>
                                 </div>
                                 <div class="col-span-1 flex flex-col bg-white border-2 relative">
@@ -52,182 +149,131 @@
                                         <h4>Liabilities</h4>
                                     </div>
                                     <div class="p-4">
-                                        <h2 class="mb-2 font-bold text-2xl">
-                                            Card Name
-                                        </h2>
+                                        <table class="mt-4 w-full whitespace-no-wrap table-auto">
+                                            <tbody>
+                                            <tr>
+                                                <td colspan="2" class="px-6 py-4">
+                                                    <h1 class="font-bold">Current Liabilities</h1>
+                                                </td>
+                                            </tr>
+                                            <tr v-for="(item,index) in form.charts.current_liabilities" :key="index"
+                                                class="hover:bg-gray-100 focus-within:bg-gray-100">
+                                                <td class="border-t px-6 py-4">
+                                                <span class=" flex items-center">
+                                                {{ item.name }}
+                                                </span>
+                                                </td>
+                                                <td class="border-t px-6 py-4">
+                                                    <jet-input id="name" @keyup="updateTotal" type="number"
+                                                               class="mt-1 block w-full"
+                                                               v-model="item.amount"/>
+                                                </td>
+                                            </tr>
+                                            <tr
+                                                class="hover:bg-gray-100 focus-within:bg-gray-100">
+                                                <td class="border-t px-6 py-4">
+                                                    <span class="font-bold">
+                                                   Total Current Liabilities
+                                                    </span>
+                                                </td>
+                                                <td class="border-t px-6 py-4 text-right">
+                                                    <span class="font-bold">{{
+                                                            $filters.currency(form.total_current_liabilities)
+                                                        }}</span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="2" class="px-6 py-4">
+                                                    <h1 class="font-bold">Long Term Liabilites</h1>
+                                                </td>
+                                            </tr>
+                                            <tr v-for="(item,index) in form.charts.long_term_liabilities" :key="index"
+                                                class="hover:bg-gray-100 focus-within:bg-gray-100">
+                                                <td class="border-t px-8 py-4">
+                                                    <span class=" flex items-center">
+                                                    {{ item.name }}
+                                                    </span>
+                                                </td>
+                                                <td class="border-t px-6 py-4">
+                                                    <jet-input id="name" @keyup="updateTotal" type="number"
+                                                               class="mt-1 block w-full"
+                                                               v-model="item.amount"/>
+                                                </td>
+                                            </tr>
+                                            <tr
+                                                class="hover:bg-gray-100 focus-within:bg-gray-100">
+                                                <td class="border-t px-6 py-4">
+                                                <span class="font-bold">
+                                               Total Long Term Liabilities
+                                                </span>
+                                                </td>
+                                                <td class="border-t px-6 py-4 text-right">
+                                                    <span class="font-bold">{{
+                                                            $filters.currency(form.total_long_term_liabilities)
+                                                        }}</span>
+                                                </td>
+                                            </tr>
+                                            <tr
+                                                class="hover:bg-gray-100 focus-within:bg-gray-100">
+                                                <td class="border-t px-2 py-4">
+                                                <span class="font-bold">
+                                               Total  Liabilities
+                                                </span>
+                                                </td>
+                                                <td class="border-t px-6 py-4 text-right">
+                                                    <span class="font-bold">{{
+                                                            $filters.currency(form.total_current_liabilities+form.total_long_term_liabilities)
+                                                        }}</span>
+                                                </td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
 
                                     </div>
 
                                     <div class="bg-blue-950 text-white p-4 font-bold">
                                         <h4>Owner's Equity</h4>
                                     </div>
+                                    <div class="p-4">
+                                        <table class="mt-4 w-full whitespace-no-wrap table-auto">
+                                            <tbody>
+                                            <tr v-for="(item,index) in form.charts.equity" :key="index"
+                                                class="hover:bg-gray-100 focus-within:bg-gray-100">
+                                                <td class="border-t px-6 py-4">
+                                                <span class=" flex items-center">
+                                                {{ item.name }}
+                                                </span>
+                                                </td>
+                                                <td class="border-t px-6 py-4">
+                                                    <jet-input id="name" @keyup="updateTotal" type="number"
+                                                               class="mt-1 block w-full"
+                                                               v-model="item.amount"/>
+                                                </td>
+                                            </tr>
+                                            <tr
+                                                class="hover:bg-gray-100 focus-within:bg-gray-100">
+                                                <td class="border-t px-6 py-4">
+                                                    <span class="font-bold">
+                                                   Total owner's equity
+                                                    </span>
+                                                </td>
+                                                <td class="border-t px-6 py-4 text-right">
+                                                    <span class="font-bold">{{
+                                                            $filters.currency(form.total_equity)
+                                                        }}</span>
+                                                </td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
                                     <div class="bg-blue-950 text-white p-4 grid grid-cols-2 font-bold  bottom-0 w-ful">
                                         <h4>Total Liabilities</h4>
-                                        <h4 class="text-right">$200</h4>
+                                        <h4 class="text-right">{{
+                                                $filters.currency(form.total_liabilities)
+                                            }}</h4>
                                     </div>
                                 </div>
                             </div>
-                            <table class="mt-4 w-full whitespace-no-wrap table-auto">
-                                <tbody>
-                                <tr>
-                                    <td colspan="2" class="px-6 py-4">
-                                        <h1 class="font-bold">Sales</h1>
-                                    </td>
-                                </tr>
-                                <tr v-for="(item,index) in form.charts.sales" :key="index"
-                                    class="hover:bg-gray-100 focus-within:bg-gray-100">
-                                    <td class="border-t px-6 py-4">
-                                    <span class=" flex items-center">
-                                    {{ item.name }}
-                                    </span>
-                                    </td>
-                                    <td class="border-t px-6 py-4">
-                                        <jet-input id="name" @keyup="updateTotal" type="number"
-                                                   class="mt-1 block w-full"
-                                                   v-model="item.amount"/>
-                                    </td>
-                                </tr>
-                                <tr
-                                    class="hover:bg-gray-100 focus-within:bg-gray-100">
-                                    <td class="border-t px-6 py-4">
-                                    <span class="font-bold">
-                                   Net Sales
-                                    </span>
-                                    </td>
-                                    <td class="border-t px-6 py-4 text-right">
-                                        <span class="font-bold">{{ $filters.currency(form.total_sales) }}</span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td colspan="2" class="px-6 py-4">
-                                        <h1 class="font-bold">Cost of goods sold</h1>
-                                    </td>
-                                </tr>
-                                <tr v-for="(item,index) in form.charts.cost_of_goods_sold" :key="index"
-                                    class="hover:bg-gray-100 focus-within:bg-gray-100">
-                                    <td class="border-t px-8 py-4">
-                                    <span class=" flex items-center">
-                                    {{ item.name }}
-                                    </span>
-                                    </td>
-                                    <td class="border-t px-6 py-4">
-                                        <jet-input id="name" @keyup="updateTotal" type="number"
-                                                   class="mt-1 block w-full"
-                                                   v-model="item.amount"/>
-                                    </td>
-                                </tr>
-                                <tr
-                                    class="hover:bg-gray-100 focus-within:bg-gray-100">
-                                    <td class="border-t px-6 py-4">
-                                    <span class="font-bold">
-                                   Gross Margin
-                                    </span>
-                                    </td>
-                                    <td class="border-t px-6 py-4 text-right">
-                                        <span class="font-bold">{{ $filters.currency(form.total_gross_margin) }}</span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td colspan="2" class="px-6 py-4">
-                                        <h1 class="font-bold">Operating expenses</h1>
-                                    </td>
-                                </tr>
-                                <tr v-for="(item,index) in form.charts.operating_expenses" :key="index"
-                                    class="hover:bg-gray-100 focus-within:bg-gray-100">
-                                    <td class="border-t px-8 py-4">
-                                    <span class=" flex items-center">
-                                    {{ item.name }}
-                                    </span>
-                                    </td>
-                                    <td class="border-t px-6 py-4">
-                                        <jet-input id="name" @keyup="updateTotal" type="number"
-                                                   class="mt-1 block w-full"
-                                                   v-model="item.amount"/>
-                                    </td>
-                                </tr>
-                                <tr
-                                    class="hover:bg-gray-100 focus-within:bg-gray-100">
-                                    <td class="border-t px-6 py-4">
-                                    <span class="font-bold">
-                                   Operating Income
-                                    </span>
-                                    </td>
-                                    <td class="border-t px-6 py-4 text-right">
-                                        <span class="font-bold">{{
-                                                $filters.currency(form.total_operating_profit)
-                                            }}</span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td colspan="2" class="px-6 py-4">
-                                        <h1 class="font-bold">Other income and expenses</h1>
-                                    </td>
-                                </tr>
-                                <tr v-for="(item,index) in form.charts.other_expenses" :key="index"
-                                    class="hover:bg-gray-100 focus-within:bg-gray-100">
-                                    <td class="border-t px-8 py-4">
-                                    <span class=" flex items-center">
-                                    {{ item.name }}
-                                    </span>
-                                    </td>
-                                    <td class="border-t px-6 py-4">
-                                        <jet-input id="name" @keyup="updateTotal" type="number"
-                                                   class="mt-1 block w-full"
-                                                   v-model="item.amount"/>
-                                    </td>
-                                </tr>
-                                <tr v-for="(item,index) in form.charts.other_income" :key="index"
-                                    class="hover:bg-gray-100 focus-within:bg-gray-100">
-                                    <td class="border-t px-8 py-4">
-                                    <span class=" flex items-center">
-                                    {{ item.name }}
-                                    </span>
-                                    </td>
-                                    <td class="border-t px-6 py-4">
-                                        <jet-input id="name" @keyup="updateTotal" type="number"
-                                                   class="mt-1 block w-full"
-                                                   v-model="item.amount"/>
-                                    </td>
-                                </tr>
-                                <tr
-                                    class="hover:bg-gray-100 focus-within:bg-gray-100">
-                                    <td class="border-t px-6 py-4">
-                                    <span class="font-bold">
-                                        Income before tax
-                                    </span>
-                                    </td>
-                                    <td class="border-t px-6 py-4 text-right">
-                                        <span class="font-bold">{{
-                                                $filters.currency(form.total_income_before_tax)
-                                            }}</span>
-                                    </td>
-                                </tr>
-                                <tr v-for="(item,index) in form.charts.income_tax" :key="index"
-                                    class="hover:bg-gray-100 focus-within:bg-gray-100">
-                                    <td class="border-t px-8 py-4">
-                                    <span class=" flex items-center">
-                                    {{ item.name }}
-                                    </span>
-                                    </td>
-                                    <td class="border-t px-6 py-4">
-                                        <jet-input id="name" @keyup="updateTotal" type="number"
-                                                   class="mt-1 block w-full"
-                                                   v-model="item.amount"/>
-                                    </td>
-                                </tr>
-                                <tr
-                                    class="hover:bg-gray-100 focus-within:bg-gray-100">
-                                    <td class="border-t px-6 py-4">
-                                    <span class="font-bold">
-                                        Net Profit/(Loss)
-                                    </span>
-                                    </td>
-                                    <td class="border-t px-6 py-4 text-right">
-                                        <span class="font-bold">{{ $filters.currency(form.net_profit) }}</span>
-                                    </td>
-                                </tr>
-                                </tbody>
-                            </table>
                             <div class="flex items-center justify-end mt-4">
                                 <jet-button class="ml-4" :class="{ 'opacity-25': form.processing }"
                                             :disabled="form.processing">
@@ -299,6 +345,12 @@ export default {
                 year: null,
                 description: null,
                 as_at_date: null,
+                total_current_assets: 0,
+                total_fixed_assets: 0,
+                total_other_assets: 0,
+                total_other_current_assets: 0,
+                total_current_liabilities: 0,
+                total_long_term_liabilities: 0,
                 total_assets: 0,
                 total_equity: 0,
                 total_liabilities: 0,
@@ -375,39 +427,41 @@ export default {
             this.form.post(this.route('clients.balance_sheets.store', this.client.id), {})
         },
         updateTotal() {
-            this.form.total_sales = 0;
-            this.form.total_operating_expenses = 0;
-            this.form.total_gross_margin = 0;
-            this.form.total_other_income = 0;
+            this.form.total_current_assets = 0;
+            this.form.total_fixed_assets = 0;
+            this.form.total_other_assets = 0;
+            this.form.total_other_current_assets = 0;
             this.form.total_other_expenses = 0;
-            this.form.total_income_before_tax = 0;
-            this.form.net_profit = 0;
-            this.form.total_operating_profit = 0;
-            this.form.total_cost_of_goods_sold = 0;
-            this.form.total_income_tax = 0;
-            this.form.charts.sales.forEach(item => {
-                this.form.total_sales += parseFloat(item.amount || '0')
+            this.form.total_current_liabilities = 0;
+            this.form.total_long_term_liabilities = 0;
+            this.form.total_assets = 0;
+            this.form.total_equity = 0;
+            this.form.total_equity_liabilities = 0;
+            this.form.charts.current_assets.forEach(item => {
+                this.form.total_current_assets += parseFloat(item.amount || '0')
             })
-            this.form.charts.cost_of_goods_sold.forEach(item => {
-                this.form.total_cost_of_goods_sold += parseFloat(item.amount || '0')
+            this.form.charts.fixed_assets.forEach(item => {
+                this.form.total_fixed_assets += parseFloat(item.amount || '0')
             })
-            this.form.total_gross_margin = this.form.total_sales - this.form.total_cost_of_goods_sold;
-            this.form.charts.operating_expenses.forEach(item => {
-                this.form.total_operating_expenses += parseFloat(item.amount || '0')
+            this.form.charts.other_assets.forEach(item => {
+                this.form.total_other_assets += parseFloat(item.amount || '0')
             })
-            this.form.total_operating_profit = this.form.total_gross_margin - this.form.total_operating_expenses;
-            this.form.charts.other_income.forEach(item => {
-                this.form.total_other_income += parseFloat(item.amount || '0')
+            this.form.charts.other_current_assets.forEach(item => {
+                this.form.total_other_current_assets += parseFloat(item.amount || '0')
             })
-            this.form.total_income_before_tax = this.form.total_operating_profit + this.form.total_other_income;
-            this.form.charts.other_expenses.forEach(item => {
-                this.form.total_other_expenses += parseFloat(item.amount || '0')
+            this.form.total_assets= this.form.total_current_assets + this.form.total_fixed_assets + this.form.total_other_assets + this.form.total_other_current_assets;
+            this.form.charts.current_liabilities.forEach(item => {
+                this.form.total_current_liabilities += parseFloat(item.amount || '0')
             })
-            this.form.total_income_before_tax -= this.form.total_other_expenses;
-            this.form.charts.income_tax.forEach(item => {
-                this.form.total_income_tax += parseFloat(item.amount || '0')
+            this.form.charts.long_term_liabilities.forEach(item => {
+                this.form.total_long_term_liabilities += parseFloat(item.amount || '0')
             })
-            this.form.net_profit = this.form.total_income_before_tax - this.form.total_income_tax;
+            this.form.total_working_capital = this.form.total_current_assets - this.form.total_current_liabilities;
+            this.form.charts.equity.forEach(item => {
+                this.form.total_equity += parseFloat(item.amount || '0')
+            })
+            this.form.total_liabilities = this.form.total_current_liabilities + this.form.total_long_term_liabilities+ this.form.total_equity;
+
         }
     },
 }

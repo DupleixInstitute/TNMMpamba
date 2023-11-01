@@ -33,7 +33,6 @@
                                 <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Year</th>
                                 <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Total Assets</th>
                                 <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Total Liabilities</th>
-                                <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Total Shareholder’s Equity</th>
                                 <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Working Capital</th>
                                 <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Action</th>
                             </tr>
@@ -53,52 +52,17 @@
                                 </td>
                                 <td class="border-t">
                                     <span class="px-6 py-4 flex items-center">
-                                    {{ $filters.currency(sheet.total_sales) }}
+                                    {{ $filters.currency(sheet.total_assets) }}
                                     </span>
                                 </td>
                                 <td class="border-t">
                                     <span class="px-6 py-4 flex items-center">
-                                    {{ $filters.currency(sheet.total_cost_of_goods_sold) }}
+                                    {{ $filters.currency(sheet.total_liabilities) }}
                                     </span>
                                 </td>
                                 <td class="border-t">
                                     <span class="px-6 py-4 flex items-center">
-                                    {{ $filters.currency(sheet.total_gross_margin) }}
-                                    </span>
-                                </td>
-                                <td class="border-t">
-                                    <span class="px-6 py-4 flex items-center">
-                                    {{ $filters.currency(sheet.total_operating_expenses) }}
-                                    </span>
-                                </td>
-                                <td class="border-t">
-                                    <span class="px-6 py-4 flex items-center">
-                                    {{ $filters.currency(sheet.total_operating_profit) }}
-                                    </span>
-                                </td>
-                                <td class="border-t">
-                                    <span class="px-6 py-4 flex items-center">
-                                    {{ $filters.currency(sheet.total_other_expenses) }}
-                                    </span>
-                                </td>
-                                <td class="border-t">
-                                    <span class="px-6 py-4 flex items-center">
-                                    {{ $filters.currency(sheet.total_other_income) }}
-                                    </span>
-                                </td>
-                                <td class="border-t">
-                                    <span class="px-6 py-4 flex items-center">
-                                    {{ $filters.currency(sheet.total_income_before_tax) }}
-                                    </span>
-                                </td>
-                                <td class="border-t">
-                                    <span class="px-6 py-4 flex items-center">
-                                    {{ $filters.currency(sheet.total_income_tax) }}
-                                    </span>
-                                </td>
-                                <td class="border-t">
-                                    <span class="px-6 py-4 flex items-center">
-                                    {{ $filters.currency(sheet.net_profit) }}
+                                    {{ $filters.currency(sheet.total_working_capital) }}
                                     </span>
                                 </td>
                                 <td class="border-t w-px pr-2">

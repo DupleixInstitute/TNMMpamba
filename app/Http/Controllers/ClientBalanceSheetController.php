@@ -75,20 +75,15 @@ class ClientBalanceSheetController extends Controller
         $sheet->client_id = $client->id;
         $sheet->year = $request->year;
         $sheet->as_at_date = $request->as_at_date;
-        $sheet->total_sales = $request->total_sales;
-        $sheet->total_operating_expenses = $request->total_operating_expenses;
-        $sheet->total_gross_margin = $request->total_gross_margin;
-        $sheet->total_other_income = $request->total_other_income;
-        $sheet->total_other_expenses = $request->total_other_expenses;
-        $sheet->total_income_before_tax = $request->total_income_before_tax;
-        $sheet->total_income_tax = $request->total_income_tax;
-        $sheet->total_cost_of_goods_sold = $request->total_cost_of_goods_sold;
-        $sheet->total_operating_profit = $request->total_operating_profit;
-        $sheet->net_profit = $request->net_profit;
+        $sheet->total_assets = $request->total_assets;
+        $sheet->total_equity = $request->total_equity;
+        $sheet->total_liabilities = $request->total_liabilities;
+        $sheet->total_equity = $request->total_equity;
+        $sheet->total_working_capital = $request->total_working_capital;
         $sheet->description = $request->description;
         $sheet->save();
         //save the charts
-        foreach ($request->charts['sales'] as $item) {
+        foreach ($request->charts['current_assets'] as $item) {
             $sheetData = new BalanceSheetData();
             $sheetData->client_id = $client->id;
             $sheetData->balance_sheet_id = $sheet->id;
@@ -97,7 +92,7 @@ class ClientBalanceSheetController extends Controller
             $sheetData->amount = $item['amount'];
             $sheetData->save();
         }
-        foreach ($request->charts['cost_of_goods_sold'] as $item) {
+        foreach ($request->charts['other_assets'] as $item) {
             $sheetData = new BalanceSheetData();
             $sheetData->client_id = $client->id;
             $sheetData->balance_sheet_id = $sheet->id;
@@ -106,7 +101,7 @@ class ClientBalanceSheetController extends Controller
             $sheetData->amount = $item['amount'];
             $sheetData->save();
         }
-        foreach ($request->charts['operating_expenses'] as $item) {
+        foreach ($request->charts['other_current_assets'] as $item) {
             $sheetData = new BalanceSheetData();
             $sheetData->client_id = $client->id;
             $sheetData->balance_sheet_id = $sheet->id;
@@ -115,7 +110,7 @@ class ClientBalanceSheetController extends Controller
             $sheetData->amount = $item['amount'];
             $sheetData->save();
         }
-        foreach ($request->charts['other_income'] as $item) {
+        foreach ($request->charts['fixed_assets'] as $item) {
             $sheetData = new BalanceSheetData();
             $sheetData->client_id = $client->id;
             $sheetData->balance_sheet_id = $sheet->id;
@@ -124,7 +119,7 @@ class ClientBalanceSheetController extends Controller
             $sheetData->amount = $item['amount'];
             $sheetData->save();
         }
-        foreach ($request->charts['other_expenses'] as $item) {
+        foreach ($request->charts['current_liabilities'] as $item) {
             $sheetData = new BalanceSheetData();
             $sheetData->client_id = $client->id;
             $sheetData->balance_sheet_id = $sheet->id;
@@ -133,7 +128,16 @@ class ClientBalanceSheetController extends Controller
             $sheetData->amount = $item['amount'];
             $sheetData->save();
         }
-        foreach ($request->charts['income_tax'] as $item) {
+        foreach ($request->charts['long_term_liabilities'] as $item) {
+            $sheetData = new BalanceSheetData();
+            $sheetData->client_id = $client->id;
+            $sheetData->balance_sheet_id = $sheet->id;
+            $sheetData->chart_of_account_id = $item['chart_of_account_id'];
+            $sheetData->name = $item['name'];
+            $sheetData->amount = $item['amount'];
+            $sheetData->save();
+        }
+        foreach ($request->charts['equity'] as $item) {
             $sheetData = new BalanceSheetData();
             $sheetData->client_id = $client->id;
             $sheetData->balance_sheet_id = $sheet->id;
@@ -170,63 +174,72 @@ class ClientBalanceSheetController extends Controller
     public function edit(BalanceSheet $sheet)
     {
         $client = $sheet->client;
-
-        $sales = ChartOfAccount::where('account_type', 'income')->get();
-        $costsOfGoodsSold = ChartOfAccount::where('account_type', 'cost_of_goods_sold')->get();
-        $expenses = ChartOfAccount::whereIn('account_type', ['expense'])->get();
-        $otherExpenses = ChartOfAccount::whereIn('account_type', ['other_expense'])->get();
-        $otherIncome = ChartOfAccount::whereIn('account_type', ['other_income'])->get();
-        $incomeTax = ChartOfAccount::whereIn('account_type', ['income_tax'])->get();
+        $currentAssets = ChartOfAccount::whereIn('account_type', ['current_asset', 'cash', 'bank', 'stock'])->get();
+        $otherAssets = ChartOfAccount::whereIn('account_type', ['other_asset'])->get();
+        $otherCurrentAssets = ChartOfAccount::whereIn('account_type', ['other_current_asset'])->get();
+        $fixedAssets = ChartOfAccount::whereIn('account_type', ['fixed_asset', 'non_current_asset'])->get();
+        $currentLiabilities = ChartOfAccount::whereIn('account_type', ['current_liability', 'income_tax', 'credit_card'])->get();
+        $longTermLiabilities = ChartOfAccount::whereIn('account_type', ['long_term_liability', 'other_liability'])->get();
+        $equity = ChartOfAccount::whereIn('account_type', ['equity'])->get();
         $chartData = [
-            'sales' => [],
-            'cost_of_goods_sold' => [],
-            'operating_expenses' => [],
-            'other_income' => [],
-            'other_expenses' => [],
-            'income_tax' => [],
+            'current_assets' => [],
+            'other_assets' => [],
+            'other_current_assets' => [],
+            'fixed_assets' => [],
+            'current_liabilities' => [],
+            'long_term_liabilities' => [],
+            'equity' => [],
         ];
-        foreach ($sales as $key) {
-            $chartData['sales'][] = [
+        foreach ($currentAssets as $key) {
+            $chartData['current_assets'][] = [
                 'name' => $key->name,
                 'chart_of_account_id' => $key->id,
                 'id' => $sheet->data->where('chart_of_account_id', $key->id)->first()->id ?? '',
                 'amount' => $sheet->data->where('chart_of_account_id', $key->id)->first()->amount ?? '',
             ];
         }
-        foreach ($costsOfGoodsSold as $key) {
-            $chartData['cost_of_goods_sold'][] = [
+        foreach ($otherCurrentAssets as $key) {
+            $chartData['other_current_assets'][] = [
                 'name' => $key->name,
                 'chart_of_account_id' => $key->id,
                 'id' => $sheet->data->where('chart_of_account_id', $key->id)->first()->id ?? '',
                 'amount' => $sheet->data->where('chart_of_account_id', $key->id)->first()->amount ?? '',
             ];
         }
-        foreach ($expenses as $key) {
-            $chartData['operating_expenses'][] = [
+        foreach ($otherAssets as $key) {
+            $chartData['other_assets'][] = [
                 'name' => $key->name,
                 'chart_of_account_id' => $key->id,
                 'id' => $sheet->data->where('chart_of_account_id', $key->id)->first()->id ?? '',
                 'amount' => $sheet->data->where('chart_of_account_id', $key->id)->first()->amount ?? '',
             ];
         }
-        foreach ($otherExpenses as $key) {
-            $chartData['other_expenses'][] = [
+        foreach ($fixedAssets as $key) {
+            $chartData['fixed_assets'][] = [
                 'name' => $key->name,
                 'chart_of_account_id' => $key->id,
                 'id' => $sheet->data->where('chart_of_account_id', $key->id)->first()->id ?? '',
                 'amount' => $sheet->data->where('chart_of_account_id', $key->id)->first()->amount ?? '',
             ];
         }
-        foreach ($otherIncome as $key) {
-            $chartData['other_income'][] = [
+        foreach ($currentLiabilities as $key) {
+            $chartData['current_liabilities'][] = [
                 'name' => $key->name,
                 'chart_of_account_id' => $key->id,
                 'id' => $sheet->data->where('chart_of_account_id', $key->id)->first()->id ?? '',
                 'amount' => $sheet->data->where('chart_of_account_id', $key->id)->first()->amount ?? '',
             ];
         }
-        foreach ($incomeTax as $key) {
-            $chartData['income_tax'][] = [
+        foreach ($longTermLiabilities as $key) {
+            $chartData['long_term_liabilities'][] = [
+                'name' => $key->name,
+                'chart_of_account_id' => $key->id,
+                'id' => $sheet->data->where('chart_of_account_id', $key->id)->first()->id ?? '',
+                'amount' => $sheet->data->where('chart_of_account_id', $key->id)->first()->amount ?? '',
+            ];
+        }
+        foreach ($equity as $key) {
+            $chartData['equity'][] = [
                 'name' => $key->name,
                 'chart_of_account_id' => $key->id,
                 'id' => $sheet->data->where('chart_of_account_id', $key->id)->first()->id ?? '',
@@ -238,12 +251,13 @@ class ClientBalanceSheetController extends Controller
         return Inertia::render('Clients/BalanceSheets/Edit', [
             'client' => $client,
             'sheet' => $sheet,
-            'sales' => $sales,
-            'costsOfGoodsSold' => $costsOfGoodsSold,
-            'otherExpenses' => $otherExpenses,
-            'expenses' => $expenses,
-            'otherIncome' => $otherIncome,
-            'incomeTax' => $incomeTax,
+            'currentAssets' => $currentAssets,
+            'otherAssets' => $otherAssets,
+            'otherCurrentAssets' => $otherCurrentAssets,
+            'fixedAssets' => $fixedAssets,
+            'currentLiabilities' => $currentLiabilities,
+            'longTermLiabilities' => $longTermLiabilities,
+            'equity' => $equity,
         ]);
     }
 
@@ -263,22 +277,17 @@ class ClientBalanceSheetController extends Controller
         ]);
         $sheet->year = $request->year;
         $sheet->as_at_date = $request->as_at_date;
-        $sheet->total_sales = $request->total_sales;
-        $sheet->total_operating_expenses = $request->total_operating_expenses;
-        $sheet->total_gross_margin = $request->total_gross_margin;
-        $sheet->total_other_income = $request->total_other_income;
-        $sheet->total_other_expenses = $request->total_other_expenses;
-        $sheet->total_income_before_tax = $request->total_income_before_tax;
-        $sheet->total_income_tax = $request->total_income_tax;
-        $sheet->total_cost_of_goods_sold = $request->total_cost_of_goods_sold;
-        $sheet->total_operating_profit = $request->total_operating_profit;
-        $sheet->net_profit = $request->net_profit;
+        $sheet->total_assets = $request->total_assets;
+        $sheet->total_equity = $request->total_equity;
+        $sheet->total_liabilities = $request->total_liabilities;
+        $sheet->total_equity = $request->total_equity;
+        $sheet->total_working_capital = $request->total_working_capital;
         $sheet->description = $request->description;
         $sheet->save();
-        //delete current linked data
+        //delete current sheet data
         $sheet->data->each->delete();
         //save the charts
-        foreach ($request->charts['sales'] as $item) {
+        foreach ($request->charts['current_assets'] as $item) {
             $sheetData = new BalanceSheetData();
             $sheetData->client_id = $client->id;
             $sheetData->balance_sheet_id = $sheet->id;
@@ -287,7 +296,7 @@ class ClientBalanceSheetController extends Controller
             $sheetData->amount = $item['amount'];
             $sheetData->save();
         }
-        foreach ($request->charts['cost_of_goods_sold'] as $item) {
+        foreach ($request->charts['other_assets'] as $item) {
             $sheetData = new BalanceSheetData();
             $sheetData->client_id = $client->id;
             $sheetData->balance_sheet_id = $sheet->id;
@@ -296,7 +305,7 @@ class ClientBalanceSheetController extends Controller
             $sheetData->amount = $item['amount'];
             $sheetData->save();
         }
-        foreach ($request->charts['operating_expenses'] as $item) {
+        foreach ($request->charts['other_current_assets'] as $item) {
             $sheetData = new BalanceSheetData();
             $sheetData->client_id = $client->id;
             $sheetData->balance_sheet_id = $sheet->id;
@@ -305,7 +314,7 @@ class ClientBalanceSheetController extends Controller
             $sheetData->amount = $item['amount'];
             $sheetData->save();
         }
-        foreach ($request->charts['other_income'] as $item) {
+        foreach ($request->charts['fixed_assets'] as $item) {
             $sheetData = new BalanceSheetData();
             $sheetData->client_id = $client->id;
             $sheetData->balance_sheet_id = $sheet->id;
@@ -314,7 +323,7 @@ class ClientBalanceSheetController extends Controller
             $sheetData->amount = $item['amount'];
             $sheetData->save();
         }
-        foreach ($request->charts['other_expenses'] as $item) {
+        foreach ($request->charts['current_liabilities'] as $item) {
             $sheetData = new BalanceSheetData();
             $sheetData->client_id = $client->id;
             $sheetData->balance_sheet_id = $sheet->id;
@@ -323,7 +332,16 @@ class ClientBalanceSheetController extends Controller
             $sheetData->amount = $item['amount'];
             $sheetData->save();
         }
-        foreach ($request->charts['income_tax'] as $item) {
+        foreach ($request->charts['long_term_liabilities'] as $item) {
+            $sheetData = new BalanceSheetData();
+            $sheetData->client_id = $client->id;
+            $sheetData->balance_sheet_id = $sheet->id;
+            $sheetData->chart_of_account_id = $item['chart_of_account_id'];
+            $sheetData->name = $item['name'];
+            $sheetData->amount = $item['amount'];
+            $sheetData->save();
+        }
+        foreach ($request->charts['equity'] as $item) {
             $sheetData = new BalanceSheetData();
             $sheetData->client_id = $client->id;
             $sheetData->balance_sheet_id = $sheet->id;
