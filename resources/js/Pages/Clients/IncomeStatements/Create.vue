@@ -106,8 +106,13 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td colspan="2" class="px-6 py-4">
+                                    <td class="px-6 py-4">
                                         <h1 class="font-bold">Cost of goods sold</h1>
+                                    </td>
+                                    <td class="px-6 py-4 text-right">
+                                        <span class="font-bold">{{
+                                                $filters.currency(form.total_cost_of_goods_sold)
+                                            }}</span>
                                     </td>
                                 </tr>
                                 <tr v-for="(item,index) in form.charts.cost_of_goods_sold" :key="index"
@@ -127,7 +132,7 @@
                                     class="hover:bg-gray-100 focus-within:bg-gray-100">
                                     <td class="border-t px-6 py-4">
                                     <span class="font-bold">
-                                   Gross Margin
+                                   Gross Profit
                                     </span>
                                     </td>
                                     <td class="border-t px-6 py-4 text-right">
