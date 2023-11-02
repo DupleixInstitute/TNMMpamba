@@ -31,6 +31,49 @@
                                 <jet-input id="year" type="number" required class="block w-full" v-model="form.year"/>
                                 <jet-input-error :message="form.errors.year" class="mt-2"/>
                             </div>
+                            <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-2">
+                                <div>
+                                    <jet-label for="audit_status" value="Reporting Month (1-12)"/>
+                                    <select
+                                        class="border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 rounded-md shadow-sm w-full"
+                                        name="reporting_month" v-model="form.reporting_month" id="reporting_month">
+                                        <option v-for="n in 12" :value="n">{{ n }}</option>
+                                    </select>
+                                    <jet-input-error :message="form.errors.reporting_month" class="mt-2"/>
+                                </div>
+                                <div>
+                                    <jet-label for="months_in_year" value="No of Months In Year (1-15)"/>
+                                    <select
+                                        class="border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 rounded-md shadow-sm w-full"
+                                        name="months_in_year" v-model="form.audit_status" id="months_in_year">
+                                        <option v-for="n in 15" :value="n">{{ n }}</option>
+                                    </select>
+                                    <jet-input-error :message="form.errors.months_in_year" class="mt-2"/>
+                                </div>
+                                <div>
+                                    <jet-label for="audit_status" value="Audit Status"/>
+                                    <select
+                                        class="border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 rounded-md shadow-sm w-full"
+                                        name="audit_status" v-model="form.audit_status" id="audit_status">
+                                        <option value="Audited">Audited</option>
+                                        <option value="Registered Accountant">Registered Accountant</option>
+                                        <option value="Management Accounts">Management Accounts</option>
+                                    </select>
+                                    <jet-input-error :message="form.errors.audit_status" class="mt-2"/>
+                                </div>
+                            </div>
+                            <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-2">
+                               <div>
+                                   <jet-label for="real_annual_inflation_rate" value="Annual Inflation Rate - Real"/>
+                                   <jet-input id="real_annual_inflation_rate" type="text" class="block w-full" v-model="form.real_annual_inflation_rate"/>
+                                   <jet-input-error :message="form.errors.real_annual_inflation_rate" class="mt-2"/>
+                               </div>
+                                <div>
+                                   <jet-label for="nominal_annual_inflation_rate" value="Annual Inflation Rate - Norminal"/>
+                                   <jet-input id="nominal_annual_inflation_rate" type="text" class="block w-full" v-model="form.nominal_annual_inflation_rate"/>
+                                   <jet-input-error :message="form.errors.nominal_annual_inflation_rate" class="mt-2"/>
+                               </div>
+                            </div>
                             <table class="mt-4 w-full whitespace-no-wrap table-auto">
                                 <tbody>
                                 <tr>
@@ -262,6 +305,11 @@ export default {
                 year: null,
                 description: null,
                 as_at_date: null,
+                reporting_month: null,
+                months_in_year: null,
+                audit_status: null,
+                real_annual_inflation_rate: null,
+                nominal_annual_inflation_rate: null,
                 total_sales: 0,
                 total_operating_expenses: 0,
                 total_gross_margin: 0,

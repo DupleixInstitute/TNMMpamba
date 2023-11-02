@@ -130,29 +130,7 @@
                             </select>
                             <jet-input-error :message="form.errors.years_in_business" class="mt-2"/>
                         </div>
-                        <div>
-                            <jet-label for="audit_status" value="Audit Status"/>
-                            <select
-                                class="border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 rounded-md shadow-sm w-full"
-                                name="audit_status" v-model="form.audit_status" id="audit_status">
-                                <option value="Audited">Audited</option>
-                                <option value="Registered Accountant">Registered Accountant</option>
-                                <option value="Management Accounts">Management Accounts</option>
-                            </select>
-                            <jet-input-error :message="form.errors.audit_status" class="mt-2"/>
-                        </div>
-                        <div>
-                            <jet-label for="real_annual_inflation_rate" value="Annual Inflation Rate - Real"/>
-                            <jet-input id="real_annual_inflation_rate" type="text" class="block w-full"
-                                       v-model="form.real_annual_inflation_rate"/>
-                            <jet-input-error :message="form.errors.real_annual_inflation_rate" class="mt-2"/>
-                        </div>
-                        <div>
-                            <jet-label for="nominal_annual_inflation_rate" value="Annual Inflation Rate - Norminal"/>
-                            <jet-input id="nominal_annual_inflation_rate" type="text" class="block w-full"
-                                       v-model="form.nominal_annual_inflation_rate"/>
-                            <jet-input-error :message="form.errors.nominal_annual_inflation_rate" class="mt-2"/>
-                        </div>
+
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-3 mt-4 gap-2" v-if="form.type==='individual'">
                         <div>

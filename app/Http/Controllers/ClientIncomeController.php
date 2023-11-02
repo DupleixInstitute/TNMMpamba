@@ -73,6 +73,11 @@ class ClientIncomeController extends Controller
         $statement->client_id = $client->id;
         $statement->year = $request->year;
         $statement->as_at_date = $request->as_at_date;
+        $statement->reporting_month = $request->reporting_month;
+        $statement->months_in_year = $request->months_in_year;
+        $statement->audit_status = $request->audit_status;
+        $statement->real_annual_inflation_rate = $request->real_annual_inflation_rate;
+        $statement->nominal_annual_inflation_rate = $request->nominal_annual_inflation_rate;
         $statement->total_sales = $request->total_sales;
         $statement->total_operating_expenses = $request->total_operating_expenses;
         $statement->total_gross_margin = $request->total_gross_margin;
@@ -261,6 +266,11 @@ class ClientIncomeController extends Controller
         ]);
         $statement->year = $request->year;
         $statement->as_at_date = $request->as_at_date;
+        $statement->reporting_month = $request->reporting_month;
+        $statement->months_in_year = $request->months_in_year;
+        $statement->audit_status = $request->audit_status;
+        $statement->real_annual_inflation_rate = $request->real_annual_inflation_rate;
+        $statement->nominal_annual_inflation_rate = $request->nominal_annual_inflation_rate;
         $statement->total_sales = $request->total_sales;
         $statement->total_operating_expenses = $request->total_operating_expenses;
         $statement->total_gross_margin = $request->total_gross_margin;
