@@ -140,8 +140,11 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td colspan="2" class="px-6 py-4">
+                                    <td  class="px-6 py-4">
                                         <h1 class="font-bold">Operating expenses</h1>
+                                    </td>
+                                    <td class="px-6 py-4 text-right">
+                                        <span class="font-bold">({{ $filters.currency(form.total_operating_expenses) }})</span>
                                     </td>
                                 </tr>
                                 <tr v-for="(item,index) in form.charts.operating_expenses" :key="index"
