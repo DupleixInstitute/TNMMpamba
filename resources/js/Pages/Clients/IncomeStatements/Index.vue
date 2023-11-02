@@ -31,6 +31,12 @@
                             <thead class="bg-gray-50">
                             <tr class="text-left font-bold">
                                 <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Year</th>
+                                <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Reporting Month</th>
+                                <th class="px-6 pt-4 pb-4 font-medium text-gray-500">No of Months In Year</th>
+                                <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Audit Status</th>
+                                <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Annual Inflation Rate - Real</th>
+                                <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Annual Inflation Rate - Nominal
+                                </th>
                                 <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Sales</th>
                                 <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Costs Of Good Sold</th>
                                 <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Gross Profit</th>
@@ -55,6 +61,31 @@
                                 <td class="border-t">
                                     <span class="px-6 py-4 flex items-center">
                                     {{ statement.year }}
+                                    </span>
+                                </td>
+                                <td class="border-t">
+                                    <span class="px-6 py-4 flex items-center">
+                                    {{ statement.reporting_month }}
+                                    </span>
+                                </td>
+                                <td class="border-t">
+                                    <span class="px-6 py-4 flex items-center">
+                                    {{ statement.months_in_year }}
+                                    </span>
+                                </td>
+                                <td class="border-t">
+                                    <span class="px-6 py-4 flex items-center">
+                                    {{ statement.audit_status }}
+                                    </span>
+                                </td>
+                                <td class="border-t">
+                                    <span class="px-6 py-4 flex items-center">
+                                    {{ statement.real_annual_inflation_rate }}
+                                    </span>
+                                </td>
+                                <td class="border-t">
+                                    <span class="px-6 py-4 flex items-center">
+                                    {{ statement.nominal_annual_inflation_rate }}
                                     </span>
                                 </td>
                                 <td class="border-t">
