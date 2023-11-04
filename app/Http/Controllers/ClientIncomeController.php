@@ -41,11 +41,12 @@ class ClientIncomeController extends Controller
     public function create(Client $client)
     {
         $sales = ChartOfAccount::where('account_type', 'income')->get();
-        $costsOfGoodsSold = ChartOfAccount::where('account_type', 'cost_of_goods_sold')->get();
-        $expenses = ChartOfAccount::whereIn('account_type', ['expense'])->get();
+        $costsOfGoodsSold = ChartOfAccount::whereIn('account_type', ['cost_of_goods_sold','cost_of_goods_sold_depreciation'])->get();
+        $expenses = ChartOfAccount::whereIn('account_type', ['expense','cost_of_goods_sold_depreciation','depreciation_property_plant_equipment','depreciation_right_of_use_assets','depreciation_investment_property','amortisation_intangible_assets','short_term_leases'])->get();
         $otherExpenses = ChartOfAccount::whereIn('account_type', ['other_expense'])->get();
         $otherIncome = ChartOfAccount::whereIn('account_type', ['other_income'])->get();
         $incomeTax = ChartOfAccount::whereIn('account_type', ['income_tax'])->get();
+        $netFinanceCosts = ChartOfAccount::whereIn('account_type', ['net_finance_costs_banks','net_finance_costs_finance_leases'])->get();
         return Inertia::render('Clients/IncomeStatements/Create', [
             'client' => $client,
             'sales' => $sales,
@@ -54,6 +55,7 @@ class ClientIncomeController extends Controller
             'expenses' => $expenses,
             'otherIncome' => $otherIncome,
             'incomeTax' => $incomeTax,
+            'netFinanceCosts' => $netFinanceCosts,
         ]);
     }
 
@@ -87,6 +89,7 @@ class ClientIncomeController extends Controller
         $statement->total_income_tax = $request->total_income_tax;
         $statement->total_cost_of_goods_sold = $request->total_cost_of_goods_sold;
         $statement->total_operating_profit = $request->total_operating_profit;
+        $statement->total_net_finance_costs = $request->total_net_finance_costs;
         $statement->net_profit = $request->net_profit;
         $statement->description = $request->description;
         $statement->save();
@@ -145,6 +148,15 @@ class ClientIncomeController extends Controller
             $statementData->amount = $item['amount'];
             $statementData->save();
         }
+        foreach ($request->charts['net_finance_costs'] as $item) {
+            $statementData = new IncomeStatementData();
+            $statementData->client_id = $client->id;
+            $statementData->income_statement_id = $statement->id;
+            $statementData->chart_of_account_id = $item['chart_of_account_id'];
+            $statementData->name = $item['name'];
+            $statementData->amount = $item['amount'];
+            $statementData->save();
+        }
 
         activity()
             ->performedOn($client)
@@ -175,11 +187,12 @@ class ClientIncomeController extends Controller
         $client = $statement->client;
 
         $sales = ChartOfAccount::where('account_type', 'income')->get();
-        $costsOfGoodsSold = ChartOfAccount::where('account_type', 'cost_of_goods_sold')->get();
-        $expenses = ChartOfAccount::whereIn('account_type', ['expense'])->get();
+        $costsOfGoodsSold = ChartOfAccount::whereIn('account_type', ['cost_of_goods_sold','cost_of_goods_sold_depreciation'])->get();
+        $expenses = ChartOfAccount::whereIn('account_type', ['expense','cost_of_goods_sold_depreciation','depreciation_property_plant_equipment','depreciation_right_of_use_assets','depreciation_investment_property','amortisation_intangible_assets','short_term_leases'])->get();
         $otherExpenses = ChartOfAccount::whereIn('account_type', ['other_expense'])->get();
         $otherIncome = ChartOfAccount::whereIn('account_type', ['other_income'])->get();
         $incomeTax = ChartOfAccount::whereIn('account_type', ['income_tax'])->get();
+        $netFinanceCosts = ChartOfAccount::whereIn('account_type', ['net_finance_costs_banks','net_finance_costs_finance_leases'])->get();
         $chartData = [
             'sales' => [],
             'cost_of_goods_sold' => [],
@@ -187,6 +200,7 @@ class ClientIncomeController extends Controller
             'other_income' => [],
             'other_expenses' => [],
             'income_tax' => [],
+            'net_finance_costs' => [],
         ];
         foreach ($sales as $key) {
             $chartData['sales'][] = [
@@ -237,6 +251,15 @@ class ClientIncomeController extends Controller
             ];
 
         }
+        foreach ($netFinanceCosts as $key) {
+            $chartData['net_finance_costs'][] = [
+                'name' => $key->name,
+                'chart_of_account_id' => $key->id,
+                'id' => $statement->data->where('chart_of_account_id', $key->id)->first()->id ?? '',
+                'amount' => $statement->data->where('chart_of_account_id', $key->id)->first()->amount ?? '',
+            ];
+
+        }
         $statement->charts = $chartData;
         return Inertia::render('Clients/IncomeStatements/Edit', [
             'client' => $client,
@@ -247,6 +270,7 @@ class ClientIncomeController extends Controller
             'expenses' => $expenses,
             'otherIncome' => $otherIncome,
             'incomeTax' => $incomeTax,
+            'netFinanceCosts' => $netFinanceCosts,
         ]);
     }
 
@@ -280,6 +304,7 @@ class ClientIncomeController extends Controller
         $statement->total_income_tax = $request->total_income_tax;
         $statement->total_cost_of_goods_sold = $request->total_cost_of_goods_sold;
         $statement->total_operating_profit = $request->total_operating_profit;
+        $statement->total_net_finance_costs = $request->total_net_finance_costs;
         $statement->net_profit = $request->net_profit;
         $statement->description = $request->description;
         $statement->save();
@@ -332,6 +357,15 @@ class ClientIncomeController extends Controller
             $statementData->save();
         }
         foreach ($request->charts['income_tax'] as $item) {
+            $statementData = new IncomeStatementData();
+            $statementData->client_id = $client->id;
+            $statementData->income_statement_id = $statement->id;
+            $statementData->chart_of_account_id = $item['chart_of_account_id'];
+            $statementData->name = $item['name'];
+            $statementData->amount = $item['amount'];
+            $statementData->save();
+        }
+        foreach ($request->charts['net_finance_costs'] as $item) {
             $statementData = new IncomeStatementData();
             $statementData->client_id = $client->id;
             $statementData->income_statement_id = $statement->id;

@@ -61,7 +61,22 @@
                                 <optgroup label="Expense">
                                     <option value="expense">Expense</option>
                                     <option value="cost_of_goods_sold">Cost of Goods Sold</option>
+                                    <option value="cost_of_goods_sold_depreciation">Cost of Goods Sold-Depreciation
+                                    </option>
+                                    <option value="depreciation_property_plant_equipment">Depreciation- property, plant and equipment
+                                    </option>
+                                    <option value="depreciation_right_of_use_assets">Depreciation - right of use assets
+                                    </option>
+                                    <option value="depreciation_investment_property">Depreciation - investment property
+                                    </option>
+                                    <option value="amortisation_intangible_assets">Amortisation - intangible assets
+                                    </option>
+                                    <option value="short_term_leases">Short-term leases
+                                    </option>
                                     <option value="other_expense">Other Expense</option>
+                                    <option value="net_finance_costs_banks">Net Finance Costs-banks</option>
+                                    <option value="net_finance_costs_finance_leases">Net Finance Costs-finance leases
+                                    </option>
                                 </optgroup>
                                 <optgroup label="Income">
                                     <option value="income">income</option>
