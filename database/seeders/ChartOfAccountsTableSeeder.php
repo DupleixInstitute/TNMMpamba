@@ -15,9 +15,9 @@ class ChartOfAccountsTableSeeder extends Seeder
     {
         DB::table('chart_of_accounts')->insert([
             [
-                'name' => '',
-                'gl_code' => '',
-                'account_type' => '',
+                'name' => 'Cost of sales-depreciation',
+                'gl_code' => '100',
+                'account_type' => 'cost_of_goods_sold_depreciation',
                 'description' => '',
             ],
             [

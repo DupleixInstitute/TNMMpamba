@@ -49,17 +49,6 @@ class ScoringAttributesTableSeeder extends Seeder
                 'is_shareholder_analysis' => 1,
                 'is_management_analysis' => 0,
             ],
-            [
-                'name' => 'Industry Analysis',
-                'description' => 'Industry Analysis for Corporates',
-                'system_name' => 'industry_analysis',
-                'is_system' => 1,
-                'is_ratio' => 0,
-                'is_corporate' => 1,
-                'is_industry_analysis' => 1,
-                'is_shareholder_analysis' => 0,
-                'is_management_analysis' => 0,
-            ],
         ]);
         //add attributes
         DB::table('scoring_attributes')->insert([
@@ -435,6 +424,21 @@ class ScoringAttributesTableSeeder extends Seeder
                 'system_name' => 'fraud_alert',
                 'field_type' => 'calculated',
                 'scoring_attribute_group_id' => ScoringAttributeGroup::where('system_name', 'shareholder_analysis')->first()->id,
+               // 'order_position' => 5,
+                'is_system' => 1,
+                'is_ratio' => 0,
+                'is_corporate' => 1,
+                'is_industry_analysis' => 0,
+                'is_shareholder_analysis' => 1,
+                'is_management_analysis' => 0,
+            ],
+            //industry analysis
+            [
+                'name' => "Porter's Five Forces Analysis",
+                'description' => '',
+                'system_name' => 'porters_five_forces_analysis',
+                'field_type' => 'calculated',
+                'scoring_attribute_group_id' => ScoringAttributeGroup::where('system_name', 'industry_analysis')->first()->id,
                // 'order_position' => 5,
                 'is_system' => 1,
                 'is_ratio' => 0,

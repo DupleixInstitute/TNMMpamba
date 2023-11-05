@@ -202,6 +202,30 @@ class PermissionsTableSeeder extends Seeder
                 'guard_name' => 'web',
             ],
             [
+                'name' => 'clients.poters_five_forces_analysis.index',
+                'module' => 'Clients',
+                'display_name' => 'View Client Poters Five Forces Analysis',
+                'guard_name' => 'web',
+            ],
+            [
+                'name' => 'clients.poters_five_forces_analysis.create',
+                'module' => 'Clients',
+                'display_name' => 'Create Client Poters Five Forces Analysis',
+                'guard_name' => 'web',
+            ],
+            [
+                'name' => 'clients.poters_five_forces_analysis.update',
+                'module' => 'Clients',
+                'display_name' => 'Update Client Poters Five Forces Analysis',
+                'guard_name' => 'web',
+            ],
+            [
+                'name' => 'clients.poters_five_forces_analysis.destroy',
+                'module' => 'Clients',
+                'display_name' => 'Delete Client Poters Five Forces Analysis',
+                'guard_name' => 'web',
+            ],
+            [
                 'name' => 'branches',
                 'module' => 'Branches',
                 'display_name' => 'Access Branches',
