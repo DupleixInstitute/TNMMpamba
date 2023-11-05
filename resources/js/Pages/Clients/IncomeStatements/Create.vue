@@ -45,7 +45,7 @@
                                     <jet-label for="months_in_year" value="No of Months In Year (1-15)"/>
                                     <select
                                         class="border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 rounded-md shadow-sm w-full"
-                                        name="months_in_year" v-model="form.audit_status" id="months_in_year">
+                                        name="months_in_year" v-model="form.months_in_year" id="months_in_year">
                                         <option v-for="n in 15" :value="n">{{ n }}</option>
                                     </select>
                                     <jet-input-error :message="form.errors.months_in_year" class="mt-2"/>

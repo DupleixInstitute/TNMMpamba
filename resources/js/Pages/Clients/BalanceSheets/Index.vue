@@ -20,11 +20,18 @@
                 <div class="w-full md:w-9/12 p-4 md:ml-4 bg-white sm:mt-4">
                     <div class="flex justify-between ">
                         <h2 class="font-semibold text-xl text-gray-800 leading-tight">Balance Sheets</h2>
-                        <inertia-link class="btn btn-blue" v-if="can('clients.balance_sheet.create')"
-                                      :href="route('clients.balance_sheets.create',client.id)">
-                            <span>Create </span>
-                            <span class="hidden md:inline">Sheet</span>
-                        </inertia-link>
+                        <div>
+                            <inertia-link class="btn btn-blue" v-if="can('clients.balance_sheet.index')"
+                                          :href="route('clients.balance_sheets.summary',client.id)">
+                                <span>View Summary </span>
+                            </inertia-link>
+                            <inertia-link class="btn btn-blue ml-2" v-if="can('clients.balance_sheet.create')"
+                                          :href="route('clients.balance_sheets.create',client.id)">
+                                <span>Create </span>
+                                <span class="hidden md:inline">Sheet</span>
+                            </inertia-link>
+                        </div>
+
                     </div>
                     <div class="mt-4 relative overflow-x-auto">
                         <table class="w-full whitespace-no-wrap table-auto">

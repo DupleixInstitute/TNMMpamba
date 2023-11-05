@@ -47,11 +47,16 @@
                                     <option value="cash">Cash</option>
                                     <option value="bank">Bank</option>
                                     <option value="stock">Stock</option>
+                                    <option value="property_plant_equipment">Property, plant and equipment</option>
+                                    <option value="investment_property">Investment property</option>
+                                    <option value="right_of_use_asset">Right of use assets</option>
                                 </optgroup>
                                 <optgroup label="Liability">
                                     <option value="current_liability">Current Liability</option>
                                     <option value="credit_card">Credit Card</option>
                                     <option value="long_term_liability">Long Term Liability</option>
+                                    <option value="other_long_term_liability">Long Term Liability</option>
+                                    <option value="finance_lease_liability">Finance lease liability</option>
                                     <option value="other_liability">Other Liability</option>
                                     <option value="income_tax">Income Tax</option>
                                 </optgroup>
@@ -80,6 +85,10 @@
                                     <option value="other_income">Other Income</option>
                                 </optgroup>
                                 <optgroup label="Equity">
+                                    <option value="equity">Equity</option>
+                                    <option value="retained_earning">Retained earnings or Accumulated profits</option>
+                                    <option value="capital_contribution">Capital/owner's contribution</option>
+                                    <option value="reserve">Reserves</option>
                                     <option value="equity">Equity</option>
                                 </optgroup>
                             </select>

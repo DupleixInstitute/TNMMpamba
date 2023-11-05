@@ -179,6 +179,7 @@ Route::group(['prefix' => 'client', 'as' => 'clients.'], function () {
     Route::delete('shareholder/{shareholder}/destroy', [ClientShareholdersController::class, 'destroy'])->name('shareholders.destroy');
     //balance sheet
     Route::get('{client}/balance_sheet', [ClientBalanceSheetController::class, 'index'])->name('balance_sheets.index');
+    Route::get('{client}/balance_sheet/summary', [ClientBalanceSheetController::class, 'summary'])->name('balance_sheets.summary');
     Route::get('{client}/balance_sheet/create', [ClientBalanceSheetController::class, 'create'])->name('balance_sheets.create');
     Route::post('{client}/balance_sheet/store', [ClientBalanceSheetController::class, 'store'])->name('balance_sheets.store');
     Route::get('balance_sheet/{sheet}/show', [ClientBalanceSheetController::class, 'show'])->name('balance_sheets.show');

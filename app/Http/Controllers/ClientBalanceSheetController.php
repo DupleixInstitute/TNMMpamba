@@ -43,10 +43,10 @@ class ClientBalanceSheetController extends Controller
         $currentAssets = ChartOfAccount::whereIn('account_type', ['current_asset', 'cash', 'bank', 'stock'])->get();
         $otherAssets = ChartOfAccount::whereIn('account_type', ['other_asset'])->get();
         $otherCurrentAssets = ChartOfAccount::whereIn('account_type', ['other_current_asset'])->get();
-        $fixedAssets = ChartOfAccount::whereIn('account_type', ['fixed_asset', 'non_current_asset'])->get();
+        $fixedAssets = ChartOfAccount::whereIn('account_type', ['fixed_asset', 'non_current_asset','property_plant_equipment','investment_property','right_of_use_asset'])->get();
         $currentLiabilities = ChartOfAccount::whereIn('account_type', ['current_liability', 'income_tax', 'credit_card'])->get();
-        $longTermLiabilities = ChartOfAccount::whereIn('account_type', ['long_term_liability', 'other_liability'])->get();
-        $equity = ChartOfAccount::whereIn('account_type', ['equity'])->get();
+        $longTermLiabilities = ChartOfAccount::whereIn('account_type', ['long_term_liability', 'other_liability','finance_lease_liability','other_long_term_liability'])->get();
+        $equity = ChartOfAccount::whereIn('account_type', ['retained_earning','capital_contribution','equity','reserve'])->get();
         return Inertia::render('Clients/BalanceSheets/Create', [
             'client' => $client,
             'currentAssets' => $currentAssets,
@@ -80,6 +80,12 @@ class ClientBalanceSheetController extends Controller
         $sheet->total_liabilities = $request->total_liabilities;
         $sheet->total_equity = $request->total_equity;
         $sheet->total_working_capital = $request->total_working_capital;
+        $sheet->total_current_assets = $request->total_current_assets;
+        $sheet->total_current_liabilities = $request->total_current_liabilities;
+        $sheet->total_long_term_liabilities = $request->total_long_term_liabilities;
+        $sheet->total_other_current_assets = $request->total_other_current_assets;
+        $sheet->total_other_assets = $request->total_other_assets;
+        $sheet->total_fixed_assets = $request->total_fixed_assets;
         $sheet->description = $request->description;
         $sheet->save();
         //save the charts
@@ -177,10 +183,10 @@ class ClientBalanceSheetController extends Controller
         $currentAssets = ChartOfAccount::whereIn('account_type', ['current_asset', 'cash', 'bank', 'stock'])->get();
         $otherAssets = ChartOfAccount::whereIn('account_type', ['other_asset'])->get();
         $otherCurrentAssets = ChartOfAccount::whereIn('account_type', ['other_current_asset'])->get();
-        $fixedAssets = ChartOfAccount::whereIn('account_type', ['fixed_asset', 'non_current_asset'])->get();
+        $fixedAssets = ChartOfAccount::whereIn('account_type', ['fixed_asset', 'non_current_asset','property_plant_equipment','investment_property','right_of_use_asset'])->get();
         $currentLiabilities = ChartOfAccount::whereIn('account_type', ['current_liability', 'income_tax', 'credit_card'])->get();
-        $longTermLiabilities = ChartOfAccount::whereIn('account_type', ['long_term_liability', 'other_liability'])->get();
-        $equity = ChartOfAccount::whereIn('account_type', ['equity'])->get();
+        $longTermLiabilities = ChartOfAccount::whereIn('account_type', ['long_term_liability', 'other_liability','finance_lease_liability','other_long_term_liability'])->get();
+        $equity = ChartOfAccount::whereIn('account_type', ['retained_earning','capital_contribution','equity','reserve'])->get();
         $chartData = [
             'current_assets' => [],
             'other_assets' => [],
@@ -282,6 +288,12 @@ class ClientBalanceSheetController extends Controller
         $sheet->total_liabilities = $request->total_liabilities;
         $sheet->total_equity = $request->total_equity;
         $sheet->total_working_capital = $request->total_working_capital;
+        $sheet->total_current_assets = $request->total_current_assets;
+        $sheet->total_current_liabilities = $request->total_current_liabilities;
+        $sheet->total_long_term_liabilities = $request->total_long_term_liabilities;
+        $sheet->total_other_current_assets = $request->total_other_current_assets;
+        $sheet->total_other_assets = $request->total_other_assets;
+        $sheet->total_fixed_assets = $request->total_fixed_assets;
         $sheet->description = $request->description;
         $sheet->save();
         //delete current sheet data
@@ -372,5 +384,16 @@ class ClientBalanceSheetController extends Controller
             ->log('Delete Balance Sheet');
         return redirect()->route('clients.balance_sheets.index', [$sheet->client_id])->with('success', 'Client sheet deleted successfully.');
 
+    }
+    public function summary(Client $client)
+    {
+        $sheets = BalanceSheet::where('client_id', $client->id)
+            ->orderBy('year')
+            ->groupBy('year')
+            ->get();
+        return Inertia::render('Clients/BalanceSheets/Summary', [
+            'client' => $client,
+            'sheets' => $sheets,
+        ]);
     }
 }

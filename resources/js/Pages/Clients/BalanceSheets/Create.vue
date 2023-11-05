@@ -431,7 +431,6 @@ export default {
             this.form.total_fixed_assets = 0;
             this.form.total_other_assets = 0;
             this.form.total_other_current_assets = 0;
-            this.form.total_other_expenses = 0;
             this.form.total_current_liabilities = 0;
             this.form.total_long_term_liabilities = 0;
             this.form.total_assets = 0;
