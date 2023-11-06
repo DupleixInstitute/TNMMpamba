@@ -19,7 +19,7 @@
                 </div>
                 <div class="w-full md:w-9/12 p-4 md:ml-4 bg-white sm:mt-4">
                     <div class="flex justify-between ">
-                        <h2 class="font-semibold text-xl text-gray-800 leading-tight">Poter's Five Forces Analysis</h2>
+                        <h2 class="font-semibold text-xl text-gray-800 leading-tight">Porter's Five Forces Analysis</h2>
                         <button @click="submit" class="btn btn-blue"
                                 v-if="can('clients.poters_five_forces_analysis.create')">
                             <span>Save </span>

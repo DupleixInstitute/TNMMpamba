@@ -195,13 +195,13 @@ Route::group(['prefix' => 'client', 'as' => 'clients.'], function () {
     Route::put('income_statement/{statement}/update', [ClientIncomeController::class, 'update'])->name('income_statements.update');
     Route::delete('income_statement/{statement}/destroy', [ClientIncomeController::class, 'destroy'])->name('income_statements.destroy');
     //poter
-    Route::get('{client}/poter', [ClientPotersController::class, 'index'])->name('poter.index');
-    Route::get('{client}/poter/create', [ClientPotersController::class, 'create'])->name('poter.create');
-    Route::post('{client}/poter/store', [ClientPotersController::class, 'store'])->name('poter.store');
-    Route::get('poter/{poter}/show', [ClientPotersController::class, 'show'])->name('poter.show');
-    Route::get('poter/{poter}/edit', [ClientPotersController::class, 'edit'])->name('poter.edit');
-    Route::put('poter/{poter}/update', [ClientPotersController::class, 'update'])->name('poter.update');
-    Route::delete('poter/{poter}/destroy', [ClientPotersController::class, 'destroy'])->name('poter.destroy');
+    Route::get('{client}/porter', [ClientPotersController::class, 'index'])->name('poter.index');
+    Route::get('{client}/porter/create', [ClientPotersController::class, 'create'])->name('poter.create');
+    Route::post('{client}/porter/store', [ClientPotersController::class, 'store'])->name('poter.store');
+    Route::get('porter/{poter}/show', [ClientPotersController::class, 'show'])->name('poter.show');
+    Route::get('porter/{poter}/edit', [ClientPotersController::class, 'edit'])->name('poter.edit');
+    Route::put('porter/{poter}/update', [ClientPotersController::class, 'update'])->name('poter.update');
+    Route::delete('porter/{poter}/destroy', [ClientPotersController::class, 'destroy'])->name('poter.destroy');
 
 });
 

@@ -50,6 +50,7 @@
                                     <option value="property_plant_equipment">Property, plant and equipment</option>
                                     <option value="investment_property">Investment property</option>
                                     <option value="right_of_use_asset">Right of use assets</option>
+                                    <option value="intangible_asset">Intangible assets</option>
                                 </optgroup>
                                 <optgroup label="Liability">
                                     <option value="current_liability">Current Liability</option>
@@ -76,6 +77,7 @@
                                     <option value="short_term_leases">Short-term leases
                                     </option>
                                     <option value="other_expense">Other Expense</option>
+                                    <option value="income_tax_expense">Income Tax Expense</option>
                                     <option value="net_finance_costs_banks">Net Finance Costs-banks</option>
                                     <option value="net_finance_costs_finance_leases">Net Finance Costs-finance leases
                                     </option>

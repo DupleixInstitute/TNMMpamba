@@ -62,7 +62,7 @@
                           :class="{'bg-gray-100': route().current('clients.poter.*')}"
                           :href="route('clients.poter.index',client.id)">
                 <font-awesome-icon icon="chart-line" class="w-4 h-4 mr-2"></font-awesome-icon>
-                Poter's Five Forces Analysis
+                Porter's Five Forces Analysis
             </inertia-link>
             <inertia-link v-if="can('loans.applications.index')"
                           class="w-full border-t border-gray-100 font-medium text-gray-600 py-2 px-4 w-full block hover:bg-gray-100 transition duration-150"
