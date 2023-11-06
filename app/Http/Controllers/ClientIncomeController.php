@@ -42,7 +42,7 @@ class ClientIncomeController extends Controller
     {
         $sales = ChartOfAccount::where('account_type', 'income')->get();
         $costsOfGoodsSold = ChartOfAccount::whereIn('account_type', ['cost_of_goods_sold','cost_of_goods_sold_depreciation'])->get();
-        $expenses = ChartOfAccount::whereIn('account_type', ['expense','cost_of_goods_sold_depreciation','depreciation_property_plant_equipment','depreciation_right_of_use_assets','depreciation_investment_property','amortisation_intangible_assets','short_term_leases'])->get();
+        $expenses = ChartOfAccount::whereIn('account_type', ['expense','cost_of_goods_sold_depreciation','depreciation_property_plant_equipment','depreciation_right_of_use_assets','depreciation_investment_property','amortisation_intangible_assets','short_term_leases','income_tax_expense'])->get();
         $otherExpenses = ChartOfAccount::whereIn('account_type', ['other_expense'])->get();
         $otherIncome = ChartOfAccount::whereIn('account_type', ['other_income'])->get();
         $incomeTax = ChartOfAccount::whereIn('account_type', ['income_tax'])->get();
@@ -188,7 +188,7 @@ class ClientIncomeController extends Controller
 
         $sales = ChartOfAccount::where('account_type', 'income')->get();
         $costsOfGoodsSold = ChartOfAccount::whereIn('account_type', ['cost_of_goods_sold','cost_of_goods_sold_depreciation'])->get();
-        $expenses = ChartOfAccount::whereIn('account_type', ['expense','cost_of_goods_sold_depreciation','depreciation_property_plant_equipment','depreciation_right_of_use_assets','depreciation_investment_property','amortisation_intangible_assets','short_term_leases'])->get();
+        $expenses = ChartOfAccount::whereIn('account_type', ['expense','cost_of_goods_sold_depreciation','depreciation_property_plant_equipment','depreciation_right_of_use_assets','depreciation_investment_property','amortisation_intangible_assets','short_term_leases','income_tax_expense'])->get();
         $otherExpenses = ChartOfAccount::whereIn('account_type', ['other_expense'])->get();
         $otherIncome = ChartOfAccount::whereIn('account_type', ['other_income'])->get();
         $incomeTax = ChartOfAccount::whereIn('account_type', ['income_tax'])->get();
