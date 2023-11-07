@@ -45,7 +45,7 @@ class ClientBalanceSheetController extends Controller
         $otherCurrentAssets = ChartOfAccount::whereIn('account_type', ['other_current_asset'])->get();
         $fixedAssets = ChartOfAccount::whereIn('account_type', ['fixed_asset', 'non_current_asset','property_plant_equipment','investment_property','right_of_use_asset'])->get();
         $currentLiabilities = ChartOfAccount::whereIn('account_type', ['current_liability', 'income_tax', 'credit_card'])->get();
-        $longTermLiabilities = ChartOfAccount::whereIn('account_type', ['long_term_liability', 'other_liability','finance_lease_liability','other_long_term_liability'])->get();
+        $longTermLiabilities = ChartOfAccount::whereIn('account_type', ['long_term_liability', 'other_liability','finance_lease_liability','other_long_term_liability','deferred_income_tax'])->get();
         $equity = ChartOfAccount::whereIn('account_type', ['retained_earning','capital_contribution','equity','reserve'])->get();
         return Inertia::render('Clients/BalanceSheets/Create', [
             'client' => $client,
@@ -185,7 +185,7 @@ class ClientBalanceSheetController extends Controller
         $otherCurrentAssets = ChartOfAccount::whereIn('account_type', ['other_current_asset'])->get();
         $fixedAssets = ChartOfAccount::whereIn('account_type', ['fixed_asset', 'non_current_asset','property_plant_equipment','investment_property','right_of_use_asset'])->get();
         $currentLiabilities = ChartOfAccount::whereIn('account_type', ['current_liability', 'income_tax', 'credit_card'])->get();
-        $longTermLiabilities = ChartOfAccount::whereIn('account_type', ['long_term_liability', 'other_liability','finance_lease_liability','other_long_term_liability'])->get();
+        $longTermLiabilities = ChartOfAccount::whereIn('account_type', ['long_term_liability', 'other_liability','finance_lease_liability','other_long_term_liability','deferred_income_tax'])->get();
         $equity = ChartOfAccount::whereIn('account_type', ['retained_earning','capital_contribution','equity','reserve'])->get();
         $chartData = [
             'current_assets' => [],

@@ -56,10 +56,11 @@
                                     <option value="current_liability">Current Liability</option>
                                     <option value="credit_card">Credit Card</option>
                                     <option value="long_term_liability">Long Term Liability</option>
-                                    <option value="other_long_term_liability">Long Term Liability</option>
+                                    <option value="other_long_term_liability">Other Long Term Liability</option>
                                     <option value="finance_lease_liability">Finance lease liability</option>
                                     <option value="other_liability">Other Liability</option>
                                     <option value="income_tax">Income Tax</option>
+                                    <option value="deferred_income_tax">Deferred Income Tax</option>
                                 </optgroup>
                                 <optgroup label="Expense">
                                     <option value="expense">Expense</option>
