@@ -148,6 +148,16 @@
                                     </div>
                                 </td>
                             </tr>
+                            <tr class="hover:bg-gray-100 focus-within:bg-gray-100">
+                                <td class="border-t px-6 py-4">
+                                    <span class="">Tangible Net Worth</span>
+                                </td>
+                                <td class="border-t px-6 py-4" v-for="sheet in sheets">
+                                    <span class="">{{
+                                            $filters.currency(sheet.total_tangible_net_worth)
+                                        }}</span>
+                                </td>
+                            </tr>
                             </tbody>
                         </table>
                     </div>

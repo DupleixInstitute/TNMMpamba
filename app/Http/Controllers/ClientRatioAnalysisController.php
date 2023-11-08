@@ -6,30 +6,72 @@ use App\Models\ChartOfAccount;
 use App\Models\Client;
 use App\Models\BalanceSheet;
 use App\Models\BalanceSheetData;
+use App\Models\IncomeStatement;
+use App\Models\RatioAnalysis;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
-class ClientBalanceSheetController extends Controller
+class ClientRatioAnalysisController extends Controller
 {
     public function __construct()
     {
         $this->middleware('auth');
-        $this->middleware(['permission:clients.balance_sheet.index'])->only(['index', 'show']);
-        $this->middleware(['permission:clients.balance_sheet.create'])->only(['create', 'store']);
-        $this->middleware(['permission:clients.balance_sheet.update'])->only(['edit', 'update']);
-        $this->middleware(['permission:clients.balance_sheet.destroy'])->only(['destroy']);
+        $this->middleware(['permission:clients.ratio_analysis.index'])->only(['index', 'show']);
+        $this->middleware(['permission:clients.ratio_analysis.create'])->only(['create', 'store']);
+        $this->middleware(['permission:clients.ratio_analysis.update'])->only(['edit', 'update']);
+        $this->middleware(['permission:clients.ratio_analysis.destroy'])->only(['destroy']);
     }
 
     public function index(Client $client)
     {
+
+        $ratio = RatioAnalysis::where('client_id', $client->id)->first();
         $sheets = BalanceSheet::where('client_id', $client->id)
-            ->orderBy('created_at', 'desc')
-            ->paginate(20);
+            ->orderBy('year')
+            ->groupBy('year')
+            ->get();
+        $data = [
+        ];
+        foreach ($sheets as $sheet) {
+            $incomeStatement = IncomeStatement::where('year', $sheet->year)->first();
+            $data[$sheet->year] = [
+                'working_capital_total_assets' => round(($sheet->total_current_assets + $sheet->total_other_current_assets - $sheet->total_current_liabilities) / ($sheet->total_assets), 2),
+                'retained_earnings_total_assets' => round(($sheet->total_retained_earnings) / ($sheet->total_assets), 2),
+                'ebit_total_assets' => round($incomeStatement->total_operating_profit / $sheet->total_assets, 2),
+                'equity_total_liabilities' => round($sheet->total_equity / $sheet->total_liabilities, 2),
+                'sales_total_assets' => round($incomeStatement->total_sales / $sheet->total_assets, 2),
+                'z_score' => round(($data[$sheet->year]['working_capital_total_assets'] * 1.2) + ($data[$sheet->year]['retained_earnings_total_assets'] * 1.4) + ($data[$sheet->year]['ebit_total_assets'] * 3.3) + ($data[$sheet->year]['equity_total_liabilities'] * 0.6) + ($data[$sheet->year]['sales_total_assets'] * 1), 2),
+                'z_second_score' => round(($data[$sheet->year]['working_capital_total_assets'] * 6.56) + ($data[$sheet->year]['retained_earnings_total_assets'] * 3.26) + ($data[$sheet->year]['ebit_total_assets'] * 6.72) + ($data[$sheet->year]['equity_total_liabilities'] * 1.05) + ($data[$sheet->year]['sales_total_assets'] * 0), 2),
+                'z_score_thresholds_healthy' => 0,
+                'current_ratio' => $sheet->total_current_liabilities?round($sheet->total_current_assets / $sheet->total_current_liabilities,2):2,
+                'quick_ratio' => $sheet->total_current_liabilities?round(($sheet->total_current_assets -$incomeStatement->total_stock) / $sheet->total_current_liabilities,2):2,
+                'debtor_days' => 0,
+                'creditor_days' => 0,
+                'working_capital' =>  $sheet->total_working_capital?round($incomeStatement->total_sales /($sheet->total_working_capital), 2):'n/a',
+                'turnover_growth' => round(($incomeStatement->total_gross_margin /$incomeStatement->total_sales)*100, 2),
+                'gross_profit' => 0,
+                'operating_profit_margin' => 0,
+                'net_profit_margin' => 0,
+                'return_on_equity' => 0,
+                'return_on_assets' => 0,
+                'return_on_investment' => 0,
+                'gearing_ratio' => 0,
+                'long_term_debt' => 0,
+                'tangible_net_worth' => 0,
+                'total_assets' => 0,
+                'solvency' => 0,
+                'interest_cover' => 0,
+                'gross_interest_debts' => 0,
+                'total_assets_turnover' => 0,
+                'fixed_assets_turn_over' => 0,
+            ];
+        }
         return Inertia::render('Clients/BalanceSheets/Index', [
             'client' => $client,
             'sheets' => $sheets,
+            'ratio' => $ratio,
         ]);
     }
 
@@ -40,11 +82,11 @@ class ClientBalanceSheetController extends Controller
      */
     public function create(Client $client)
     {
-        $currentAssets = ChartOfAccount::whereIn('account_type', ['current_asset', 'cash', 'bank', 'stock','accounts_receivable'])->get();
+        $currentAssets = ChartOfAccount::whereIn('account_type', ['current_asset', 'cash', 'bank', 'stock'])->get();
         $otherAssets = ChartOfAccount::whereIn('account_type', ['other_asset'])->get();
         $otherCurrentAssets = ChartOfAccount::whereIn('account_type', ['other_current_asset'])->get();
         $fixedAssets = ChartOfAccount::whereIn('account_type', ['fixed_asset', 'non_current_asset', 'property_plant_equipment', 'investment_property', 'right_of_use_asset', 'intangible_asset'])->get();
-        $currentLiabilities = ChartOfAccount::whereIn('account_type', ['current_liability', 'income_tax', 'credit_card','accounts_payable'])->get();
+        $currentLiabilities = ChartOfAccount::whereIn('account_type', ['current_liability', 'income_tax', 'credit_card'])->get();
         $longTermLiabilities = ChartOfAccount::whereIn('account_type', ['long_term_liability', 'other_liability', 'finance_lease_liability', 'other_long_term_liability', 'deferred_income_tax'])->get();
         $equity = ChartOfAccount::whereIn('account_type', ['retained_earning', 'capital_contribution', 'equity', 'reserve'])->get();
         return Inertia::render('Clients/BalanceSheets/Create', [
@@ -78,7 +120,7 @@ class ClientBalanceSheetController extends Controller
         $sheet->total_assets = $request->total_assets;
         $sheet->total_equity = $request->total_equity;
         $sheet->total_liabilities = $request->total_liabilities;
-        $sheet->total_equity_liabilities = $request->total_equity_liabilities;
+        $sheet->total_equity = $request->total_equity;
         $sheet->total_working_capital = $request->total_working_capital;
         $sheet->total_current_assets = $request->total_current_assets;
         $sheet->total_current_liabilities = $request->total_current_liabilities;
@@ -92,7 +134,7 @@ class ClientBalanceSheetController extends Controller
         foreach ($request->charts['current_assets'] as $item) {
             $sheetData = new BalanceSheetData();
             $sheetData->client_id = $client->id;
-            $sheetData->balance_sheet_id = $sheet->id;
+            $sheetData->ratio_analysis_id = $sheet->id;
             $sheetData->chart_of_account_id = $item['chart_of_account_id'];
             $sheetData->name = $item['name'];
             $sheetData->amount = $item['amount'];
@@ -101,7 +143,7 @@ class ClientBalanceSheetController extends Controller
         foreach ($request->charts['other_assets'] as $item) {
             $sheetData = new BalanceSheetData();
             $sheetData->client_id = $client->id;
-            $sheetData->balance_sheet_id = $sheet->id;
+            $sheetData->ratio_analysis_id = $sheet->id;
             $sheetData->chart_of_account_id = $item['chart_of_account_id'];
             $sheetData->name = $item['name'];
             $sheetData->amount = $item['amount'];
@@ -110,7 +152,7 @@ class ClientBalanceSheetController extends Controller
         foreach ($request->charts['other_current_assets'] as $item) {
             $sheetData = new BalanceSheetData();
             $sheetData->client_id = $client->id;
-            $sheetData->balance_sheet_id = $sheet->id;
+            $sheetData->ratio_analysis_id = $sheet->id;
             $sheetData->chart_of_account_id = $item['chart_of_account_id'];
             $sheetData->name = $item['name'];
             $sheetData->amount = $item['amount'];
@@ -119,7 +161,7 @@ class ClientBalanceSheetController extends Controller
         foreach ($request->charts['fixed_assets'] as $item) {
             $sheetData = new BalanceSheetData();
             $sheetData->client_id = $client->id;
-            $sheetData->balance_sheet_id = $sheet->id;
+            $sheetData->ratio_analysis_id = $sheet->id;
             $sheetData->chart_of_account_id = $item['chart_of_account_id'];
             $sheetData->name = $item['name'];
             $sheetData->amount = $item['amount'];
@@ -128,7 +170,7 @@ class ClientBalanceSheetController extends Controller
         foreach ($request->charts['current_liabilities'] as $item) {
             $sheetData = new BalanceSheetData();
             $sheetData->client_id = $client->id;
-            $sheetData->balance_sheet_id = $sheet->id;
+            $sheetData->ratio_analysis_id = $sheet->id;
             $sheetData->chart_of_account_id = $item['chart_of_account_id'];
             $sheetData->name = $item['name'];
             $sheetData->amount = $item['amount'];
@@ -137,7 +179,7 @@ class ClientBalanceSheetController extends Controller
         foreach ($request->charts['long_term_liabilities'] as $item) {
             $sheetData = new BalanceSheetData();
             $sheetData->client_id = $client->id;
-            $sheetData->balance_sheet_id = $sheet->id;
+            $sheetData->ratio_analysis_id = $sheet->id;
             $sheetData->chart_of_account_id = $item['chart_of_account_id'];
             $sheetData->name = $item['name'];
             $sheetData->amount = $item['amount'];
@@ -146,7 +188,7 @@ class ClientBalanceSheetController extends Controller
         foreach ($request->charts['equity'] as $item) {
             $sheetData = new BalanceSheetData();
             $sheetData->client_id = $client->id;
-            $sheetData->balance_sheet_id = $sheet->id;
+            $sheetData->ratio_analysis_id = $sheet->id;
             $sheetData->chart_of_account_id = $item['chart_of_account_id'];
             $sheetData->name = $item['name'];
             $sheetData->amount = $item['amount'];
@@ -156,7 +198,7 @@ class ClientBalanceSheetController extends Controller
         activity()
             ->performedOn($client)
             ->log('Create Balance Sheet');
-        return redirect()->route('clients.balance_sheets.index', [$client->id])->with('success', 'Balance Sheet created successfully.');
+        return redirect()->route('clients.ratio_analysiss.index', [$client->id])->with('success', 'Balance Sheet created successfully.');
 
     }
 
@@ -180,11 +222,11 @@ class ClientBalanceSheetController extends Controller
     public function edit(BalanceSheet $sheet)
     {
         $client = $sheet->client;
-        $currentAssets = ChartOfAccount::whereIn('account_type', ['current_asset', 'cash', 'bank', 'stock','accounts_receivable'])->get();
+        $currentAssets = ChartOfAccount::whereIn('account_type', ['current_asset', 'cash', 'bank', 'stock'])->get();
         $otherAssets = ChartOfAccount::whereIn('account_type', ['other_asset'])->get();
         $otherCurrentAssets = ChartOfAccount::whereIn('account_type', ['other_current_asset'])->get();
         $fixedAssets = ChartOfAccount::whereIn('account_type', ['fixed_asset', 'non_current_asset', 'property_plant_equipment', 'investment_property', 'right_of_use_asset', 'intangible_asset'])->get();
-        $currentLiabilities = ChartOfAccount::whereIn('account_type', ['current_liability', 'income_tax', 'credit_card','accounts_payable'])->get();
+        $currentLiabilities = ChartOfAccount::whereIn('account_type', ['current_liability', 'income_tax', 'credit_card'])->get();
         $longTermLiabilities = ChartOfAccount::whereIn('account_type', ['long_term_liability', 'other_liability', 'finance_lease_liability', 'other_long_term_liability', 'deferred_income_tax'])->get();
         $equity = ChartOfAccount::whereIn('account_type', ['retained_earning', 'capital_contribution', 'equity', 'reserve'])->get();
         $chartData = [
@@ -285,8 +327,8 @@ class ClientBalanceSheetController extends Controller
         $sheet->as_at_date = $request->as_at_date;
         $sheet->total_assets = $request->total_assets;
         $sheet->total_equity = $request->total_equity;
-        $sheet->total_equity_liabilities = $request->total_equity_liabilities;
         $sheet->total_liabilities = $request->total_liabilities;
+        $sheet->total_equity = $request->total_equity;
         $sheet->total_working_capital = $request->total_working_capital;
         $sheet->total_current_assets = $request->total_current_assets;
         $sheet->total_current_liabilities = $request->total_current_liabilities;
@@ -302,7 +344,7 @@ class ClientBalanceSheetController extends Controller
         foreach ($request->charts['current_assets'] as $item) {
             $sheetData = new BalanceSheetData();
             $sheetData->client_id = $client->id;
-            $sheetData->balance_sheet_id = $sheet->id;
+            $sheetData->ratio_analysis_id = $sheet->id;
             $sheetData->chart_of_account_id = $item['chart_of_account_id'];
             $sheetData->name = $item['name'];
             $sheetData->amount = $item['amount'];
@@ -311,7 +353,7 @@ class ClientBalanceSheetController extends Controller
         foreach ($request->charts['other_assets'] as $item) {
             $sheetData = new BalanceSheetData();
             $sheetData->client_id = $client->id;
-            $sheetData->balance_sheet_id = $sheet->id;
+            $sheetData->ratio_analysis_id = $sheet->id;
             $sheetData->chart_of_account_id = $item['chart_of_account_id'];
             $sheetData->name = $item['name'];
             $sheetData->amount = $item['amount'];
@@ -320,7 +362,7 @@ class ClientBalanceSheetController extends Controller
         foreach ($request->charts['other_current_assets'] as $item) {
             $sheetData = new BalanceSheetData();
             $sheetData->client_id = $client->id;
-            $sheetData->balance_sheet_id = $sheet->id;
+            $sheetData->ratio_analysis_id = $sheet->id;
             $sheetData->chart_of_account_id = $item['chart_of_account_id'];
             $sheetData->name = $item['name'];
             $sheetData->amount = $item['amount'];
@@ -329,7 +371,7 @@ class ClientBalanceSheetController extends Controller
         foreach ($request->charts['fixed_assets'] as $item) {
             $sheetData = new BalanceSheetData();
             $sheetData->client_id = $client->id;
-            $sheetData->balance_sheet_id = $sheet->id;
+            $sheetData->ratio_analysis_id = $sheet->id;
             $sheetData->chart_of_account_id = $item['chart_of_account_id'];
             $sheetData->name = $item['name'];
             $sheetData->amount = $item['amount'];
@@ -338,7 +380,7 @@ class ClientBalanceSheetController extends Controller
         foreach ($request->charts['current_liabilities'] as $item) {
             $sheetData = new BalanceSheetData();
             $sheetData->client_id = $client->id;
-            $sheetData->balance_sheet_id = $sheet->id;
+            $sheetData->ratio_analysis_id = $sheet->id;
             $sheetData->chart_of_account_id = $item['chart_of_account_id'];
             $sheetData->name = $item['name'];
             $sheetData->amount = $item['amount'];
@@ -347,7 +389,7 @@ class ClientBalanceSheetController extends Controller
         foreach ($request->charts['long_term_liabilities'] as $item) {
             $sheetData = new BalanceSheetData();
             $sheetData->client_id = $client->id;
-            $sheetData->balance_sheet_id = $sheet->id;
+            $sheetData->ratio_analysis_id = $sheet->id;
             $sheetData->chart_of_account_id = $item['chart_of_account_id'];
             $sheetData->name = $item['name'];
             $sheetData->amount = $item['amount'];
@@ -356,7 +398,7 @@ class ClientBalanceSheetController extends Controller
         foreach ($request->charts['equity'] as $item) {
             $sheetData = new BalanceSheetData();
             $sheetData->client_id = $client->id;
-            $sheetData->balance_sheet_id = $sheet->id;
+            $sheetData->ratio_analysis_id = $sheet->id;
             $sheetData->chart_of_account_id = $item['chart_of_account_id'];
             $sheetData->name = $item['name'];
             $sheetData->amount = $item['amount'];
@@ -365,7 +407,7 @@ class ClientBalanceSheetController extends Controller
         activity()
             ->performedOn($client)
             ->log('Update Balance Sheet');
-        return redirect()->route('clients.balance_sheets.index', [$client->id])->with('success', 'Balance Sheet updated successfully.');
+        return redirect()->route('clients.ratio_analysiss.index', [$client->id])->with('success', 'Balance Sheet updated successfully.');
 
     }
 
@@ -382,7 +424,7 @@ class ClientBalanceSheetController extends Controller
         activity()
             ->performedOn($sheet)
             ->log('Delete Balance Sheet');
-        return redirect()->route('clients.balance_sheets.index', [$sheet->client_id])->with('success', 'Client sheet deleted successfully.');
+        return redirect()->route('clients.ratio_analysiss.index', [$sheet->client_id])->with('success', 'Client sheet deleted successfully.');
 
     }
 

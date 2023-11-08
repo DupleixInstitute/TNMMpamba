@@ -20,4 +20,8 @@ class BalanceSheetData extends Model
         });
     }
 
+    public function chart()
+    {
+        return $this->belongsTo(ChartOfAccount::class,'chart_of_account_id');
+    }
 }

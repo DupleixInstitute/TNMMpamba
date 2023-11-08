@@ -6,6 +6,7 @@ use App\Http\Controllers\ClientBalanceSheetController;
 use App\Http\Controllers\ClientIncomeController;
 use App\Http\Controllers\ClientNotesController;
 use App\Http\Controllers\ClientPotersController;
+use App\Http\Controllers\ClientRatioAnalysisController;
 use App\Http\Controllers\ClientShareholdersController;
 use App\Http\Controllers\IndustryTypesController;
 use App\Http\Controllers\LegalTypesController;
@@ -161,6 +162,14 @@ Route::group(['prefix' => 'client', 'as' => 'clients.'], function () {
     Route::get('file/{file}/edit', [ClientFilesController::class, 'edit'])->name('files.edit');
     Route::put('file/{file}/update', [ClientFilesController::class, 'update'])->name('files.update');
     Route::delete('file/{file}/destroy', [ClientFilesController::class, 'destroy'])->name('files.destroy');
+    //ratio analysis
+    Route::get('{client}/ratio_analysis', [ClientRatioAnalysisController::class, 'index'])->name('ratio_analysis.index');
+    Route::get('{client}/ratio_analysis/create', [ClientRatioAnalysisController::class, 'create'])->name('ratio_analysis.create');
+    Route::post('{client}/ratio_analysis/store', [ClientRatioAnalysisController::class, 'store'])->name('ratio_analysis.store');
+    Route::get('ratio_analysis/{ratio}/show', [ClientRatioAnalysisController::class, 'show'])->name('ratio_analysis.show');
+    Route::get('ratio_analysis/{ratio}/edit', [ClientRatioAnalysisController::class, 'edit'])->name('ratio_analysis.edit');
+    Route::put('ratio_analysis/{ratio}/update', [ClientRatioAnalysisController::class, 'update'])->name('ratio_analysis.update');
+    Route::delete('ratio_analysis/{ratio}/destroy', [ClientRatioAnalysisController::class, 'destroy'])->name('ratio_analysis.destroy');
     //notes
     Route::get('{client}/note', [ClientNotesController::class, 'index'])->name('notes.index');
     Route::get('{client}/note/create', [ClientNotesController::class, 'create'])->name('notes.create');

@@ -222,7 +222,7 @@
                                                 </td>
                                                 <td class="border-t px-6 py-4 text-right">
                                                     <span class="font-bold">{{
-                                                            $filters.currency(form.total_current_liabilities+form.total_long_term_liabilities)
+                                                            $filters.currency(form.total_current_liabilities + form.total_long_term_liabilities)
                                                         }}</span>
                                                 </td>
                                             </tr>
@@ -267,9 +267,9 @@
                                         </table>
                                     </div>
                                     <div class="bg-blue-950 text-white p-4 grid grid-cols-2 font-bold  bottom-0 w-ful">
-                                        <h4>Total Liabilities</h4>
+                                        <h4>Total Equity/Liabilities</h4>
                                         <h4 class="text-right">{{
-                                                $filters.currency(form.total_liabilities)
+                                                $filters.currency(form.total_equity_liabilities)
                                             }}</h4>
                                     </div>
                                 </div>
@@ -357,7 +357,7 @@ export default {
                 total_liabilities: 0,
                 total_working_capital: 0,
                 total_equity_liabilities: 0,
-                charts:this.sheet.charts
+                charts: this.sheet.charts
             }),
             pageTitle: "Edit Sheet",
             pageDescription: "Edit Sheet",
@@ -376,7 +376,6 @@ export default {
             this.form.total_fixed_assets = 0;
             this.form.total_other_assets = 0;
             this.form.total_other_current_assets = 0;
-            this.form.total_other_expenses = 0;
             this.form.total_current_liabilities = 0;
             this.form.total_long_term_liabilities = 0;
             this.form.total_assets = 0;
@@ -394,7 +393,7 @@ export default {
             this.form.charts.other_current_assets.forEach(item => {
                 this.form.total_other_current_assets += parseFloat(item.amount || '0')
             })
-            this.form.total_assets= this.form.total_current_assets + this.form.total_fixed_assets + this.form.total_other_assets + this.form.total_other_current_assets;
+            this.form.total_assets = this.form.total_current_assets + this.form.total_fixed_assets + this.form.total_other_assets + this.form.total_other_current_assets;
             this.form.charts.current_liabilities.forEach(item => {
                 this.form.total_current_liabilities += parseFloat(item.amount || '0')
             })
@@ -405,7 +404,8 @@ export default {
             this.form.charts.equity.forEach(item => {
                 this.form.total_equity += parseFloat(item.amount || '0')
             })
-            this.form.total_liabilities = this.form.total_current_liabilities + this.form.total_long_term_liabilities+ this.form.total_equity;
+            this.form.total_liabilities = this.form.total_current_liabilities + this.form.total_long_term_liabilities;
+            this.form.total_equity_liabilities = this.form.total_current_liabilities + this.form.total_liabilities;
 
         }
     },

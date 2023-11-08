@@ -267,9 +267,9 @@
                                         </table>
                                     </div>
                                     <div class="bg-blue-950 text-white p-4 grid grid-cols-2 font-bold  bottom-0 w-ful">
-                                        <h4>Total Liabilities</h4>
+                                        <h4>Total Equity/Liabilities</h4>
                                         <h4 class="text-right">{{
-                                                $filters.currency(form.total_liabilities)
+                                                $filters.currency(form.total_equity_liabilities)
                                             }}</h4>
                                     </div>
                                 </div>
@@ -459,7 +459,8 @@ export default {
             this.form.charts.equity.forEach(item => {
                 this.form.total_equity += parseFloat(item.amount || '0')
             })
-            this.form.total_liabilities = this.form.total_current_liabilities + this.form.total_long_term_liabilities+ this.form.total_equity;
+            this.form.total_liabilities = this.form.total_current_liabilities + this.form.total_long_term_liabilities;
+            this.form.total_equity_liabilities = this.form.total_current_liabilities + this.form.total_liabilities;
 
         }
     },

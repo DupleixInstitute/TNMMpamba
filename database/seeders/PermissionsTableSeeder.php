@@ -226,6 +226,30 @@ class PermissionsTableSeeder extends Seeder
                 'guard_name' => 'web',
             ],
             [
+                'name' => 'clients.ratio_analysis.index',
+                'module' => 'Clients',
+                'display_name' => 'View Client Ratio Analysis',
+                'guard_name' => 'web',
+            ],
+            [
+                'name' => 'clients.ratio_analysis.create',
+                'module' => 'Clients',
+                'display_name' => 'Create Client Ratio Analysis',
+                'guard_name' => 'web',
+            ],
+            [
+                'name' => 'clients.ratio_analysis.update',
+                'module' => 'Clients',
+                'display_name' => 'Update Client Ratio Analysis',
+                'guard_name' => 'web',
+            ],
+            [
+                'name' => 'clients.ratio_analysis.destroy',
+                'module' => 'Clients',
+                'display_name' => 'Delete Client Ratio Analysis',
+                'guard_name' => 'web',
+            ],
+            [
                 'name' => 'branches',
                 'module' => 'Branches',
                 'display_name' => 'Access Branches',

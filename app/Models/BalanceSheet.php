@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Cviebrock\EloquentSluggable\Sluggable;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -23,6 +25,10 @@ class BalanceSheet extends Model
         'total_other_assets' => 'double',
         'total_fixed_assets' => 'double',
     ];
+    protected $appends = [
+        'total_tangible_net_worth',
+        'total_retained_earnings',
+    ];
 
     public function scopeFilter($query, array $filters)
     {
@@ -41,5 +47,28 @@ class BalanceSheet extends Model
     public function data()
     {
         return $this->hasMany(BalanceSheetData::class);
+    }
+
+    protected function totalTangibleNetWorth(): Attribute
+    {
+        return Attribute::make(
+            get: function ($value, array $attributes) {
+                return  $this->data()->whereHas('chart',function (Builder $query){
+                    $query->where('account_type','intangible_asset');
+                })->sum('amount');
+            },
+            set: fn($value) => $value,
+        );
+    }
+    protected function totalRetainedEarnings(): Attribute
+    {
+        return Attribute::make(
+            get: function ($value, array $attributes) {
+                return  $this->data()->whereHas('chart',function (Builder $query){
+                    $query->where('account_type','retained_earning');
+                })->sum('amount');
+            },
+            set: fn($value) => $value,
+        );
     }
 }

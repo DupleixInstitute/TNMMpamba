@@ -3,19 +3,14 @@
 namespace App\Models;
 
 use Cviebrock\EloquentSluggable\Sluggable;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class IncomeStatement extends Model
+class RatioAnalysis extends Model
 {
     use HasFactory;
 
-    protected $appends = [
-        'total_stock'
-    ];
-
+protected $table='ratio_analysis';
     public function scopeFilter($query, array $filters)
     {
         $query->when($filters['search'] ?? null, function ($query, $search) {
@@ -38,17 +33,5 @@ class IncomeStatement extends Model
     public function data()
     {
         return $this->hasMany(IncomeStatementData::class);
-    }
-
-    protected function totalStock(): Attribute
-    {
-        return Attribute::make(
-            get: function ($value, array $attributes) {
-                return $this->data()->whereHas('chart', function (Builder $query) {
-                    $query->where('account_type', 'stock');
-                })->sum('amount');
-            },
-            set: fn($value) => $value,
-        );
     }
 }

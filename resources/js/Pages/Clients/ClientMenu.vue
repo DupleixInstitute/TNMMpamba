@@ -57,6 +57,13 @@
                 <font-awesome-icon icon="money-bill" class="w-4 h-4 mr-2"></font-awesome-icon>
                 Income Statement
             </inertia-link>
+            <inertia-link v-if="can('clients.ratio_analysis.index')"
+                          class="w-full border-t border-gray-100 font-medium text-gray-600 py-2 px-4 w-full block hover:bg-gray-100 transition duration-150"
+                          :class="{'bg-gray-100': route().current('clients.ratio_analysis.*')}"
+                          :href="route('clients.ratio_analysis.index',client.id)">
+                <font-awesome-icon icon="chart-line" class="w-4 h-4 mr-2"></font-awesome-icon>
+                Ratio Analysis
+            </inertia-link>
             <inertia-link v-if="can('clients.poters_five_forces_analysis.index')"
                           class="w-full border-t border-gray-100 font-medium text-gray-600 py-2 px-4 w-full block hover:bg-gray-100 transition duration-150"
                           :class="{'bg-gray-100': route().current('clients.poter.*')}"

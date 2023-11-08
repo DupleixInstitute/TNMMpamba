@@ -43,6 +43,7 @@
                                 <optgroup label="Asset">
                                     <option value="fixed_asset">Fixed Asset</option>
                                     <option value="current_asset">Current Asset</option>
+                                    <option value="accounts_receivable">Accounts Receivable</option>
                                     <option value="other_current_asset">Other Current
                                         Asset
                                     </option>
@@ -57,6 +58,7 @@
                                 </optgroup>
                                 <optgroup label="Liability">
                                     <option value="current_liability">Current Liability</option>
+                                    <option value="accounts_payable">Accounts Payable</option>
                                     <option value="credit_card">Credit Card</option>
                                     <option value="long_term_liability">Long Term Liability</option>
                                     <option value="other_long_term_liability">Other Long Term Liability</option>
