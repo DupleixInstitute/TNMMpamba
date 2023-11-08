@@ -36,6 +36,10 @@ class ClientRatioAnalysisController extends Controller
         ];
         foreach ($sheets as $sheet) {
             $incomeStatement = IncomeStatement::where('year', $sheet->year)->first();
+            $turnoverGrowth = 0;
+            if ($statement = IncomeStatement::where('year', $sheet->year - 1)->first()) {
+                $turnoverGrowth = $statement->total_sales ? round(($incomeStatement->total_sales / $statement->total_sales - 1) * 100) : 0;
+            }
             $data[$sheet->year] = [
                 'working_capital_total_assets' => round(($sheet->total_current_assets + $sheet->total_other_current_assets - $sheet->total_current_liabilities) / ($sheet->total_assets), 2),
                 'retained_earnings_total_assets' => round(($sheet->total_retained_earnings) / ($sheet->total_assets), 2),
@@ -45,33 +49,34 @@ class ClientRatioAnalysisController extends Controller
                 'z_score' => round(($data[$sheet->year]['working_capital_total_assets'] * 1.2) + ($data[$sheet->year]['retained_earnings_total_assets'] * 1.4) + ($data[$sheet->year]['ebit_total_assets'] * 3.3) + ($data[$sheet->year]['equity_total_liabilities'] * 0.6) + ($data[$sheet->year]['sales_total_assets'] * 1), 2),
                 'z_second_score' => round(($data[$sheet->year]['working_capital_total_assets'] * 6.56) + ($data[$sheet->year]['retained_earnings_total_assets'] * 3.26) + ($data[$sheet->year]['ebit_total_assets'] * 6.72) + ($data[$sheet->year]['equity_total_liabilities'] * 1.05) + ($data[$sheet->year]['sales_total_assets'] * 0), 2),
                 'z_score_thresholds_healthy' => 0,
-                'current_ratio' => $sheet->total_current_liabilities?round($sheet->total_current_assets / $sheet->total_current_liabilities,2):2,
-                'quick_ratio' => $sheet->total_current_liabilities?round(($sheet->total_current_assets -$incomeStatement->total_stock) / $sheet->total_current_liabilities,2):2,
-                'debtor_days' => 0,
-                'creditor_days' => 0,
-                'working_capital' =>  $sheet->total_working_capital?round($incomeStatement->total_sales /($sheet->total_working_capital), 2):'n/a',
-                'turnover_growth' => round(($incomeStatement->total_gross_margin /$incomeStatement->total_sales)*100, 2),
-                'gross_profit' => 0,
-                'operating_profit_margin' => 0,
-                'net_profit_margin' => 0,
-                'return_on_equity' => 0,
-                'return_on_assets' => 0,
-                'return_on_investment' => 0,
-                'gearing_ratio' => 0,
-                'long_term_debt' => 0,
-                'tangible_net_worth' => 0,
-                'total_assets' => 0,
-                'solvency' => 0,
-                'interest_cover' => 0,
-                'gross_interest_debts' => 0,
-                'total_assets_turnover' => 0,
-                'fixed_assets_turn_over' => 0,
+                'current_ratio' => $sheet->total_current_liabilities ? round($sheet->total_current_assets / $sheet->total_current_liabilities, 2) : 2,
+                'quick_ratio' => $sheet->total_current_liabilities ? round(($sheet->total_current_assets - $incomeStatement->total_stock) / $sheet->total_current_liabilities, 2) : 2,
+                'debtor_days' => round($sheet->total_accounts_receivable / $incomeStatement->total_sales, 2),
+                'creditor_days' => round($sheet->total_accounts_payable / $incomeStatement->total_sales, 2),
+                'working_capital' => $sheet->total_working_capital ? round($incomeStatement->total_sales / ($sheet->total_working_capital), 2) : 'n/a',
+                'turnover_growth' => $turnoverGrowth,
+                'gross_profit' => round(($incomeStatement->total_gross_margin / $incomeStatement->total_sales) * 100, 2),
+                'operating_profit_margin' => round(($incomeStatement->total_operating_profit / $incomeStatement->total_sales) * 100, 2),
+                'net_profit_margin' => round(($incomeStatement->net_profit / $incomeStatement->total_sales) * 100, 2),
+                'return_on_equity' => round(($incomeStatement->net_profit / $sheet->total_equity) * 100, 2),
+                'return_on_assets' => round(($incomeStatement->net_profit / $sheet->total_assets), 2),
+                'return_on_investment' => round(($incomeStatement->total_operating_profit / ($sheet->total_assets + $sheet->total_long_term_liabilities)), 2),
+                'gearing_ratio' => round($sheet->total_liabilities / $sheet->total_equity, 2),
+                'long_term_debt' => round($sheet->total_long_term_liabilities / $sheet->total_equity, 2),
+                'tangible_net_worth' => round($sheet->total_liabilities / $sheet->total_tangible_net_worth, 2),
+                'total_assets' => round($sheet->total_equity / $sheet->total_assets, 2),
+                'solvency' => $sheet->total_liabilities ? round($sheet->total_assets / $sheet->total_liabilities, 2) : 'n/a',
+                'interest_cover' => $incomeStatement->total_net_finance_costs ? round($incomeStatement->total_operating_profit / $incomeStatement->total_net_finance_costs, 2) : 'n/a',
+                'gross_interest_debts' => $sheet->total_long_term_liabilities ? round(($incomeStatement->total_cost_of_goods_sold_depreciation + $incomeStatement->total_amortisation) / $sheet->total_long_term_liabilities, 2) : 'n/a',
+                'total_assets_turnover' => round($incomeStatement->total_sales / $sheet->total_assets, 2),
+                'fixed_assets_turn_over' => round($incomeStatement->total_sales / $sheet->total_fixed_assets, 2),
             ];
         }
         return Inertia::render('Clients/BalanceSheets/Index', [
             'client' => $client,
             'sheets' => $sheets,
             'ratio' => $ratio,
+            'data' => $data,
         ]);
     }
 

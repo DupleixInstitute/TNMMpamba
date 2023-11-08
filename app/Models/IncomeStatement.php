@@ -13,7 +13,10 @@ class IncomeStatement extends Model
     use HasFactory;
 
     protected $appends = [
-        'total_stock'
+        'total_stock',
+        'total_net_finance_costs',
+        'total_cost_of_goods_sold_depreciation',
+        'total_amortisation',
     ];
 
     public function scopeFilter($query, array $filters)
@@ -46,6 +49,39 @@ class IncomeStatement extends Model
             get: function ($value, array $attributes) {
                 return $this->data()->whereHas('chart', function (Builder $query) {
                     $query->where('account_type', 'stock');
+                })->sum('amount');
+            },
+            set: fn($value) => $value,
+        );
+    }
+    protected function totalNetFinanceCosts(): Attribute
+    {
+        return Attribute::make(
+            get: function ($value, array $attributes) {
+                return $this->data()->whereHas('chart', function (Builder $query) {
+                    $query->whereIn('account_type', ['net_finance_costs_banks','net_finance_costs_finance_leases']);
+                })->sum('amount');
+            },
+            set: fn($value) => $value,
+        );
+    }
+    protected function totalCostOfGoodsSoldDepreciation(): Attribute
+    {
+        return Attribute::make(
+            get: function ($value, array $attributes) {
+                return $this->data()->whereHas('chart', function (Builder $query) {
+                    $query->whereIn('account_type', ['cost_of_goods_sold_depreciation']);
+                })->sum('amount');
+            },
+            set: fn($value) => $value,
+        );
+    }
+    protected function totalAmortisation(): Attribute
+    {
+        return Attribute::make(
+            get: function ($value, array $attributes) {
+                return $this->data()->whereHas('chart', function (Builder $query) {
+                    $query->whereIn('account_type', ['amortisation_intangible_assets']);
                 })->sum('amount');
             },
             set: fn($value) => $value,

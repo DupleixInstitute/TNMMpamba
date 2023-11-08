@@ -28,6 +28,8 @@ class BalanceSheet extends Model
     protected $appends = [
         'total_tangible_net_worth',
         'total_retained_earnings',
+        'total_accounts_receivable',
+        'total_accounts_payable',
     ];
 
     public function scopeFilter($query, array $filters)
@@ -66,6 +68,28 @@ class BalanceSheet extends Model
             get: function ($value, array $attributes) {
                 return  $this->data()->whereHas('chart',function (Builder $query){
                     $query->where('account_type','retained_earning');
+                })->sum('amount');
+            },
+            set: fn($value) => $value,
+        );
+    }
+    protected function totalAccountsReceivable(): Attribute
+    {
+        return Attribute::make(
+            get: function ($value, array $attributes) {
+                return  $this->data()->whereHas('chart',function (Builder $query){
+                    $query->where('account_type','accounts_receivable');
+                })->sum('amount');
+            },
+            set: fn($value) => $value,
+        );
+    }
+    protected function totalAccountsPayable(): Attribute
+    {
+        return Attribute::make(
+            get: function ($value, array $attributes) {
+                return  $this->data()->whereHas('chart',function (Builder $query){
+                    $query->where('account_type','accounts_payable');
                 })->sum('amount');
             },
             set: fn($value) => $value,
