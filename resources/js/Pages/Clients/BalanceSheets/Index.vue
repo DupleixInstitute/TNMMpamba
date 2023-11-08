@@ -55,9 +55,12 @@
                                 <td class="border-t">
                                     <span class="px-6 py-4 flex items-center">
                                     {{ sheet.year }}
-                                        <span v-if="sheet.total_assets!==sheet.total_liabilities"
+                                        <span v-if="sheet.total_assets!==sheet.total_equity_liabilities"
                                               class="ml-2 text-red-600" title="Not balanced"><font-awesome-icon
                                             icon="times-circle"></font-awesome-icon></span>
+                                        <span v-if="sheet.total_assets===sheet.total_equity_liabilities"
+                                              class="ml-2 text-green-600" title="Balanced"><font-awesome-icon
+                                            icon="check-circle"></font-awesome-icon></span>
                                     </span>
                                 </td>
                                 <td class="border-t">

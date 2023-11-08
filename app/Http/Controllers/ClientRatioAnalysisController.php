@@ -72,6 +72,11 @@ class ClientRatioAnalysisController extends Controller
                 'fixed_assets_turn_over' => round($incomeStatement->total_sales / $sheet->total_fixed_assets, 2),
             ];
         }
+        $count = $sheets->count();
+        dd($count);
+        foreach ($data as $key => $value) {
+
+        }
         return Inertia::render('Clients/BalanceSheets/Index', [
             'client' => $client,
             'sheets' => $sheets,

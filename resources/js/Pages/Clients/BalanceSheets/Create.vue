@@ -460,7 +460,7 @@ export default {
                 this.form.total_equity += parseFloat(item.amount || '0')
             })
             this.form.total_liabilities = this.form.total_current_liabilities + this.form.total_long_term_liabilities;
-            this.form.total_equity_liabilities = this.form.total_current_liabilities + this.form.total_liabilities;
+            this.form.total_equity_liabilities =  this.form.total_liabilities+ this.form.total_equity;
 
         }
     },
