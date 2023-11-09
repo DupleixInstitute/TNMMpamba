@@ -398,7 +398,7 @@ class LoanApplicationsController extends Controller
                     }
                 }
             }
-            $attribute->save();
+            //$attribute->save();
         }
         $application->score = LoanApplicationScore::where('loan_application_id', $application->id)->sum('score');
         $application->score_percentage = $application->score * 100 / $product->score;
