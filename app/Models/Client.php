@@ -88,6 +88,10 @@ class Client extends Model
     {
         return $this->belongsTo(LegalType::class);
     }
+    public function ratio()
+    {
+        return $this->hasOne(RatioAnalysis::class,'client_id','id');
+    }
 
     public function courses()
     {

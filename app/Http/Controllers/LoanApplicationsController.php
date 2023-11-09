@@ -318,6 +318,88 @@ class LoanApplicationsController extends Controller
             }
             $attribute->save();
         }
+        //let's update fields of type calculated
+        $formulaAttributes = LoanApplicationScore::with(['productAttribute'])
+            ->where('loan_application_id', $application->id)
+            ->whereHas('scoringAttribute', function (Builder $query) {
+                $query->where('field_type', 'calculated');
+            })->get();
+        $industryType = $application->client->industryType;
+        $ratio = $application->client->ratio;
+        foreach ($formulaAttributes as $attribute) {
+
+            $ratioScore = 0.00;
+            $maxScore = $attribute->productAttribute->score;
+            $minScore = $attribute->productAttribute->min_score;
+            //update is ratio
+            if ($attribute->productAttribute->is_ratio) {
+                $ratioValue = $ratio->{$attribute->productAttribute->system_name};
+                $ratioBenchmarkValue = $industryType->{$attribute->productAttribute->system_name};
+                $ratioScore = $ratioBenchmarkValue ? ($ratioValue * $maxScore / $ratioBenchmarkValue) : 0;
+                if ($ratioScore > $maxScore) {
+                    $ratioScore = $maxScore;
+                }
+                if ($ratioScore < 0) {
+                    $ratioScore = 0.00;
+                }
+            }
+            if ($attribute->productAttribute->is_ratio) {
+
+            }
+            $formula = $attribute->productAttribute->data;
+            preg_match_all(
+                '/\{\{field_(\d)+}}/',
+                $formula,
+                $matches,
+                PREG_PATTERN_ORDER
+            );
+            if (!empty($matches[0])) {
+                foreach ($matches[0] as $match) {
+                    //find the value of that field
+                    $score = LoanApplicationScore::where('loan_product_scoring_attribute_id', explode('_', $match)[1])->where('loan_application_id', $application->id)->first();
+                    if (empty($score)) {
+                        //throw error
+                    }
+                    $formula = str_replace($match, $score->value, $formula);
+                }
+                //at this point our formula is ready
+                $math = new EvalMath;
+                $value = $math->evaluate($formula);
+                $attribute->value = round($value, 2);
+            }
+            //update the score now that we have a value
+            $options = LoanProductScoringAttributeOptionValue::where('loan_product_id', $product->id)->where('loan_product_scoring_attribute_id', $attribute->productAttribute->id)->get();
+            if ($attribute->productAttribute->option_type === 'range') {
+                foreach ($options as $key) {
+                    if ($attribute->value >= $key->lower_value && $attribute->value <= $key->upper_value) {
+                        $attribute->score = $key->score;
+                        //check if score is accepted
+                        if (in_array($key->name, $attribute->productAttribute->accept_value)) {
+                            $attribute->accepted = 1;
+                        }
+                    }
+                }
+            }
+            if ($attribute->productAttribute->option_type === 'greater_than_or_less_than') {
+                foreach ($options as $key) {
+                    if ($key->name === 'Greater Than or Equal To' && $attribute->value >= $attribute->productAttribute->median_value) {
+                        $score->score = $key->score;
+                        //check if score is accepted
+                        if (in_array($key->name, $attribute->productAttribute->accept_value)) {
+                            $attribute->accepted = 1;
+                        }
+                    }
+                    if ($key->name === 'Less Than' && $attribute->value < $attribute->productAttribute->median_value) {
+                        $attribute->score = $key->score;
+                        //check if score is accepted
+                        if (in_array($key->name, $attribute->productAttribute->accept_value)) {
+                            $attribute->accepted = 1;
+                        }
+                    }
+                }
+            }
+            $attribute->save();
+        }
         $application->score = LoanApplicationScore::where('loan_application_id', $application->id)->sum('score');
         $application->score_percentage = $application->score * 100 / $product->score;
         $application->save();
