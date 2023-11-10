@@ -155,8 +155,13 @@ class LoanApplicationsController extends Controller
                         } else {
                             $item->attribute->options = [];
                         }
+                        if ($item->attribute->field_type === 'checkbox') {
+                            $item->value = [];
+                        } else {
+                            $item->value = '';
+                        }
                     }
-                    $item->value = '';
+
                     return $item;
                 });
                 $group->attributes = $attributes;
@@ -209,9 +214,14 @@ class LoanApplicationsController extends Controller
                 $score->weight = $field['weight'];
                 $score->effective_weight = $field['effective_weight'];
                 $score->weighted_score = $field['weighted_score'];
-                $score->value = $field['value'];
+                if ($field['attribute']['field_type'] === 'checkbox') {
+                    $score->value = json_encode($field['value']);
+                } else {
+                    $score->value = $field['value'];
+                }
+
                 //determine the score
-                if ($field['attribute']['field_type'] === 'dropdown' || $field['attribute']['field_type'] === 'radio' || $field['attribute']['field_type'] === 'checkbox') {
+                if ($field['attribute']['field_type'] === 'dropdown' || $field['attribute']['field_type'] === 'radio') {
                     foreach ($field['attribute']['options'] as $key) {
                         if ($key['name'] == $field['value']) {
                             $score->score = $key['score'];
@@ -221,6 +231,22 @@ class LoanApplicationsController extends Controller
                             }
                         }
                     }
+                } elseif ($field['attribute']['field_type'] === 'checkbox') {
+                    $tempScore = 0;
+                    $tempAccepted = 0;
+                    foreach ($field['value'] as $item) {
+                        foreach ($field['attribute']['options'] as $key) {
+                            if ($key['name'] == $item) {
+                                $tempScore += $key['score'];
+                                //check if score is accepted
+                                if (in_array($key['name'], $field['accept_value'])) {
+                                    $tempAccepted = 1;
+                                }
+                            }
+                        }
+                    }
+                    $score->score = $tempScore;
+                    $score->accepted = $tempAccepted;
                 } elseif ($field['attribute']['field_type'] === 'text' || $field['attribute']['field_type'] === 'number') {
                     if ($field['option_type'] === 'range') {
                         foreach ($field['attribute']['options'] as $key) {
@@ -452,10 +478,19 @@ class LoanApplicationsController extends Controller
                 //get value
                 $score = LoanApplicationScore::where('loan_application_id', $application->id)->where('loan_product_scoring_attribute_id', $item->id)->first();
                 if (!empty($score)) {
-                    $item->value = $score->value;
+                    if ($item->attribute->field_type === 'checkbox') {
+                        $item->value = json_decode($score->value);
+                    } else {
+                        $item->value = $score->value;
+                    }
+
                     $item->accepted = $score->accepted;
                 } else {
-                    $item->value = '';
+                    if ($item->attribute->field_type === 'checkbox') {
+                        $item->value = [];
+                    } else {
+                        $item->value = '';
+                    }
                     $item->accepted = false;
                 }
                 return $item;
@@ -560,9 +595,17 @@ class LoanApplicationsController extends Controller
                 //get value
                 $score = LoanApplicationScore::where('loan_application_id', $application->id)->where('loan_product_scoring_attribute_id', $item->id)->first();
                 if (!empty($score)) {
-                    $item->value = $score->value;
+                    if ($item->attribute->field_type === 'checkbox') {
+                        $item->value = $score->value ? json_decode($score->value) : [];
+                    } else {
+                        $item->value = $score->value;
+                    }
                 } else {
-                    $item->value = '';
+                    if ($item->attribute->field_type === 'checkbox') {
+                        $item->value = [];
+                    } else {
+                        $item->value = '';
+                    }
                 }
                 return $item;
             });
@@ -608,9 +651,13 @@ class LoanApplicationsController extends Controller
                 $score->weight = $field['weight'];
                 $score->effective_weight = $field['effective_weight'];
                 $score->weighted_score = $field['weighted_score'];
-                $score->value = $field['value'];
+                if ($field['attribute']['field_type'] === 'checkbox') {
+                    $score->value = json_encode($field['value']);
+                } else {
+                    $score->value = $field['value'];
+                }
                 //determine the score
-                if ($field['attribute']['field_type'] === 'dropdown' || $field['attribute']['field_type'] === 'radio' || $field['attribute']['field_type'] === 'checkbox') {
+                if ($field['attribute']['field_type'] === 'dropdown' || $field['attribute']['field_type'] === 'radio') {
                     foreach ($field['attribute']['options'] as $key) {
                         if ($key['name'] == $field['value']) {
                             $score->score = $key['score'];
@@ -620,6 +667,22 @@ class LoanApplicationsController extends Controller
                             }
                         }
                     }
+                } elseif ($field['attribute']['field_type'] === 'checkbox') {
+                    $tempScore = 0;
+                    $tempAccepted = 0;
+                    foreach ($field['value'] as $item) {
+                        foreach ($field['attribute']['options'] as $key) {
+                            if ($key['name'] == $item) {
+                                $tempScore += $key['score'];
+                                //check if score is accepted
+                                if (in_array($key['name'], $field['accept_value'])) {
+                                    $tempAccepted = 1;
+                                }
+                            }
+                        }
+                    }
+                    $score->score = $tempScore;
+                    $score->accepted = $tempAccepted;
                 } elseif ($field['attribute']['field_type'] === 'text' || $field['attribute']['field_type'] === 'number') {
                     if ($field['option_type'] === 'range') {
                         foreach ($field['attribute']['options'] as $key) {

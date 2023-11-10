@@ -154,7 +154,11 @@
                                         {{ attribute.name }}
                                     </td>
                                     <td class="border-t px-6 py-4">
-                                        {{ attribute.value }}
+                                        <div v-if="attribute.attribute.field_type==='checkbox'">
+                                            <span class="mr-2 bg-gray-100 p-1" v-for="value in attribute.value">{{value}}</span>
+                                        </div>
+                                        <div v-else>{{ attribute.value }}</div>
+
                                     </td>
                                     <td class="border-t px-6 py-4">
                                         {{ attribute.score }}

@@ -13,11 +13,11 @@
                 <form @submit.prevent="submit" enctype="multipart/form-data">
                     <div class="grid grid-cols-1 md:grid-cols-1 gap-2 mt-4">
                         <div>
-                            <b>Client:</b>{{application.client.name}}
+                            <b>Client:</b>{{ application.client.name }}
 
                         </div>
                         <div>
-                            <b>Product:</b>{{application.product.name}}
+                            <b>Product:</b>{{ application.product.name }}
 
                         </div>
                     </div>
@@ -90,15 +90,27 @@
                                     <div v-if="field.attribute.field_type==='radio'">
                                         <jet-label :for="'field_'+parentIndex+'_'+index" :value="field.name"/>
                                         <div v-for="option in field.attribute.options" class="flex items-center mb-4">
-                                            <input v-model="field.value" :id="'field_'+parentIndex+'_'+index+'_'+option" type="radio" :value="option" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-                                            <label :for="'field_'+parentIndex+'_'+index+'_'+option"  class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">{{ option }}</label>
+                                            <input v-model="field.value" :id="'field_'+parentIndex+'_'+index+'_'+option.id"
+                                                   type="radio" :value="option.name"
+                                                   class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                                            <label :for="'field_'+parentIndex+'_'+index+'_'+option.id"
+                                                   class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">{{
+                                                    option.name
+                                                }}</label>
                                         </div>
                                     </div>
                                     <div v-if="field.attribute.field_type==='checkbox'">
-                                        <jet-label :for="'field_'+parentIndex+'_'+index" :value="field.name"/>
+                                        <jet-label :for="'field_'+parentIndex+'_'+index" :value="field.name" class="mb-4"/>
                                         <div v-for="option in field.attribute.options" class="flex items-center mb-4">
-                                            <input v-model="field.value" :id="'field_'+parentIndex+'_'+index+'_'+option" type="checkbox" :value="option" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-                                            <label :for="'field_'+parentIndex+'_'+index+'_'+option"  class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">{{ option }}</label>
+
+                                            <label :for="'field_'+parentIndex+'_'+index+'_'+option.id"
+                                                   class="ml-2 text-sm font-medium">
+                                                <input v-model="field.value" :id="'field_'+parentIndex+'_'+index+'_'+option.id"
+                                                       type="checkbox" :name="'field_'+parentIndex+'_'+index+'[]'" :value="option.name"
+                                                       class="w-4 h-4 text-blue-600  border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                                                {{
+                                                    option.name
+                                                }}</label>
                                         </div>
                                     </div>
                                 </div>
@@ -139,6 +151,7 @@ import JetLabel from "@/Jetstream/Label.vue";
 import Select from "@/Jetstream/Select.vue";
 import FileInput from "@/Jetstream/FileInput.vue";
 import TextareaInput from "@/Jetstream/TextareaInput.vue";
+
 const fetchClients = async (query) => {
     let where = ''
     const response = await fetch(
@@ -192,7 +205,7 @@ export default {
                 description: this.application.description,
                 date: this.application.date,
                 status: this.application.status,
-                attributes:JSON.parse(JSON.stringify(this.application.product.form_attributes))
+                attributes: JSON.parse(JSON.stringify(this.application.product.form_attributes))
             }),
             usersMultiSelect: {
                 value: null,
@@ -204,7 +217,7 @@ export default {
                 delay: 4,
                 searchable: true,
                 options: async (query) => {
-                    return await fetchUsers(query||this.loan.staff_id)
+                    return await fetchUsers(query || this.loan.staff_id)
                 }
             },
             pageTitle: "Edit Application",
@@ -218,9 +231,7 @@ export default {
         },
 
     },
-    computed: {
-
-    }
+    computed: {}
 }
 </script>
 <style scoped>
