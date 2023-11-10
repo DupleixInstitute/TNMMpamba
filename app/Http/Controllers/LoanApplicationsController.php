@@ -326,7 +326,7 @@ class LoanApplicationsController extends Controller
             })->get();
         $industryType = $application->client->industryType;
         $ratio = $application->client->ratio;
-        foreach ($formulaAttributes as $attribute) {
+        /*foreach ($formulaAttributes as $attribute) {
 
             $ratioScore = 0.00;
             $maxScore = $attribute->productAttribute->score;
@@ -399,7 +399,7 @@ class LoanApplicationsController extends Controller
                 }
             }
             //$attribute->save();
-        }
+        }*/
         $application->score = LoanApplicationScore::where('loan_application_id', $application->id)->sum('score');
         $application->score_percentage = $application->score * 100 / $product->score;
         $application->save();
