@@ -191,6 +191,7 @@ class LoanApplicationsController extends Controller
         $attributes = $request->json('attributes');
         $client = Client::find($request->client_id);
         $product = LoanProduct::find($request->loan_product_id);
+        $client->load(['shareholders', 'industryType', 'ratio']);
         $application = new LoanApplication();
         $application->created_by_id = Auth::id();
         $application->loan_product_id = $request->loan_product_id;
@@ -350,11 +351,14 @@ class LoanApplicationsController extends Controller
             ->whereHas('scoringAttribute', function (Builder $query) {
                 $query->where('field_type', 'calculated');
             })->get();
-        $industryType = $application->client->industryType;
-        $ratio = $application->client->ratio;
-        /*foreach ($formulaAttributes as $attribute) {
+        $industryType = $client->industryType;
+        $ratio = $client->ratio;
+        $shareholders = $client->shareholders;
+        $porter = $client->porter;
+        foreach ($formulaAttributes as $attribute) {
 
             $ratioScore = 0.00;
+            $accepted = 0;
             $maxScore = $attribute->productAttribute->score;
             $minScore = $attribute->productAttribute->min_score;
             //update is ratio
@@ -369,63 +373,60 @@ class LoanApplicationsController extends Controller
                     $ratioScore = 0.00;
                 }
             }
-            if ($attribute->productAttribute->is_ratio) {
+            if ($attribute->productAttribute->is_shareholder_analysis) {
+                if ($attribute->productAttribute->system_name !== 'blacklisted' && $attribute->productAttribute->system_name !== 'fraud_alert') {
+                    $average = round($client->shareholders->average($attribute->productAttribute->system_name));
+                    switch ($average) {
+                        case 0:
+                            $ratioScore = $maxScore;
+                            $accepted = 1;
+                            break;
+                        case 1:
+                            $ratioScore = $maxScore * 40 / 100;
+                            $accepted = 1;
+                            break;
+                        case 2:
+                            $ratioScore = $maxScore * 20 / 100;
+                            $accepted = 1;
+                            break;
+                        default:
+                            $ratioScore = 0;
+                            $accepted = 0;
+                    }
+                } else {
+                    if ($shareholders->where($attribute->productAttribute->system_name, 1)->count() > 0) {
+                        $attribute->value = 'yes';
+                        $ratioScore = 0;
+                        $accepted = 0;
+                    } else {
+                        $attribute->value = 'no';
+                        $ratioScore = $maxScore;
+                        $accepted = 1;
+                    }
+                }
 
             }
-            $formula = $attribute->productAttribute->data;
-            preg_match_all(
-                '/\{\{field_(\d)+}}/',
-                $formula,
-                $matches,
-                PREG_PATTERN_ORDER
-            );
-            if (!empty($matches[0])) {
-                foreach ($matches[0] as $match) {
-                    //find the value of that field
-                    $score = LoanApplicationScore::where('loan_product_scoring_attribute_id', explode('_', $match)[1])->where('loan_application_id', $application->id)->first();
-                    if (empty($score)) {
-                        //throw error
+            if ($attribute->productAttribute->is_industry_analysis) {
+                if ($attribute->productAttribute->system_name === 'porters_five_forces_analysis') {
+                    $porter = $porter->grand_total;
+                    if ($porter->grand_total < 0) {
+                        $ratioScore = 0;
+                        $accepted = 0;
                     }
-                    $formula = str_replace($match, $score->value, $formula);
-                }
-                //at this point our formula is ready
-                $math = new EvalMath;
-                $value = $math->evaluate($formula);
-                $attribute->value = round($value, 2);
-            }
-            //update the score now that we have a value
-            $options = LoanProductScoringAttributeOptionValue::where('loan_product_id', $product->id)->where('loan_product_scoring_attribute_id', $attribute->productAttribute->id)->get();
-            if ($attribute->productAttribute->option_type === 'range') {
-                foreach ($options as $key) {
-                    if ($attribute->value >= $key->lower_value && $attribute->value <= $key->upper_value) {
-                        $attribute->score = $key->score;
-                        //check if score is accepted
-                        if (in_array($key->name, $attribute->productAttribute->accept_value)) {
-                            $attribute->accepted = 1;
-                        }
+                    if ($porter->grand_total == 0) {
+                        $ratioScore = $maxScore * 50 / 100;
+                        $accepted = 1;
+                    }
+                    if ($porter->grand_total > 0) {
+                        $ratioScore = $maxScore;
+                        $accepted = 1;
                     }
                 }
             }
-            if ($attribute->productAttribute->option_type === 'greater_than_or_less_than') {
-                foreach ($options as $key) {
-                    if ($key->name === 'Greater Than or Equal To' && $attribute->value >= $attribute->productAttribute->median_value) {
-                        $score->score = $key->score;
-                        //check if score is accepted
-                        if (in_array($key->name, $attribute->productAttribute->accept_value)) {
-                            $attribute->accepted = 1;
-                        }
-                    }
-                    if ($key->name === 'Less Than' && $attribute->value < $attribute->productAttribute->median_value) {
-                        $attribute->score = $key->score;
-                        //check if score is accepted
-                        if (in_array($key->name, $attribute->productAttribute->accept_value)) {
-                            $attribute->accepted = 1;
-                        }
-                    }
-                }
-            }
-            //$attribute->save();
-        }*/
+            $attribute->score = $ratioScore;
+            $attribute->accepted = $accepted;
+            $attribute->save();
+        }
         $application->score = LoanApplicationScore::where('loan_application_id', $application->id)->sum('score');
         $application->score_percentage = $application->score * 100 / $product->score;
         $application->save();
@@ -444,7 +445,17 @@ class LoanApplicationsController extends Controller
      */
     public function show(LoanApplication $application)
     {
-        $application->load(['staff', 'client', 'product']);
+        $application->load(['staff', 'client', 'client.shareholders', 'client.industryType', 'client.ratio', 'product']);
+        $error = '';
+        $message = '';
+        if ($application->client->type === 'corporate') {
+            if ($application->client->shareholders->where('blacklisted', 1) > 0) {
+                $error = 'One of the shareholders is blacklisted, this application should not be approved.<br>';
+            }
+            if ($application->client->shareholders->where('fraud_alert', 1) > 0) {
+                $error .= 'One of the shareholders has a fraud alert, this application should not be approved.';
+            }
+        }
         $groups = LoanProductScoringAttribute::where('is_group', 1)->where('loan_product_id', $application->product->id)->get();
         $groups->transform(function ($group) use ($application) {
             $attributes = LoanProductScoringAttribute::with(['attribute'])->where('is_group', 0)->where('scoring_attribute_group_id', $group->scoring_attribute_group_id)->where('loan_product_id', $application->product->id)->orderBy('order_position')->get();
@@ -498,6 +509,12 @@ class LoanApplicationsController extends Controller
             $group->attributes = $attributes;
             return $group;
         });
+        if ($error) {
+            session()->flash('error', $error);
+        }
+        if ($message) {
+            session()->flash('success', $message);
+        }
         $application->product->scoring_attributes = $groups;
         return Inertia::render('LoanApplications/Show', [
             'application' => $application,
@@ -632,7 +649,8 @@ class LoanApplicationsController extends Controller
             'date' => ['required'],
         ]);
         $attributes = $request->json('attributes');
-        $client = $application->client_id;
+        $client = $application->client;
+        $client->load(['shareholders', 'industryType', 'ratio']);
         $product = $application->product;
         $application->staff_id = $request->staff_id;
         $application->date = $request->date;
@@ -778,6 +796,88 @@ class LoanApplicationsController extends Controller
                     }
                 }
             }
+            $attribute->save();
+        }
+        //let's update fields of type calculated
+        $formulaAttributes = LoanApplicationScore::with(['productAttribute'])
+            ->where('loan_application_id', $application->id)
+            ->whereHas('scoringAttribute', function (Builder $query) {
+                $query->where('field_type', 'calculated');
+            })->get();
+        $industryType = $client->industryType;
+        $ratio = $client->ratio;
+        $shareholders = $client->shareholders;
+        $porter = $client->porter;
+        foreach ($formulaAttributes as $attribute) {
+
+            $ratioScore = 0.00;
+            $accepted = 0;
+            $maxScore = $attribute->productAttribute->score;
+            $minScore = $attribute->productAttribute->min_score;
+            //update is ratio
+            if ($attribute->productAttribute->is_ratio) {
+                $ratioValue = $ratio->{$attribute->productAttribute->system_name};
+                $ratioBenchmarkValue = $industryType->{$attribute->productAttribute->system_name};
+                $ratioScore = $ratioBenchmarkValue ? ($ratioValue * $maxScore / $ratioBenchmarkValue) : 0;
+                if ($ratioScore > $maxScore) {
+                    $ratioScore = $maxScore;
+                }
+                if ($ratioScore < 0) {
+                    $ratioScore = 0.00;
+                }
+            }
+            if ($attribute->productAttribute->is_shareholder_analysis) {
+                if ($attribute->productAttribute->system_name !== 'blacklisted' && $attribute->productAttribute->system_name !== 'fraud_alert') {
+                    $average = round($client->shareholders->average($attribute->productAttribute->system_name));
+                    switch ($average) {
+                        case 0:
+                            $ratioScore = $maxScore;
+                            $accepted = 1;
+                            break;
+                        case 1:
+                            $ratioScore = $maxScore * 40 / 100;
+                            $accepted = 1;
+                            break;
+                        case 2:
+                            $ratioScore = $maxScore * 20 / 100;
+                            $accepted = 1;
+                            break;
+                        default:
+                            $ratioScore = 0;
+                            $accepted = 0;
+                    }
+                } else {
+                    if ($shareholders->where($attribute->productAttribute->system_name, 1)->count() > 0) {
+                        $attribute->value = 'yes';
+                        $ratioScore = 0;
+                        $accepted = 0;
+                    } else {
+                        $attribute->value = 'no';
+                        $ratioScore = $maxScore;
+                        $accepted = 1;
+                    }
+                }
+
+            }
+            if ($attribute->productAttribute->is_industry_analysis) {
+                if ($attribute->productAttribute->system_name === 'porters_five_forces_analysis') {
+                    $porter = $porter->grand_total;
+                    if ($porter->grand_total < 0) {
+                        $ratioScore = 0;
+                        $accepted = 0;
+                    }
+                    if ($porter->grand_total == 0) {
+                        $ratioScore = $maxScore * 50 / 100;
+                        $accepted = 1;
+                    }
+                    if ($porter->grand_total > 0) {
+                        $ratioScore = $maxScore;
+                        $accepted = 1;
+                    }
+                }
+            }
+            $attribute->score = $ratioScore;
+            $attribute->accepted = $accepted;
             $attribute->save();
         }
         $application->score = LoanApplicationScore::where('loan_application_id', $application->id)->sum('score');

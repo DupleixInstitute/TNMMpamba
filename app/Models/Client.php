@@ -93,9 +93,9 @@ class Client extends Model
         return $this->hasOne(RatioAnalysis::class,'client_id','id');
     }
 
-    public function courses()
+    public function porter()
     {
-        return $this->hasMany(Course::class, 'member_id', 'id');
+        return $this->hasOne(PorterFiveForcesAnalysis::class, 'client_id', 'id');
     }
 
     public function loans()
@@ -103,9 +103,9 @@ class Client extends Model
         return $this->hasMany(LoanApplication::class, 'member_id', 'id');
     }
 
-    public function invoices()
+    public function shareholders()
     {
-        return $this->hasMany(Invoice::class, 'patient_id', 'id');
+        return $this->hasMany(Shareholder::class, 'client_id', 'id');
     }
 
     public function consultations()
