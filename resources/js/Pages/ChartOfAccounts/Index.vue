@@ -230,6 +230,10 @@
                                   v-if="chartOfAccount.account_type==='reserve'">
                                  Equity - Reserves
                             </span>
+                            <span class="px-6 py-4 flex items-center"
+                                  v-if="chartOfAccount.account_type==='current_liability'">
+                                 Current Liability
+                            </span>
                         </td>
                         <td class="border-t">
                              <span class="px-6 py-4 flex items-center">

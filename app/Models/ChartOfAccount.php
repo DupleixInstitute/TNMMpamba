@@ -11,6 +11,7 @@ class ChartOfAccount extends Model
 
     protected $casts = [
         'allow_manual' => 'boolean',
+        'enable_reconciliation' => 'boolean',
         'active' => 'boolean',
     ];
 
