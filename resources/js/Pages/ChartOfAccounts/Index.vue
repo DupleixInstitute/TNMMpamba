@@ -96,7 +96,7 @@
                                 Cash
                             </span>
                             <span class="px-6 py-4 flex items-center"
-                                          v-if="chartOfAccount.account_type==='bank'">
+                                  v-if="chartOfAccount.account_type==='bank'">
                                 Bank
                             </span>
                             <span class="px-6 py-4 flex items-center"
@@ -111,7 +111,8 @@
                                   v-if="chartOfAccount.account_type==='credit_card'">
                                 Credit Card
                             </span>
-                            <span class="px-6 py-4 flex items-center" v-if="chartOfAccount.account_type==='long_term_liability'">
+                            <span class="px-6 py-4 flex items-center"
+                                  v-if="chartOfAccount.account_type==='long_term_liability'">
                                 Long Term Liability
                             </span>
                             <span class="px-6 py-4 flex items-center"
@@ -138,17 +139,96 @@
                                   v-if="chartOfAccount.account_type==='cost_of_goods_sold'">
                                 Cost of Goods Sold
                             </span>
-                            <span class="px-6 py-4 flex items-center" v-if="chartOfAccount.account_type==='other_expense'">
+                            <span class="px-6 py-4 flex items-center"
+                                  v-if="chartOfAccount.account_type==='other_expense'">
                                 Other Expense
                             </span>
                             <span class="px-6 py-4 flex items-center" v-if="chartOfAccount.account_type==='equity'">
                                 Equity
                             </span>
-                            <span class="px-6 py-4 flex items-center" v-if="chartOfAccount.account_type==='accounts_receivable'">
+                            <span class="px-6 py-4 flex items-center"
+                                  v-if="chartOfAccount.account_type==='accounts_receivable'">
                                 Accounts Receivable
                             </span>
-                            <span class="px-6 py-4 flex items-center" v-if="chartOfAccount.account_type==='accounts_payable'">
+                            <span class="px-6 py-4 flex items-center"
+                                  v-if="chartOfAccount.account_type==='accounts_payable'">
                                 Accounts Payable
+                            </span>
+                            <span class="px-6 py-4 flex items-center"
+                                  v-if="chartOfAccount.account_type==='property_plant_equipment'">
+                               Asset- Property, plant and equipment
+                            </span>
+                            <span class="px-6 py-4 flex items-center"
+                                  v-if="chartOfAccount.account_type==='investment_property'">
+                                Asset- Investment property
+                            </span>
+                            <span class="px-6 py-4 flex items-center"
+                                  v-if="chartOfAccount.account_type==='right_of_use_asset'">
+                                Asset-Right of use assets
+                            </span>
+                            <span class="px-6 py-4 flex items-center"
+                                  v-if="chartOfAccount.account_type==='intangible_asset'">
+                                Asset-Intangible assets
+                            </span>
+                            <span class="px-6 py-4 flex items-center"
+                                  v-if="chartOfAccount.account_type==='other_long_term_liability'">
+                                Other Long Term Liability
+                            </span>
+                            <span class="px-6 py-4 flex items-center"
+                                  v-if="chartOfAccount.account_type==='finance_lease_liability'">
+                                Finance lease liability
+                            </span>
+                            <span class="px-6 py-4 flex items-center"
+                                  v-if="chartOfAccount.account_type==='deferred_income_tax'">
+                                Deferred Income Tax
+                            </span>
+                            <span class="px-6 py-4 flex items-center"
+                                  v-if="chartOfAccount.account_type==='cost_of_goods_sold_depreciation'">
+                                Expense-Cost of Goods Sold-Depreciation
+                            </span>
+                            <span class="px-6 py-4 flex items-center"
+                                  v-if="chartOfAccount.account_type==='depreciation_property_plant_equipment'">
+                                Expense- Depreciation- property, plant and equipment
+                            </span>
+                            <span class="px-6 py-4 flex items-center"
+                                  v-if="chartOfAccount.account_type==='depreciation_right_of_use_assets'">
+                               Expense - Depreciation - right of use assets
+                            </span>
+                            <span class="px-6 py-4 flex items-center"
+                                  v-if="chartOfAccount.account_type==='depreciation_investment_property'">
+                               Expense - Depreciation - investment property
+                            </span>
+                            <span class="px-6 py-4 flex items-center"
+                                  v-if="chartOfAccount.account_type==='amortisation_intangible_assets'">
+                                Expense - Amortisation - intangible assets
+                            </span>
+                            <span class="px-6 py-4 flex items-center"
+                                  v-if="chartOfAccount.account_type==='short_term_leases'">
+                                Expense - Short-term leases
+                            </span>
+                            <span class="px-6 py-4 flex items-center"
+                                  v-if="chartOfAccount.account_type==='income_tax_expense'">
+                               Income Tax Expense
+                            </span>
+                            <span class="px-6 py-4 flex items-center"
+                                  v-if="chartOfAccount.account_type==='net_finance_costs_banks'">
+                                Expense - Net Finance Costs-banks
+                            </span>
+                            <span class="px-6 py-4 flex items-center"
+                                  v-if="chartOfAccount.account_type==='net_finance_costs_finance_leases'">
+                                Expense - Net Finance Costs-finance leases
+                            </span>
+                            <span class="px-6 py-4 flex items-center"
+                                  v-if="chartOfAccount.account_type==='retained_earning'">
+                                Equity - Retained earnings or Accumulated profits
+                            </span>
+                            <span class="px-6 py-4 flex items-center"
+                                  v-if="chartOfAccount.account_type==='capital_contribution'">
+                                 Equity - Capital/owner's contribution
+                            </span>
+                            <span class="px-6 py-4 flex items-center"
+                                  v-if="chartOfAccount.account_type==='reserve'">
+                                 Equity - Reserves
                             </span>
                         </td>
                         <td class="border-t">

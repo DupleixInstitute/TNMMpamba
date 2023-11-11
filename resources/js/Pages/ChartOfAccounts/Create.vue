@@ -97,7 +97,6 @@
                                     <option value="retained_earning">Retained earnings or Accumulated profits</option>
                                     <option value="capital_contribution">Capital/owner's contribution</option>
                                     <option value="reserve">Reserves</option>
-                                    <option value="equity">Equity</option>
                                 </optgroup>
                             </select>
                             <jet-input-error :message="form.errors.account_type" class="mt-2"/>
