@@ -9,6 +9,7 @@ use App\Http\Controllers\ClientPotersController;
 use App\Http\Controllers\ClientRatioAnalysisController;
 use App\Http\Controllers\ClientShareholdersController;
 use App\Http\Controllers\IndustryTypesController;
+use App\Http\Controllers\InkhundlaController;
 use App\Http\Controllers\LegalTypesController;
 use App\Http\Controllers\LoanProductsController;
 use App\Http\Controllers\BranchesController;
@@ -29,6 +30,7 @@ use App\Http\Controllers\CurrenciesController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DistrictsController;
 use App\Http\Controllers\EventCategoriesController;
+use App\Http\Controllers\RegionsController;
 use App\Http\Controllers\ScoringAttributesController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\ExpenseTypeController;
@@ -323,6 +325,16 @@ Route::group(['prefix' => 'bank'], function () {
 });
 //locations
 Route::group(['prefix' => 'location', 'as' => 'locations.'], function () {
+    //regions for swaziland
+    Route::group(['prefix' => 'region'], function () {
+        Route::get('/', [RegionsController::class, 'index'])->name('regions.index');
+        Route::get('/create', [RegionsController::class, 'create'])->name('regions.create');
+        Route::post('/store', [RegionsController::class, 'store'])->name('regions.store');
+        Route::get('/{province}/show', [RegionsController::class, 'show'])->name('regions.show');
+        Route::get('/{province}/edit', [RegionsController::class, 'edit'])->name('regions.edit');
+        Route::put('/{province}/update', [RegionsController::class, 'update'])->name('regions.update');
+        Route::delete('/{province}/destroy', [RegionsController::class, 'destroy'])->name('regions.destroy');
+    });
     Route::group(['prefix' => 'province'], function () {
         Route::get('/', [ProvincesController::class, 'index'])->name('provinces.index');
         Route::get('/create', [ProvincesController::class, 'create'])->name('provinces.create');
@@ -331,6 +343,16 @@ Route::group(['prefix' => 'location', 'as' => 'locations.'], function () {
         Route::get('/{province}/edit', [ProvincesController::class, 'edit'])->name('provinces.edit');
         Route::put('/{province}/update', [ProvincesController::class, 'update'])->name('provinces.update');
         Route::delete('/{province}/destroy', [ProvincesController::class, 'destroy'])->name('provinces.destroy');
+    });
+    //inkhundla
+    Route::group(['prefix' => 'inkhundla'], function () {
+        Route::get('/', [InkhundlaController::class, 'index'])->name('inkhundla.index');
+        Route::get('/create', [InkhundlaController::class, 'create'])->name('inkhundla.create');
+        Route::post('/store', [InkhundlaController::class, 'store'])->name('inkhundla.store');
+        Route::get('/{district}/show', [InkhundlaController::class, 'show'])->name('inkhundla.show');
+        Route::get('/{district}/edit', [InkhundlaController::class, 'edit'])->name('inkhundla.edit');
+        Route::put('/{district}/update', [InkhundlaController::class, 'update'])->name('inkhundla.update');
+        Route::delete('/{district}/destroy', [InkhundlaController::class, 'destroy'])->name('inkhundla.destroy');
     });
     //districts
     Route::group(['prefix' => 'district'], function () {

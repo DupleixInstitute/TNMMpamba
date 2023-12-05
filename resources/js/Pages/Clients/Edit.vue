@@ -228,7 +228,7 @@
 
                         </div>
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-5 mt-4 gap-2">
+                    <div class="grid grid-cols-1 md:grid-cols-3 mt-4 gap-2">
                         <div>
                             <jet-label for="country_id" value="Country"/>
                             <Multiselect
@@ -239,7 +239,7 @@
                             <jet-input-error :message="form.errors.country_id" class="mt-2"/>
                         </div>
                         <div>
-                            <jet-label for="province_id" value="Province"/>
+                            <jet-label for="province_id" value="Region"/>
                             <Multiselect
                                 id="province_id"
                                 v-model="form.province_id"
@@ -248,7 +248,7 @@
                             <jet-input-error :message="form.errors.province_id" class="mt-2"/>
                         </div>
                         <div>
-                            <jet-label for="district_id" value="District"/>
+                            <jet-label for="district_id" value="Inkhundla"/>
                             <Multiselect
                                 id="district_id"
                                 v-model="form.district_id"
@@ -256,7 +256,7 @@
                             />
                             <jet-input-error :message="form.errors.district_id" class="mt-2"/>
                         </div>
-                        <div>
+                        <div class="hidden">
                             <jet-label for="ward_id" value="Ward"/>
                             <Multiselect
                                 id="district_id"
@@ -264,15 +264,16 @@
                                 :options="availableWards"
                             />
                             <jet-input-error :message="form.errors.ward_id" class="mt-2"/>
-                        </div> <div>
-                        <jet-label for="village_id" value="Village"/>
-                        <Multiselect
-                            id="village_id"
-                            v-model="form.village_id"
-                            :options="availableVillages"
-                        />
-                        <jet-input-error :message="form.errors.village_id" class="mt-2"/>
-                    </div>
+                        </div>
+                        <div class="hidden">
+                            <jet-label for="village_id" value="Village"/>
+                            <Multiselect
+                                id="village_id"
+                                v-model="form.village_id"
+                                :options="availableVillages"
+                            />
+                            <jet-input-error :message="form.errors.village_id" class="mt-2"/>
+                        </div>
                     </div>
                     <div class="grid  grid-cols-1 md:grid-cols-2 mt-4 gap-2">
                         <div>

@@ -222,18 +222,18 @@
                             <td class="w-1/2 border border-gray-300 p-4 text-gray-500">{{ client.country?.name }}</td>
                         </tr>
                         <tr>
-                            <td class="w-1/2 border border-gray-300 font-semibold p-4 text-gray-900">Province</td>
+                            <td class="w-1/2 border border-gray-300 font-semibold p-4 text-gray-900">Region</td>
                             <td class="w-1/2 border border-gray-300 p-4 text-gray-500">{{ client.province?.name }}</td>
                         </tr>
                         <tr>
-                            <td class="w-1/2 border border-gray-300 font-semibold p-4 text-gray-900">District</td>
+                            <td class="w-1/2 border border-gray-300 font-semibold p-4 text-gray-900">Inkhundla</td>
                             <td class="w-1/2 border border-gray-300 p-4 text-gray-500">{{ client.district?.name }}</td>
                         </tr>
-                        <tr>
+                        <tr class="hidden">
                             <td class="w-1/2 border border-gray-300 font-semibold p-4 text-gray-900">Ward</td>
                             <td class="w-1/2 border border-gray-300 p-4 text-gray-500">{{ client.ward?.name }}</td>
                         </tr>
-                        <tr>
+                        <tr class="hidden">
                             <td class="w-1/2 border border-gray-300 font-semibold p-4 text-gray-900">Village</td>
                             <td class="w-1/2 border border-gray-300 p-4 text-gray-500">{{ client.village?.name }}</td>
                         </tr>

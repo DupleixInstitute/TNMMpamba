@@ -159,24 +159,24 @@ return [
             'dropdown' => true,
             'children' => [
                 [
-                    'name' => 'Provinces',
+                    'name' => 'Regions',
                     'icon' => 'circle',
-                    'route' => 'locations.provinces.index',
+                    'route' => 'locations.regions.index',
                     'permissions' => 'locations.index',
                     'dropdown' => false,
                     'children' => [],
                     'order' => 0,
                 ],
                 [
-                    'name' => 'Districts',
+                    'name' => 'Inkhundla',
                     'icon' => 'circle',
-                    'route' => 'locations.districts.index',
+                    'route' => 'locations.inkhundla.index',
                     'permissions' => 'locations.index',
                     'dropdown' => false,
                     'children' => [],
                     'order' => 1,
                 ],
-                [
+                /*[
                     'name' => 'Wards',
                     'icon' => 'circle',
                     'route' => 'locations.wards.index',
@@ -193,7 +193,7 @@ return [
                     'dropdown' => false,
                     'children' => [],
                     'order' => 3,
-                ],
+                ],*/
             ],
             'order' => 6,
         ],
