@@ -82,79 +82,7 @@ class LoanApplicationsController extends Controller
                 $attributes = LoanProductScoringAttribute::with(['attribute'])->where('is_group', 0)->where('scoring_attribute_group_id', $group->scoring_attribute_group_id)->where('loan_product_id', $product->id)->orderBy('order_position')->get();
                 $attributes->transform(function ($item) {
                     if (!empty($item->attribute)) {
-                        if ($item->attribute->field_type === 'dropdown' || $item->attribute->field_type === 'radio' || $item->attribute->field_type === 'checkbox') {
-                            $options = json_decode($item->attribute->options);
-                            $optionsArray = [];
-                            foreach ($options as $option) {
-                                if ($opt = LoanProductScoringAttributeOptionValue::where('loan_product_scoring_attribute_id', $item->id)->where('name', $option)->first()) {
-                                    $optionsArray[] = $opt;
-                                } else {
-                                    $optionsArray[] = [
-                                        'id' => '',
-                                        'loan_product_scoring_attribute_id' => '',
-                                        'scoring_attribute_id' => $item->id,
-                                        'name' => $option,
-                                        'weight' => '',
-                                        'score' => '',
-                                        'effective_weight' => '',
-                                        'weighted_score' => '',
-                                        'description' => '',
-                                        'active' => true,
-                                    ];
-                                }
-                            }
-                            $item->attribute->options = $optionsArray;
-                        } elseif ($item->attribute->field_type === 'number' || $item->attribute->field_type === 'text') {
-                            $optionsArray = [];
-                            if ($item->option_type === 'greater_than_or_less_than') {
-                                if ($opt = LoanProductScoringAttributeOptionValue::where('loan_product_scoring_attribute_id', $item->id)->where('name', 'Greater Than or Equal To')->first()) {
-                                    $optionsArray[] = $opt;
-                                } else {
-                                    $optionsArray[] = [
-                                        'id' => '',
-                                        'loan_product_scoring_attribute_id' => '',
-                                        'scoring_attribute_id' => $item->id,
-                                        'loan_product_id' => $item->loan_product_id,
-                                        'name' => 'Greater Than or Equal To',
-                                        'weight' => '',
-                                        'score' => '',
-                                        'effective_weight' => '',
-                                        'weighted_score' => '',
-                                        'description' => '',
-                                        'lower_value' => '',
-                                        'upper_value' => '',
-                                        'median_value' => '',
-                                        'active' => true,
-                                    ];
-                                }
-                                if ($opt = LoanProductScoringAttributeOptionValue::where('loan_product_scoring_attribute_id', $item->id)->where('name', 'Less Than')->first()) {
-                                    $optionsArray[] = $opt;
-                                } else {
-                                    $optionsArray[] = [
-                                        'id' => '',
-                                        'loan_product_scoring_attribute_id' => '',
-                                        'scoring_attribute_id' => $item->id,
-                                        'loan_product_id' => $item->loan_product_id,
-                                        'name' => 'Less Than',
-                                        'weight' => '',
-                                        'score' => '',
-                                        'effective_weight' => '',
-                                        'weighted_score' => '',
-                                        'description' => '',
-                                        'lower_value' => '',
-                                        'upper_value' => '',
-                                        'median_value' => '',
-                                        'active' => true,
-                                    ];
-                                }
-                            }
-                            if ($item->option_type === 'range') {
-                                $optionsArray = LoanProductScoringAttributeOptionValue::where('loan_product_scoring_attribute_id', $item->id)->get();
-                            }
-                            $item->attribute->options = $optionsArray;
-                        } else {
-                            $item->attribute->options = [];
-                        }
+                        $item->attribute->options = $item->options?:[];
                         if ($item->attribute->field_type === 'checkbox') {
                             $item->value = [];
                         } else {
@@ -462,29 +390,7 @@ class LoanApplicationsController extends Controller
             $group->total_score = (float)$attributes->sum('score');
             $attributes->transform(function ($item) use ($application) {
                 if (!empty($item->attribute)) {
-                    if ($item->attribute->field_type === 'dropdown' || $item->attribute->field_type === 'radio' || $item->attribute->field_type === 'checkbox') {
-                        $options = json_decode($item->attribute->options);
-                        $optionsArray = [];
-                        foreach ($options as $option) {
-                            if ($opt = LoanProductScoringAttributeOptionValue::where('loan_product_scoring_attribute_id', $item->id)->where('name', $option)->first()) {
-                                $optionsArray[] = $opt;
-                            } else {
-                                $optionsArray[] = [
-                                    'id' => '',
-                                    'loan_product_scoring_attribute_id' => '',
-                                    'scoring_attribute_id' => $item->id,
-                                    'name' => $option,
-                                    'weight' => '',
-                                    'score' => '',
-                                    'effective_weight' => '',
-                                    'weighted_score' => '',
-                                    'description' => '',
-                                    'active' => true,
-                                ];
-                            }
-                        }
-                        $item->attribute->options = $optionsArray;
-                    }
+                    $item->attribute->options = $item->options?:[];
                 }
                 //get value
                 $score = LoanApplicationScore::where('loan_application_id', $application->id)->where('loan_product_scoring_attribute_id', $item->id)->first();
@@ -535,79 +441,7 @@ class LoanApplicationsController extends Controller
             $attributes = LoanProductScoringAttribute::with(['attribute'])->where('is_group', 0)->where('scoring_attribute_group_id', $group->scoring_attribute_group_id)->where('loan_product_id', $application->product->id)->orderBy('order_position')->get();
             $attributes->transform(function ($item) use ($application) {
                 if (!empty($item->attribute)) {
-                    if ($item->attribute->field_type === 'dropdown' || $item->attribute->field_type === 'radio' || $item->attribute->field_type === 'checkbox') {
-                        $options = json_decode($item->attribute->options);
-                        $optionsArray = [];
-                        foreach ($options as $option) {
-                            if ($opt = LoanProductScoringAttributeOptionValue::where('loan_product_scoring_attribute_id', $item->id)->where('name', $option)->first()) {
-                                $optionsArray[] = $opt;
-                            } else {
-                                $optionsArray[] = [
-                                    'id' => '',
-                                    'loan_product_scoring_attribute_id' => '',
-                                    'scoring_attribute_id' => $item->id,
-                                    'name' => $option,
-                                    'weight' => '',
-                                    'score' => '',
-                                    'effective_weight' => '',
-                                    'weighted_score' => '',
-                                    'description' => '',
-                                    'active' => true,
-                                ];
-                            }
-                        }
-                        $item->attribute->options = $optionsArray;
-                    } elseif ($item->attribute->field_type === 'number' || $item->attribute->field_type === 'text') {
-                        $optionsArray = [];
-                        if ($item->option_type === 'greater_than_or_less_than') {
-                            if ($opt = LoanProductScoringAttributeOptionValue::where('loan_product_scoring_attribute_id', $item->id)->where('name', 'Greater Than or Equal To')->first()) {
-                                $optionsArray[] = $opt;
-                            } else {
-                                $optionsArray[] = [
-                                    'id' => '',
-                                    'loan_product_scoring_attribute_id' => '',
-                                    'scoring_attribute_id' => $item->id,
-                                    'loan_product_id' => $item->loan_product_id,
-                                    'name' => 'Greater Than or Equal To',
-                                    'weight' => '',
-                                    'score' => '',
-                                    'effective_weight' => '',
-                                    'weighted_score' => '',
-                                    'description' => '',
-                                    'lower_value' => '',
-                                    'upper_value' => '',
-                                    'median_value' => '',
-                                    'active' => true,
-                                ];
-                            }
-                            if ($opt = LoanProductScoringAttributeOptionValue::where('loan_product_scoring_attribute_id', $item->id)->where('name', 'Less Than')->first()) {
-                                $optionsArray[] = $opt;
-                            } else {
-                                $optionsArray[] = [
-                                    'id' => '',
-                                    'loan_product_scoring_attribute_id' => '',
-                                    'scoring_attribute_id' => $item->id,
-                                    'loan_product_id' => $item->loan_product_id,
-                                    'name' => 'Less Than',
-                                    'weight' => '',
-                                    'score' => '',
-                                    'effective_weight' => '',
-                                    'weighted_score' => '',
-                                    'description' => '',
-                                    'lower_value' => '',
-                                    'upper_value' => '',
-                                    'median_value' => '',
-                                    'active' => true,
-                                ];
-                            }
-                        }
-                        if ($item->option_type === 'range') {
-                            $optionsArray = LoanProductScoringAttributeOptionValue::where('loan_product_scoring_attribute_id', $item->id)->get();
-                        }
-                        $item->attribute->options = $optionsArray;
-                    } else {
-                        $item->attribute->options = [];
-                    }
+                    $item->attribute->options = $item->options?:[];
                 }
                 //get value
                 $score = LoanApplicationScore::where('loan_application_id', $application->id)->where('loan_product_scoring_attribute_id', $item->id)->first();
