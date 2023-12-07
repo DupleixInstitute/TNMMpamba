@@ -161,7 +161,7 @@
 
                                     </td>
                                     <td class="border-t px-6 py-4">
-                                        {{ attribute.score }}
+                                        {{ attribute.actual_score }}
                                     </td>
                                     <td class="border-t px-6 py-4">
                                         <span class="ml-2 text-green-600" v-if="attribute.accepted"><font-awesome-icon

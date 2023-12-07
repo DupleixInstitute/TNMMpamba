@@ -82,7 +82,7 @@ class LoanApplicationsController extends Controller
                 $attributes = LoanProductScoringAttribute::with(['attribute'])->where('is_group', 0)->where('scoring_attribute_group_id', $group->scoring_attribute_group_id)->where('loan_product_id', $product->id)->orderBy('order_position')->get();
                 $attributes->transform(function ($item) {
                     if (!empty($item->attribute)) {
-                        $item->attribute->options = $item->options?:[];
+                        $item->attribute->options = $item->options ?: [];
                         if ($item->attribute->field_type === 'checkbox') {
                             $item->value = [];
                         } else {
@@ -387,10 +387,11 @@ class LoanApplicationsController extends Controller
         $groups = LoanProductScoringAttribute::where('is_group', 1)->where('loan_product_id', $application->product->id)->get();
         $groups->transform(function ($group) use ($application) {
             $attributes = LoanProductScoringAttribute::with(['attribute'])->where('is_group', 0)->where('scoring_attribute_group_id', $group->scoring_attribute_group_id)->where('loan_product_id', $application->product->id)->orderBy('order_position')->get();
-            $group->total_score = (float)$attributes->sum('score');
-            $attributes->transform(function ($item) use ($application) {
+            $group->max_total_score = (float)$attributes->sum('score');
+            $groupTotalScore = 0;
+            $attributes->transform(function ($item) use ($application, &$groupTotalScore) {
                 if (!empty($item->attribute)) {
-                    $item->attribute->options = $item->options?:[];
+                    $item->attribute->options = $item->options ?: [];
                 }
                 //get value
                 $score = LoanApplicationScore::where('loan_application_id', $application->id)->where('loan_product_scoring_attribute_id', $item->id)->first();
@@ -402,6 +403,8 @@ class LoanApplicationsController extends Controller
                     }
 
                     $item->accepted = $score->accepted;
+                    $item->actual_score = $score->score;
+                    $groupTotalScore = $groupTotalScore + $score->score;
                 } else {
                     if ($item->attribute->field_type === 'checkbox') {
                         $item->value = [];
@@ -409,9 +412,11 @@ class LoanApplicationsController extends Controller
                         $item->value = '';
                     }
                     $item->accepted = false;
+                    $item->actual_score = 0;
                 }
                 return $item;
             });
+            $group->total_score = $groupTotalScore;
             $group->attributes = $attributes;
             return $group;
         });
@@ -441,7 +446,7 @@ class LoanApplicationsController extends Controller
             $attributes = LoanProductScoringAttribute::with(['attribute'])->where('is_group', 0)->where('scoring_attribute_group_id', $group->scoring_attribute_group_id)->where('loan_product_id', $application->product->id)->orderBy('order_position')->get();
             $attributes->transform(function ($item) use ($application) {
                 if (!empty($item->attribute)) {
-                    $item->attribute->options = $item->options?:[];
+                    $item->attribute->options = $item->options ?: [];
                 }
                 //get value
                 $score = LoanApplicationScore::where('loan_application_id', $application->id)->where('loan_product_scoring_attribute_id', $item->id)->first();
