@@ -143,7 +143,9 @@
                                 <tr class="text-left font-bold">
                                     <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Name</th>
                                     <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Value</th>
-                                    <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Score</th>
+                                    <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Max Score</th>
+                                    <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Actual Score</th>
+                                    <th class="px-6 pt-4 pb-4 font-medium text-gray-500">% Score</th>
                                     <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Accepted</th>
                                 </tr>
                                 </thead>
@@ -161,7 +163,13 @@
 
                                     </td>
                                     <td class="border-t px-6 py-4">
+                                        {{ attribute.score }}
+                                    </td>
+                                    <td class="border-t px-6 py-4">
                                         {{ attribute.actual_score }}
+                                    </td>
+                                    <td class="border-t px-6 py-4">
+                                        {{ $filters.formatNumber(attribute.percentage_score) }}%
                                     </td>
                                     <td class="border-t px-6 py-4">
                                         <span class="ml-2 text-green-600" v-if="attribute.accepted"><font-awesome-icon
@@ -173,8 +181,16 @@
                                 <tfoot>
                                 <tr class="text-left font-bold">
                                     <th class="px-6 pt-4 pb-4 font-medium text-gray-500" colspan="2">Total</th>
-                                    <th class="px-6 pt-4 pb-4 font-bold text-gray-800" colspan="2">
+                                    <th class="px-6 pt-4 pb-4 font-bold text-gray-800" colspan="">
+                                        {{ group.max_total_score }}
+                                    </th>
+                                    <th class="px-6 pt-4 pb-4 font-bold text-gray-800" colspan="">
                                         {{ group.total_score }}
+                                    </th>
+                                    <th class="px-6 pt-4 pb-4 font-bold text-gray-800" colspan="">
+                                        {{ group.total_percentage }}%
+                                    </th>
+                                    <th class="px-6 pt-4 pb-4 font-bold text-gray-800" colspan="">
                                     </th>
                                 </tr>
                                 </tfoot>

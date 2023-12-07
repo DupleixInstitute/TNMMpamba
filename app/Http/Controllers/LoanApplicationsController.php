@@ -404,6 +404,7 @@ class LoanApplicationsController extends Controller
 
                     $item->accepted = $score->accepted;
                     $item->actual_score = $score->score;
+                    $item->percentage_score = $item->score>0 ? round($score->score * 100 / $item->score, 2) : 0;
                     $groupTotalScore = $groupTotalScore + $score->score;
                 } else {
                     if ($item->attribute->field_type === 'checkbox') {
@@ -412,11 +413,13 @@ class LoanApplicationsController extends Controller
                         $item->value = '';
                     }
                     $item->accepted = false;
+                    $item->percentage_score = 0;
                     $item->actual_score = 0;
                 }
                 return $item;
             });
             $group->total_score = $groupTotalScore;
+            $group->total_percentage =  $group->max_total_score>0 ? round($group->total_score * 100 /  $group->max_total_score, 2) : 0;
             $group->attributes = $attributes;
             return $group;
         });
