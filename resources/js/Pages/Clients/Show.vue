@@ -64,7 +64,7 @@
                             </td>
                         </tr>
                         <tr>
-                            <td class="w-1/2 border border-gray-300 font-semibold p-4 text-gray-900">External ID</td>
+                            <td class="w-1/2 border border-gray-300 font-semibold p-4 text-gray-900">CIF</td>
                             <td class="w-1/2 border border-gray-300 p-4 text-gray-500">{{ client.external_id }}</td>
                         </tr>
                         <tr v-if="client.type==='corporate'">

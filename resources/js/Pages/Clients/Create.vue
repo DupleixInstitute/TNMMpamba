@@ -200,7 +200,7 @@
 
                         </div>
                         <div>
-                            <jet-label for="external_id" value="External ID"/>
+                            <jet-label for="external_id" value="CIF"/>
                             <jet-input id="external_id" type="text" class="block w-full"
                                        v-model="form.external_id"/>
                             <jet-input-error :message="form.errors.external_id" class="mt-2"/>

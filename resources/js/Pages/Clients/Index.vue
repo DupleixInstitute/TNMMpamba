@@ -41,7 +41,7 @@
                         <th class="px-6 pt-4 pb-4 font-medium text-gray-500">ID</th>
                         <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Name</th>
                         <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Type</th>
-                        <th class="px-6 pt-4 pb-4 font-medium text-gray-500">External ID</th>
+                        <th class="px-6 pt-4 pb-4 font-medium text-gray-500">CIF</th>
                         <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Mobile</th>
                         <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Joining Date</th>
                         <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Action</th>
