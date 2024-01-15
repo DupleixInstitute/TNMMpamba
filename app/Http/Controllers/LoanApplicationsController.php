@@ -377,10 +377,10 @@ class LoanApplicationsController extends Controller
         $error = '';
         $message = '';
         if ($application->client->type === 'corporate') {
-            if ($application->client->shareholders->where('blacklisted', 1) > 0) {
+            if ($application->client->shareholders->where('blacklisted', 1)->count() > 0) {
                 $error = 'One of the shareholders is blacklisted, this application should not be approved.<br>';
             }
-            if ($application->client->shareholders->where('fraud_alert', 1) > 0) {
+            if ($application->client->shareholders->where('fraud_alert', 1)->count() > 0) {
                 $error .= 'One of the shareholders has a fraud alert, this application should not be approved.';
             }
         }
