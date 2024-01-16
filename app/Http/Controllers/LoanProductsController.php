@@ -361,6 +361,7 @@ class LoanProductsController extends Controller
             $attribute->is_shareholder_analysis = $key['is_shareholder_analysis'] ? 1 : 0;
             $attribute->is_management_analysis = $key['is_management_analysis'] ? 1 : 0;
             $attribute->save();
+            $existingAttributes[] = $attribute->id;
             foreach ($key['attributes'] as $item) {
                 $childAttribute = null;
                 if (!empty($item['id'])) {
@@ -396,6 +397,7 @@ class LoanProductsController extends Controller
                 $childAttribute->is_shareholder_analysis = $item['is_shareholder_analysis'] ? 1 : 0;
                 $childAttribute->is_management_analysis = $item['is_management_analysis'] ? 1 : 0;
                 $childAttribute->save();
+                $existingAttributes[] = $attribute->id;
                 //save options
                 if (!empty($item['attribute']['options']) && is_array($item['attribute']['options'])) {
                     foreach ($item['attribute']['options'] as $option) {
@@ -424,8 +426,8 @@ class LoanProductsController extends Controller
         }
         //delete attributes that have been removed
         $newAttributes = LoanProductScoringAttribute::where('loan_product_id', $product->id)->pluck('id');
-        $allAttributes->each(function ($item) use ($newAttributes) {
-            if (!$newAttributes->contains($item->id)) {
+        $allAttributes->each(function ($item) use ($existingAttributes, $newAttributes) {
+            if (!in_array($item->id, $existingAttributes)) {
                 LoanProductScoringAttribute::where('id', $item->id)->delete();
                 if ($item->is_group) {
                     LoanProductScoringAttribute::where('scoring_attribute_group_id', $item->id)->delete();
