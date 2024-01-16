@@ -137,6 +137,9 @@ class ScoringAttributesController extends Controller
 
     public function destroy(ScoringAttributeGroup $attribute)
     {
+        if ($count = LoanProductScoringAttribute::where('scoring_attribute_group_id', $attribute->id)->count() > 1) {
+            return redirect()->back()->with('error', 'You cannot delete this attribute, its being used in ' . $count . ' places.');
+        }
         $attribute->delete();
         activity()
             ->performedOn($attribute)
