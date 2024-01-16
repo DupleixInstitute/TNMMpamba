@@ -394,7 +394,7 @@ class LoanApplicationsController extends Controller
                 if (!empty($item->attribute)) {
                     $item->attribute->options = $item->options ?: [];
                 }else{
-                    abort(422, 'A linkined scoring attribute with id ' . $item->scoring_attribute_id . ' was deleted');
+                    abort(422, 'A linked scoring attribute with id ' . $item->scoring_attribute_id . ' was deleted');
 
                 }
                 //get value
@@ -455,6 +455,10 @@ class LoanApplicationsController extends Controller
             $attributes->transform(function ($item) use ($application) {
                 if (!empty($item->attribute)) {
                     $item->attribute->options = $item->options ?: [];
+                }
+                else{
+                    abort(422, 'A linked scoring attribute with id ' . $item->scoring_attribute_id . ' was deleted');
+
                 }
                 //get value
                 $score = LoanApplicationScore::where('loan_application_id', $application->id)->where('loan_product_scoring_attribute_id', $item->id)->first();
