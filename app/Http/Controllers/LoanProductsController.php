@@ -219,13 +219,38 @@ class LoanProductsController extends Controller
 
             return $group;
         });
-        $product->scoringAttributes->transform(function ($item) {
+        $brokenAttributes = [];
+        $product->scoringAttributes->transform(function ($item) use (&$brokenAttributes) {
             if (!empty($item->attribute)) {
-                $item->attribute->options = $item->options?:[];
+                $item->attribute->options = $item->options ?: [];
 
+            }
+            if (!empty($item->scoring_attribute_id) && empty($item->attribute)) {
+                $brokenAttributes[] = [
+                    'id' => $item->id,
+                    'name' => $item->name
+                ];
             }
             return $item;
         });
+        if (count($brokenAttributes)) {
+            $error = "Your loan product is broken. Some scoring attributes where deleted for the following attributes:";
+            foreach ($brokenAttributes as $key) {
+                $error .= "{$key['name']},";
+                LoanProductScoringAttribute::where('id', $key['id'])->delete();
+            }
+            $error .= ".We have deleted the orphaned attributes, please re-add them";
+            $product->refresh();
+            $product->load(['category', 'createdBy', 'scoringAttributes', 'scoringAttributes.attribute']);
+            $product->scoringAttributes->transform(function ($item) {
+                if (!empty($item->attribute)) {
+                    $item->attribute->options = $item->options ?: [];
+
+                }
+                return $item;
+            });
+            session()->flash('error', $error);
+        }
         $product->form_attributes = $product->scoringAttributes->where('is_group', 1);
 
         $product->form_attributes->transform(function ($score) use ($product) {

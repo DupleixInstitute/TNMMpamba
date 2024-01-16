@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\LoanProductScoringAttribute;
 use App\Models\ScoringAttribute;
 use App\Models\ScoringAttributeGroup;
 use Illuminate\Http\Request;
@@ -52,7 +53,7 @@ class ScoringAttributesController extends Controller
         $attribute->parent_id = $request->parent_id;
         $attribute->name = $request->name;
         $attribute->description = $request->description;
-        $attribute->active = $request->active?1:0;
+        $attribute->active = $request->active ? 1 : 0;
         $attribute->save();
 
         activity()
@@ -60,15 +61,16 @@ class ScoringAttributesController extends Controller
             ->log('Create Scoring Attribute');
         return redirect()->route('scoring_attributes.index')->with('success', 'Scoring Attribute created successfully.');
     }
-    public function storeItem(Request $request,ScoringAttributeGroup $group)
+
+    public function storeItem(Request $request, ScoringAttributeGroup $group)
     {
         $request->validate([
             'name' => ['required', 'string'],
             'field_type' => ['required'],
         ]);
-        if(!empty($request->id)){
+        if (!empty($request->id)) {
             $attribute = ScoringAttribute::find($request->id);
-        }else{
+        } else {
             $attribute = new ScoringAttribute();
             $attribute->created_by_id = Auth::id();
             $attribute->scoring_attribute_group_id = $request->scoring_attribute_group_id;
@@ -77,16 +79,16 @@ class ScoringAttributesController extends Controller
         $attribute->field_type = $request->field_type;
         $attribute->condition = $request->condition;
         $attribute->default_values = $request->default_values;
-        if($request->field_type==='dropdown'||$request->field_type==='radio'||$request->field_type==='checkbox'){
+        if ($request->field_type === 'dropdown' || $request->field_type === 'radio' || $request->field_type === 'checkbox') {
             $attribute->options = json_encode($request->options);
-        }else{
+        } else {
             $attribute->options = $request->options;
         }
         $attribute->rules = $request->rules;
         $attribute->class = $request->class;
         $attribute->description = $request->description;
-        $attribute->required = $request->required?1:0;
-        $attribute->active = $request->active?1:0;
+        $attribute->required = $request->required ? 1 : 0;
+        $attribute->active = $request->active ? 1 : 0;
         $attribute->save();
         activity()
             ->performedOn($attribute)
@@ -96,10 +98,10 @@ class ScoringAttributesController extends Controller
 
     public function show(ScoringAttributeGroup $attribute)
     {
-        $attribute->load(['scoringAttributes','createdBy']);
-        $attribute->scoringAttributes->transform(function ($item){
-            if($item->field_type==='dropdown'||$item->field_type==='radio'||$item->field_type==='checkbox'){
-                $item->options=json_decode($item->options);
+        $attribute->load(['scoringAttributes', 'createdBy']);
+        $attribute->scoringAttributes->transform(function ($item) {
+            if ($item->field_type === 'dropdown' || $item->field_type === 'radio' || $item->field_type === 'checkbox') {
+                $item->options = json_decode($item->options);
             }
             return $item;
         });
@@ -124,7 +126,7 @@ class ScoringAttributesController extends Controller
         $attribute->parent_id = $request->parent_id;
         $attribute->name = $request->name;
         $attribute->description = $request->description;
-        $attribute->active = $request->active?1:0;
+        $attribute->active = $request->active ? 1 : 0;
         $attribute->save();
         activity()
             ->performedOn($attribute)
@@ -141,8 +143,12 @@ class ScoringAttributesController extends Controller
             ->log('Delete Scoring Attribute');
         return redirect()->route('scoring_attributes.index')->with('success', 'Scoring Attribute deleted successfully.');
     }
+
     public function destroyItem(ScoringAttribute $attribute)
     {
+        if ($count = LoanProductScoringAttribute::where('scoring_attribute_id', $attribute->id)->count() > 1) {
+            return redirect()->back()->with('error', 'You cannot delete this attribute, its being used in ' . $count . ' places.');
+        }
         $attribute->delete();
         activity()
             ->performedOn($attribute)

@@ -387,15 +387,20 @@ class LoanApplicationsController extends Controller
         $groups = LoanProductScoringAttribute::where('is_group', 1)->where('loan_product_id', $application->product->id)->get();
         $groups->transform(function ($group) use ($application) {
             $attributes = LoanProductScoringAttribute::with(['attribute'])->where('is_group', 0)->where('scoring_attribute_group_id', $group->scoring_attribute_group_id)->where('loan_product_id', $application->product->id)->orderBy('order_position')->get();
+
             $group->max_total_score = (float)$attributes->sum('score');
             $groupTotalScore = 0;
             $attributes->transform(function ($item) use ($application, &$groupTotalScore) {
                 if (!empty($item->attribute)) {
                     $item->attribute->options = $item->options ?: [];
+                }else{
+                    abort(422, 'A linkined scoring attribute with id ' . $item->scoring_attribute_id . ' was deleted');
+
                 }
                 //get value
                 $score = LoanApplicationScore::where('loan_application_id', $application->id)->where('loan_product_scoring_attribute_id', $item->id)->first();
                 if (!empty($score)) {
+
                     if ($item->attribute->field_type === 'checkbox') {
                         $item->value = json_decode($score->value);
                     } else {
@@ -404,7 +409,7 @@ class LoanApplicationsController extends Controller
 
                     $item->accepted = $score->accepted;
                     $item->actual_score = $score->score;
-                    $item->percentage_score = $item->score>0 ? round($score->score * 100 / $item->score, 2) : 0;
+                    $item->percentage_score = $item->score > 0 ? round($score->score * 100 / $item->score, 2) : 0;
                     $groupTotalScore = $groupTotalScore + $score->score;
                 } else {
                     if ($item->attribute->field_type === 'checkbox') {
@@ -419,7 +424,7 @@ class LoanApplicationsController extends Controller
                 return $item;
             });
             $group->total_score = $groupTotalScore;
-            $group->total_percentage =  $group->max_total_score>0 ? round($group->total_score * 100 /  $group->max_total_score, 2) : 0;
+            $group->total_percentage = $group->max_total_score > 0 ? round($group->total_score * 100 / $group->max_total_score, 2) : 0;
             $group->attributes = $attributes;
             return $group;
         });
