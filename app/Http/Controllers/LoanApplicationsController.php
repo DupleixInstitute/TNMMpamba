@@ -118,6 +118,9 @@ class LoanApplicationsController extends Controller
 
         $attributes = $request->json('attributes');
         $client = Client::find($request->client_id);
+        if ($client->type === 'corporate' && empty($client->ratio)) {
+            return redirect()->back()->with('error', 'No financial data entered for the chosen client. Ration analysis not found!');
+        }
         $product = LoanProduct::find($request->loan_product_id);
         $client->load(['shareholders', 'industryType', 'ratio']);
         $application = new LoanApplication();
@@ -393,7 +396,7 @@ class LoanApplicationsController extends Controller
             $attributes->transform(function ($item) use ($application, &$groupTotalScore) {
                 if (!empty($item->attribute)) {
                     $item->attribute->options = $item->options ?: [];
-                }else{
+                } else {
                     abort(422, 'A linked scoring attribute with id ' . $item->scoring_attribute_id . ' was deleted');
 
                 }
@@ -455,8 +458,7 @@ class LoanApplicationsController extends Controller
             $attributes->transform(function ($item) use ($application) {
                 if (!empty($item->attribute)) {
                     $item->attribute->options = $item->options ?: [];
-                }
-                else{
+                } else {
                     abort(422, 'A linked scoring attribute with id ' . $item->scoring_attribute_id . ' was deleted');
 
                 }
