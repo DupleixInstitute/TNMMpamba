@@ -4,10 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class LoanProduct extends Model
 {
-    use HasFactory;
+    use LogsActivity, HasFactory;
 
     protected $appends = [
 
@@ -39,6 +41,12 @@ class LoanProduct extends Model
     public function scoringAttributes()
     {
         return $this->hasMany(LoanProductScoringAttribute::class, 'loan_product_id', 'id')->orderBy('order_position');
+    }
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logAll()
+            ->logOnlyDirty();
     }
 
 }

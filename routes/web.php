@@ -11,6 +11,7 @@ use App\Http\Controllers\ClientShareholdersController;
 use App\Http\Controllers\IndustryTypesController;
 use App\Http\Controllers\InkhundlaController;
 use App\Http\Controllers\LegalTypesController;
+use App\Http\Controllers\LoanApprovalStagesController;
 use App\Http\Controllers\LoanProductsController;
 use App\Http\Controllers\BranchesController;
 use App\Http\Controllers\ChartOfAccountController;
@@ -222,6 +223,7 @@ Route::group(['prefix' => 'loan_application', 'as' => 'loan_applications.'], fun
     Route::get('/create', [LoanApplicationsController::class, 'create'])->name('create');
     Route::post('/store', [LoanApplicationsController::class, 'store'])->name('store');
     Route::post('/{application}/change_status', [LoanApplicationsController::class, 'changeStatus'])->name('change_status');
+    Route::post('/{application}/assign_approver', [LoanApplicationsController::class, 'assignApprover'])->name('assign_approver');
     Route::get('/{application}/show', [LoanApplicationsController::class, 'show'])->name('show');
     Route::get('/{application}/edit', [LoanApplicationsController::class, 'edit'])->name('edit');
     Route::put('/{application}/update', [LoanApplicationsController::class, 'update'])->name('update');
@@ -395,6 +397,16 @@ Route::group(['prefix' => 'currency'], function () {
     Route::put('/{currency}/update', [CurrenciesController::class, 'update'])->name('currencies.update');
     Route::delete('/{currency}/destroy', [CurrenciesController::class, 'destroy'])->name('currencies.destroy');
 });
+//approval stages
+Route::group(['prefix' => 'loan_approval_stage'], function () {
+    Route::get('/', [LoanApprovalStagesController::class, 'index'])->name('loan_approval_stages.index');
+    Route::get('/create', [LoanApprovalStagesController::class, 'create'])->name('loan_approval_stages.create');
+    Route::post('/store', [LoanApprovalStagesController::class, 'store'])->name('loan_approval_stages.store');
+    Route::get('/{stage}/show', [LoanApprovalStagesController::class, 'show'])->name('loan_approval_stages.show');
+    Route::get('/{stage}/edit', [LoanApprovalStagesController::class, 'edit'])->name('loan_approval_stages.edit');
+    Route::put('/{stage}/update', [LoanApprovalStagesController::class, 'update'])->name('loan_approval_stages.update');
+    Route::delete('/{stage}/destroy', [LoanApprovalStagesController::class, 'destroy'])->name('loan_approval_stages.destroy');
+});
 
 Route::group(['prefix' => 'financial_period'], function () {
     Route::get('/', [FinancialPeriodController::class, 'index'])->name('accounting.financial_periods.index');
@@ -484,98 +496,6 @@ Route::group(['prefix' => 'portal', 'as' => 'portal.'], function () {
         Route::get('profile', [MemberPortalUsersController::class, 'profile'])->name('profile.show');
 
     });
-    //loans
-    Route::group(['prefix' => 'loan', 'as' => 'loans.'], function () {
-        Route::get('/', [MemberPortalLoansController::class, 'index'])->name('index');
-        Route::get('/{loan}/show', [MemberPortalLoansController::class, 'show'])->name('show');
-        Route::get('create', [MemberPortalLoansController::class, 'create'])->name('create');
-        Route::post('store', [MemberPortalLoansController::class, 'store'])->name('store');
-        //files
-        Route::get('{loan}/file', [MemberPortalLoanFilesController::class, 'index'])->name('files.index');
-        Route::get('{loan}/file/create', [MemberPortalLoanFilesController::class, 'create'])->name('files.create');
-        Route::post('{loan}/file/store', [MemberPortalLoanFilesController::class, 'store'])->name('files.store');
-        Route::get('file/{file}/show', [MemberPortalLoanFilesController::class, 'show'])->name('files.show');
-        Route::get('file/{file}/edit', [MemberPortalLoanFilesController::class, 'edit'])->name('files.edit');
-        Route::put('file/{file}/update', [MemberPortalLoanFilesController::class, 'update'])->name('files.update');
-        Route::delete('file/{file}/destroy', [MemberPortalLoanFilesController::class, 'destroy'])->name('files.destroy');
-        //notes
-        Route::get('{loan}/note', [MemberPortalLoanNotesController::class, 'index'])->name('notes.index');
-        Route::get('{loan}/note/create', [MemberPortalLoanNotesController::class, 'create'])->name('notes.create');
-        Route::post('{loan}/note/store', [MemberPortalLoanNotesController::class, 'store'])->name('notes.store');
-        Route::get('note/{note}/show', [MemberPortalLoanNotesController::class, 'show'])->name('notes.show');
-        Route::get('note/{note}/edit', [MemberPortalLoanNotesController::class, 'edit'])->name('notes.edit');
-        Route::put('note/{note}/update', [MemberPortalLoanNotesController::class, 'update'])->name('notes.update');
-        Route::delete('note/{note}/destroy', [MemberPortalLoanNotesController::class, 'destroy'])->name('notes.destroy');
-        //guarantors
-        Route::get('{loan}/guarantor', [MemberPortalLoanGuarantorsController::class, 'index'])->name('guarantors.index');
-        Route::get('{loan}/guarantor/create', [MemberPortalLoanGuarantorsController::class, 'create'])->name('guarantors.create');
-        Route::post('{loan}/guarantor/store', [MemberPortalLoanGuarantorsController::class, 'store'])->name('guarantors.store');
-        Route::get('guarantor/{guarantor}/show', [MemberPortalLoanGuarantorsController::class, 'show'])->name('guarantors.show');
-        Route::get('guarantor/{guarantor}/edit', [MemberPortalLoanGuarantorsController::class, 'edit'])->name('guarantors.edit');
-        Route::put('guarantor/{guarantor}/update', [MemberPortalLoanGuarantorsController::class, 'update'])->name('guarantors.update');
-        Route::delete('guarantor/{guarantor}/destroy', [MemberPortalLoanGuarantorsController::class, 'destroy'])->name('guarantors.destroy');
 
-    });
-    Route::group(['prefix' => 'course', 'as' => 'courses.'], function () {
-        Route::get('/', [MemberPortalCoursesController::class, 'index'])->name('index');
-        Route::get('/{course}/show', [MemberPortalCoursesController::class, 'show'])->name('show');
-        Route::any('/search', [MemberPortalCoursesController::class, 'search'])->name('search');
-        //materials
-        Route::get('/{course}/material', [MemberPortalCourseMaterialsController::class, 'index'])->name('materials.index');
-        Route::get('/material/{material}/show', [MemberPortalCourseMaterialsController::class, 'show'])->name('materials.show');
-        //registrations
-        Route::get('/{course}/registration', [MemberPortalCoursesController::class, 'registrations'])->name('registrations.index');
-        //articles
-        Route::get('/{course}/article', [MemberPortalCoursesController::class, 'articles'])->name('articles.index');
-    });
-    Route::prefix('registration')->name('registrations.')->group(function () {
-        Route::get('/', [MemberPortalCourseRegistrationsController::class, 'index'])->name('index');
-        Route::get('/create', [MemberPortalCourseRegistrationsController::class, 'create'])->name('create');
-        Route::post('/store', [MemberPortalCourseRegistrationsController::class, 'store'])->name('store');
-        Route::get('/{registration}/show', [MemberPortalCourseRegistrationsController::class, 'show'])->name('show');
-        Route::get('/{registration}/edit', [MemberPortalCourseRegistrationsController::class, 'edit'])->name('edit');
-        Route::put('/{registration}/update', [MemberPortalCourseRegistrationsController::class, 'update'])->name('update');
-        Route::delete('/{registration}/destroy', [MemberPortalCourseRegistrationsController::class, 'destroy'])->name('destroy');
-    });
-    //events
-    Route::group(['prefix' => 'event', 'as' => 'events.'], function () {
-        Route::get('/', [MemberPortalEventsController::class, 'index'])->name('index');
-        Route::get('/calendar', [MemberPortalEventsController::class, 'calendar'])->name('calendar');
-        Route::get('/get_events', [MemberPortalEventsController::class, 'getEvents'])->name('get_events');
-        Route::get('/{event}/show', [MemberPortalEventsController::class, 'show'])->name('show');
-    });
-    //articles
-    Route::prefix('article')->name('articles.')->group(function () {
-        Route::get('/', [MemberPortalArticlesController::class, 'index'])->name('index');
-        Route::get('/{article}/show', [MemberPortalArticlesController::class, 'show'])->name('show');
-        //comments
-        Route::post('/{article}/comment/store', [MemberPortalArticlesController::class, 'storeComment'])->name('comments.store');
-        Route::delete('/comment/{comment}/destroy', [MemberPortalArticlesController::class, 'destroyComment'])->name('comments.destroy');
-
-    });
-    //messages
-    Route::group(['prefix' => 'inbox', 'as' => 'inbox.'], function () {
-        Route::get('/', [PatientPortalAppointmentsController::class, 'index'])->name('index');
-        Route::get('/compose', [PatientPortalAppointmentsController::class, 'compose'])->name('compose');
-    });
-});
-Route::get('/test', function () {
-    $formula = "{{field_33}}+{{field_34}}/12";
-    preg_match_all(
-        '/\{\{field_(\d)+}}/',
-        $formula,
-        $matches,
-        PREG_PATTERN_ORDER
-    );
-    foreach ($matches[0] as $match) {
-        //find the value of that field
-        $formula = str_replace($match, rand(12, 100), $formula);
-    }
-    dump($formula);
-    $math = new EvalMath;
-    $result = $math->evaluate($formula);
-    dump($result);
-    print_r($matches[0]);
-    dd('test');
 });
 

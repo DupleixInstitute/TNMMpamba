@@ -2,22 +2,19 @@
 
 namespace App\Models;
 
-use Cviebrock\EloquentSluggable\Sluggable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Permission\Models\Role;
 
-class Shareholder extends Model
+class LoanApprovalStage extends Model
 {
     use LogsActivity, HasFactory;
 
-    protected $casts = [
-        'blacklisted' => 'boolean',
-        'fraud_alert' => 'boolean',
-    ];
 
-    public function scopeFilter($query, array $filters)
+    public function scopeFilter($query, array $filters): void
     {
         $query->when($filters['search'] ?? null, function ($query, $search) {
             $query->where(function ($query) use ($search) {
@@ -26,14 +23,9 @@ class Shareholder extends Model
         });
     }
 
-    public function createdBy()
+    public function role(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'created_by_id');
-    }
-
-    public function client()
-    {
-        return $this->belongsTo(Client::class, 'client_id');
+        return $this->belongsTo(Role::class,'role_id');
     }
     public function getActivitylogOptions(): LogOptions
     {

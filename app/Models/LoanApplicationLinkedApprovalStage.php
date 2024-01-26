@@ -4,46 +4,39 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
-class LoanApplication extends Model
+class LoanApplicationLinkedApprovalStage extends Model
 {
     use LogsActivity, HasFactory;
 
+    protected $table = 'loan_applications_linked_approval_stages';
     protected $casts = [
-
+        'is_current' => 'boolean',
+        'completed' => 'boolean',
     ];
 
 
-    public function client()
+    public function application(): BelongsTo
     {
-        return $this->belongsTo(Client::class);
+        return $this->belongsTo(LoanApplication::class, 'loan_application_id');
     }
 
-    public function product()
+    public function stage()
     {
-        return $this->belongsTo(LoanProduct::class, 'loan_product_id');
+        return $this->belongsTo(LoanApprovalStage::class, 'loan_approval_stage_id');
     }
 
-    public function staff()
+    public function approver()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'approver_id');
     }
 
-    public function scores()
+    public function assignedBy()
     {
-        return $this->hasMany(LoanApplicationScore::class, 'loan_application_id');
-    }
-
-    public function linkedStages()
-    {
-        return $this->hasMany(LoanApplicationLinkedApprovalStage::class, 'loan_application_id');
-    }
-
-    public function currentLinkedStage()
-    {
-        return $this->belongsTo(LoanApplicationLinkedApprovalStage::class, 'current_loan_application_approval_stage_id');
+        return $this->belongsTo(User::class, 'assigned_by_id');
     }
 
     public function scopeFilter($query, array $filters)
@@ -54,8 +47,8 @@ class LoanApplication extends Model
                     ->orWhere('description', 'like', '%' . $search . '%');
             });
         });
-        $query->when($filters['loan_product_id'] ?? null, function ($query, $loan_category_id) {
-            $query->where('loan_product_id', $loan_category_id);
+        $query->when($filters['loan_category_id'] ?? null, function ($query, $loan_category_id) {
+            $query->where('loan_category_id', $loan_category_id);
         });
         $query->when($filters['status'] ?? null, function ($query, $status) {
             $query->where('status', $status);
@@ -86,17 +79,11 @@ class LoanApplication extends Model
         });
     }
 
-    public function scopeStaff($query, $staffID)
-    {
-        $query->when($staffID, function ($query, $staffID) {
-            $query->where('staff_id', $staffID);
-        });
-    }
-
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
             ->logAll()
             ->logOnlyDirty();
     }
+
 }

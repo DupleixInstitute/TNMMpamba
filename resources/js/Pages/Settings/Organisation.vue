@@ -8,6 +8,12 @@
         <div class=" mx-auto">
             <div class="bg-white rounded shadow overflow-x-auto">
 
+                <inertia-link v-if="can('loans.approval_stages.index')"
+                              class="w-full border-t-2 border-gray-100 font-medium text-gray-600 py-2 px-4 w-full block hover:bg-gray-100 transition duration-150"
+                              :href="route('loan_approval_stages.index')">
+                    <font-awesome-icon icon="cogs" class="w-4 h-4 mr-2"></font-awesome-icon>
+                    Manage Approval Stages
+                </inertia-link>
                 <inertia-link v-if="can('banks')"
                               class="w-full border-t-2 border-gray-100 font-medium text-gray-600 py-2 px-4 w-full block hover:bg-gray-100 transition duration-150"
                               :href="route('banks.index')">

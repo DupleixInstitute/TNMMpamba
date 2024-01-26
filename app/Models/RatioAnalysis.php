@@ -5,12 +5,15 @@ namespace App\Models;
 use Cviebrock\EloquentSluggable\Sluggable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class RatioAnalysis extends Model
 {
-    use HasFactory;
+    use LogsActivity, HasFactory;
 
-protected $table='ratio_analysis';
+    protected $table = 'ratio_analysis';
+
     public function scopeFilter($query, array $filters)
     {
         $query->when($filters['search'] ?? null, function ($query, $search) {
@@ -34,4 +37,12 @@ protected $table='ratio_analysis';
     {
         return $this->hasMany(IncomeStatementData::class);
     }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logAll()
+            ->logOnlyDirty();
+    }
+
 }

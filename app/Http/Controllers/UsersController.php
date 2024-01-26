@@ -314,6 +314,7 @@ class UsersController extends Controller
     {
         $search = $request->s;
         $type = $request->type;
+        $roleID = $request->role_id;
         $id = $request->id;
         $data = User::where(function ($query) use ($search) {
             $query->where('name', 'like', "%$search%");
@@ -323,6 +324,10 @@ class UsersController extends Controller
         })->when($type, function ($query) use ($type) {
             return $query->whereHas('roles', function ($query) use ($type) {
                 $query->where('name', $type);
+            });
+        })->when($roleID, function ($query) use ($roleID) {
+            return $query->whereHas('roles', function ($query) use ($roleID) {
+                $query->where('id', $roleID);
             });
         })->when($id, function ($query) use ($id) {
             return $query->where('id', $id);

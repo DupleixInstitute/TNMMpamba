@@ -441,7 +441,8 @@ class PermissionsTableSeeder extends Seeder
                 'module' => 'Loans',
                 'display_name' => 'View Loan Applications',
                 'guard_name' => 'web',
-            ], [
+            ],
+            [
                 'name' => 'loans.applications.view_assigned_loan_applications_only',
                 'module' => 'Loans',
                 'display_name' => 'View Assigned Loan Applications Only',
@@ -460,6 +461,18 @@ class PermissionsTableSeeder extends Seeder
                 'guard_name' => 'web',
             ],
             [
+                'name' => 'loans.applications.assign_approver',
+                'module' => 'Loans',
+                'display_name' => 'Assign Loan Applications Approvers',
+                'guard_name' => 'web',
+            ],
+            [
+                'name' => 'loans.applications.view_approvals',
+                'module' => 'Loans',
+                'display_name' => 'View Loan Applications Approvals',
+                'guard_name' => 'web',
+            ],
+            [
                 'name' => 'loans.applications.approve',
                 'module' => 'Loans',
                 'display_name' => 'Approve Loan Applications',
@@ -469,6 +482,30 @@ class PermissionsTableSeeder extends Seeder
                 'name' => 'loans.applications.destroy',
                 'module' => 'Loans',
                 'display_name' => 'Delete Loan Applications',
+                'guard_name' => 'web',
+            ],
+            [
+                'name' => 'loans.approval_stages.index',
+                'module' => 'Loans',
+                'display_name' => 'View Loan Approval Stages',
+                'guard_name' => 'web',
+            ],
+            [
+                'name' => 'loans.approval_stages.create',
+                'module' => 'Loans',
+                'display_name' => 'Create Loan Approval Stages',
+                'guard_name' => 'web',
+            ],
+            [
+                'name' => 'loans.approval_stages.update',
+                'module' => 'Loans',
+                'display_name' => 'Update Loan Approval Stages',
+                'guard_name' => 'web',
+            ],
+            [
+                'name' => 'loans.approval_stages.destroy',
+                'module' => 'Loans',
+                'display_name' => 'Delete Loan Approval Stages',
                 'guard_name' => 'web',
             ],
             [

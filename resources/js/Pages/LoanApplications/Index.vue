@@ -28,7 +28,8 @@
                     </div>
                 </div>
             </filter-search>
-            <inertia-link class="btn btn-blue" v-if="can('loans.applications.create')" :href="route('loan_applications.create')">
+            <inertia-link class="btn btn-blue" v-if="can('loans.applications.create')"
+                          :href="route('loan_applications.create')">
                 <span>Create </span>
                 <span class="hidden md:inline">Application</span>
             </inertia-link>
@@ -57,22 +58,25 @@
                     <tr v-for="application in applications.data" :key="application.id"
                         class="hover:bg-gray-100 focus-within:bg-gray-100">
                         <td class="border-t">
-                            <inertia-link class="px-6 py-4 flex items-center" :href="route('loan_applications.show', application.id)"
+                            <inertia-link class="px-6 py-4 flex items-center"
+                                          :href="route('loan_applications.show', application.id)"
                                           tabindex="-1">
                                 {{ application.id }}
                             </inertia-link>
                         </td>
                         <td class="border-t">
                             <inertia-link class="px-6 py-4 flex items-center focus:text-indigo-500"
-                                          :href="route('clients.show', application.client_id)" v-if="application.client">
-                                <img v-if="application.client.profile_photo_url" class="block w-5 h-5 rounded-full mr-2 -my-2"
+                                          :href="route('clients.show', application.client_id)"
+                                          v-if="application.client">
+                                <img v-if="application.client.profile_photo_url"
+                                     class="block w-5 h-5 rounded-full mr-2 -my-2"
                                      :src="application.client.profile_photo_url">
                                 {{ application.client.name }}
                             </inertia-link>
                         </td>
                         <td class="border-t">
                             <span class="px-6 py-4 flex items-center" v-if="application.product">
-                                {{application.product.name}}
+                                {{ application.product.name }}
                             </span>
                         </td>
                         <td class="border-t">
@@ -82,36 +86,47 @@
                         </td>
                         <td class="border-t">
                             <span class="px-6 py-4 flex items-center">
-                                 {{ $filters.formatNumber(application.score) }} ({{$filters.formatNumber(application.score_percentage)}}%)
+                                 {{
+                                    $filters.formatNumber(application.score)
+                                }} ({{ $filters.formatNumber(application.score_percentage) }}%)
                             </span>
                         </td>
-                        <td class="border-t">
-                                 <span class="px-6 py-4 flex items-center">
-                                    <span v-if="application.status=='pending'"
-                                          class="px-2 rounded-full bg-yellow-100 text-yellow-800">
+                        <td class="border-t px-6 py-4">
+                            <div v-if="application.current_linked_stage">
+                                <span
+                                    v-if="application.current_linked_stage.stage">{{
+                                        application.current_linked_stage.stage.name
+                                    }} -</span>
+
+                                <span v-if="application.current_linked_stage.status=='pending'"
+                                      class="px-2 rounded-full bg-yellow-100 text-yellow-800">
                                         pending
                                     </span>
-                                    <span v-if="application.status=='in_progress'"
-                                          class="px-2 rounded-full bg-blue-100 text-blue-800">
+                                <span v-if="application.current_linked_stage.status=='returned'"
+                                      class="px-2 rounded-full bg-yellow-100 text-yellow-800">
+                                        returned
+                                    </span>
+                                <span v-if="application.current_linked_stage.status=='in_progress'"
+                                      class="px-2 rounded-full bg-blue-100 text-blue-800">
                                         in progress
                                     </span>
-                                     <span v-if="application.status=='approved'"
-                                           class="px-2 rounded-full bg-green-100 text-green-800">
+                                <span v-if="application.current_linked_stage.status=='approved'"
+                                      class="px-2 rounded-full bg-green-100 text-green-800">
                                         approved
                                     </span>
-                                    <span v-if="application.status=='done'"
-                                          class="px-2 rounded-full bg-green-100 text-green-800">
+                                <span v-if="application.current_linked_stage.status=='done'"
+                                      class="px-2 rounded-full bg-green-100 text-green-800">
                                         done
                                     </span>
-                                    <span v-if="application.status=='cancelled'"
-                                          class="px-2 rounded-full bg-red-100 text-red-800">
-                                        cancelled
+                                <span v-if="application.current_linked_stage.status=='sent_back'"
+                                      class="px-2 rounded-full bg-yellow-100 text-yellow-800">
+                                        sent back
                                     </span>
-                                     <span v-if="application.status=='rejected'"
-                                           class="px-2 rounded-full bg-red-100 text-red-800">
+                                <span v-if="application.current_linked_stage.status=='rejected'"
+                                      class="px-2 rounded-full bg-red-100 text-red-800">
                                         rejected
                                     </span>
-                                </span>
+                            </div>
                         </td>
                         <td class="border-t">
                             <span class="px-6 py-4 flex items-center">
@@ -130,7 +145,8 @@
                                               tabindex="-1" class="text-indigo-600 hover:text-indigo-900" title="Edit">
                                     <font-awesome-icon icon="edit"/>
                                 </inertia-link>
-                                <a href="#" v-if="can('loans.applications.destroy')" @click="deleteAction(application.id)"
+                                <a href="#" v-if="can('loans.applications.destroy')"
+                                   @click="deleteAction(application.id)"
                                    class="text-red-600 hover:text-red-900" title="Delete">
                                     <font-awesome-icon icon="trash"/>
                                 </a>

@@ -4,10 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class ScoringAttribute extends Model
 {
-    use HasFactory;
+    use LogsActivity, HasFactory;
 
     protected $appends = [
 
@@ -36,6 +38,11 @@ class ScoringAttribute extends Model
     {
         return $this->created_at->diffForHumans();
     }
-
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logAll()
+            ->logOnlyDirty();
+    }
 
 }

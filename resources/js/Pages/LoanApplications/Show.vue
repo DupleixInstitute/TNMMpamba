@@ -5,7 +5,8 @@
                 <inertia-link class="text-indigo-400 hover:text-indigo-600" :href="route('loan_applications.index')">
                     Loan Applications
                 </inertia-link>
-                <span class="text-indigo-400 font-medium">/</span> #{{ application.id }}
+                <span class="text-indigo-400 font-medium">/</span>
+                #{{ application.id }}
             </h2>
         </template>
         <div class=" mx-auto">
@@ -55,72 +56,76 @@
                             </jet-dropdown>
                         </div>
                         <div class="p-5 border-t border-gray-200 dark:border-dark-5">
-                            <div class="flex justify-between">
+                            <div class="grid grid-cols-2 ">
                                 <span class="font-medium">Client</span>
                                 <span>
-                                    <inertia-link class="px-6 py-4 flex items-center focus:text-indigo-500"
-                                                  :href="route('clients.show', application.client_id)"
-                                                  v-if="application.client">
+                                    <inertia-link
+                                        class="px-6 py-4 flex items-center text-indigo-600 focus:text-indigo-500"
+                                        :href="route('clients.show', application.client_id)"
+                                        v-if="application.client">
                                 {{ application.client.name }}
                             </inertia-link>
                                 </span>
                             </div>
-                            <div class="flex justify-between">
+                            <div class="grid grid-cols-2 ">
                                 <span class="font-medium">Product</span>
                                 <span>
-                                    <inertia-link class="px-6 py-4 flex items-center focus:text-indigo-500"
-                                                  :href="route('loan_products.show', application.loan_product_id)"
-                                                  v-if="application.product">
+                                    <inertia-link
+                                        class="px-6 py-4 flex items-center text-indigo-600  focus:text-indigo-500"
+                                        :href="route('loan_products.show', application.loan_product_id)"
+                                        v-if="application.product">
                                 {{ application.product.name }}
                             </inertia-link>
                                 </span>
                             </div>
-                            <div class="flex justify-between">
+                            <div class="grid grid-cols-2 ">
                                 <span class="font-medium">Amount</span>
                                 <span>{{ $filters.formatNumber(application.amount) }}</span>
                             </div>
-                            <div class="flex justify-between">
+                            <div class="grid grid-cols-2 ">
                                 <span class="font-medium">Score</span>
                                 <span> {{
                                         $filters.formatNumber(application.score)
                                     }} ({{ $filters.formatNumber(application.score_percentage) }}%)</span>
                             </div>
-                            <div class="flex justify-between">
-                                <span class="font-medium">Status</span>
-                                <span class="">
-                                     <span v-if="application.status=='pending'"
-                                           class="px-2 rounded-full bg-yellow-100 text-yellow-800">
+                            <div class="grid grid-cols-2 ">
+                                <div class="font-medium">Status</div>
+                                <div v-if="application.current_linked_stage">
+                                      <span
+                                          v-if="application.current_linked_stage.stage">{{
+                                              application.current_linked_stage.stage.name
+                                          }} -</span>
+
+                                    <span v-if="application.current_linked_stage.status=='pending'"
+                                          class="px-2 rounded-full bg-yellow-100 text-yellow-800">
                                         pending
                                     </span>
-                                    <span v-if="application.status=='in_progress'"
+                                    <span v-if="application.current_linked_stage.status=='returned'"
+                                          class="px-2 rounded-full bg-yellow-100 text-yellow-800">
+                                        returned
+                                    </span>
+                                    <span v-if="application.current_linked_stage.status=='in_progress'"
                                           class="px-2 rounded-full bg-blue-100 text-blue-800">
                                         in progress
                                     </span>
-                                     <span v-if="application.status=='approved'"
-                                           class="px-2 rounded-full bg-green-100 text-green-800">
+                                    <span v-if="application.current_linked_stage.status=='approved'"
+                                          class="px-2 rounded-full bg-green-100 text-green-800">
                                         approved
                                     </span>
-                                    <span v-if="application.status=='done'"
+                                    <span v-if="application.current_linked_stage.status=='done'"
                                           class="px-2 rounded-full bg-green-100 text-green-800">
                                         done
                                     </span>
-                                    <span v-if="application.status=='cancelled'"
-                                          class="px-2 rounded-full bg-red-100 text-red-800">
-                                        cancelled
+                                    <span v-if="application.current_linked_stage.status=='sent_back'"
+                                          class="px-2 rounded-full bg-yellow-100 text-yellow-800">
+                                        sent back
                                     </span>
-                                     <span v-if="application.status=='rejected'"
-                                           class="px-2 rounded-full bg-red-100 text-red-800">
+                                    <span v-if="application.current_linked_stage.status=='rejected'"
+                                          class="px-2 rounded-full bg-red-100 text-red-800">
                                         rejected
                                     </span>
-                                </span>
+                                </div>
                             </div>
-                        </div>
-                        <div class="p-5 border-t border-gray-200 dark:border-dark-5 flex">
-                            <button v-if="can('loans.applications.approve')"
-                                    @click="showChangeStatusModal=true"
-                                    type="button" class="btn btn-primary py-1 px-2">
-                                Change Status
-                            </button>
                         </div>
                     </div>
                     <div class="bg-white p-5 mt-5">
@@ -132,6 +137,103 @@
                     </div>
                 </div>
                 <div class="w-full md:w-9/12 p-4 md:ml-4 bg-white">
+                    <div v-if="can('loans.applications.view_approvals')">
+                        <div class="flex justify-between mb-4">
+                            <h2 class="font-semibold text-xl text-gray-800 leading-tight">Approvals</h2>
+                        </div>
+                        <div class="mt-4 overflow-x-auto">
+                            <table class="w-full whitespace-no-wrap table-auto mt-4">
+                                <thead>
+                                <tr class="text-left font-bold">
+                                    <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Name</th>
+                                    <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Approver</th>
+                                    <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Status</th>
+                                    <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Received At</th>
+                                    <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Started At</th>
+                                    <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Finished At</th>
+                                    <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Notes</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr v-for="approval in application.linked_stages"
+                                    class="hover:bg-gray-100 focus-within:bg-gray-100">
+                                    <td class="border-t px-6 py-4">
+                                        <span v-if="approval.stage">{{ approval.stage.name }}</span>
+                                    </td>
+                                    <td class="border-t px-6 py-4">
+                                        <div v-if="approval.approver">
+                                            <inertia-link :href="route('users.show', approval.approver.id)"
+                                                          tabindex="-1" class="text-green-600 hover:text-green-900" title="View">
+                                                {{approval.approver.name}}
+                                            </inertia-link>
+                                        </div>
+                                        <div v-else>
+                                            <button v-if="can('loans.applications.assign_approver')"
+                                                    @click="assignApproverAction(approval.id)"
+                                                    type="button" class="btn btn-primary py-1 px-2">
+                                                Assign
+                                            </button>
+                                            <span v-else>not assigned</span>
+                                        </div>
+                                    </td>
+                                    <td class="border-t px-6 py-4 flex">
+                                         <span v-if="approval.status==='pending'"
+                                               class="px-2 rounded-full bg-yellow-100 text-yellow-800">
+                                        pending
+                                    </span>
+                                        <span v-if="approval.status==='returned'"
+                                              class="px-2 rounded-full bg-yellow-100 text-yellow-800">
+                                        returned
+                                    </span>
+                                        <span v-if="approval.status==='in_progress'"
+                                              class="px-2 rounded-full bg-blue-100 text-blue-800">
+                                        in progress
+                                    </span>
+                                        <span v-if="approval.status==='approved'"
+                                              class="px-2 rounded-full bg-green-100 text-green-800">
+                                        approved
+                                    </span>
+                                        <span v-if="approval.status==='done'"
+                                              class="px-2 rounded-full bg-green-100 text-green-800">
+                                        done
+                                    </span>
+                                        <span v-if="approval.status==='sent_back'"
+                                              class="px-2 rounded-full bg-yellow-100 text-yellow-800">
+                                        sent back
+                                    </span>
+                                        <span v-if="approval.status==='rejected'"
+                                              class="px-2 rounded-full bg-red-100 text-red-800">
+                                        rejected
+                                    </span>
+                                        <button class="ml-2 bg-blue-600 text-white p-1 rounded"
+                                                @click="changeStatusAction(approval.id)"
+                                                v-if="approval.approver_id===$attrs.auth.user.id && approval.is_current && !approval.completed">
+                                            <font-awesome-icon icon="edit"/>
+                                        </button>
+                                    </td>
+                                    <td class="border-t px-6 py-4">
+                                        <span v-if="approval.stage_received_at">{{
+                                                $filters.time(approval.stage_received_at)
+                                            }}</span>
+                                    </td>
+                                    <td class="border-t px-6 py-4">
+                                        <span v-if="approval.stage_started_at">{{
+                                                $filters.time(approval.stage_started_at)
+                                            }}</span>
+                                    </td>
+                                    <td class="border-t px-6 py-4">
+                                        <span v-if="approval.stage_finished_at">{{
+                                                $filters.time(approval.stage_finished_at)
+                                            }}</span>
+                                    </td>
+                                    <td class="border-t px-6 py-4">
+                                        <span class="text-sm">{{ approval.description }}</span>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                     <div class="flex justify-between mb-4">
                         <h2 class="font-semibold text-xl text-gray-800 leading-tight">Scores</h2>
                     </div>
@@ -157,7 +259,8 @@
                                     </td>
                                     <td class="border-t px-6 py-4">
                                         <div v-if="attribute.attribute.field_type==='checkbox'">
-                                            <span class="mr-2 bg-gray-100 p-1" v-for="value in attribute.value">{{value}}</span>
+                                            <span class="mr-2 bg-gray-100 p-1"
+                                                  v-for="value in attribute.value">{{ value }}</span>
                                         </div>
                                         <div v-else>{{ attribute.value }}</div>
 
@@ -227,17 +330,27 @@
                 Change Status
             </template>
             <template #content>
-                <div class="grid grid-cols-1 gap-2 mt-4">
+                <div class="grid grid-cols-1 gap-4 mt-4">
                     <div>
                         <jet-label for="status" value="Status"/>
                         <select
                             class="border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 rounded-md shadow-sm w-full"
-                            name="status" v-model="form.status" id="status"
+                            name="status" v-model="changeStatusForm.status" id="status"
                             required>
                             <option value="pending">Pending</option>
+                            <option value="in_progress">In Progress</option>
                             <option value="approved">Approved</option>
+                            <option value="sent_back">Send Back To Last Stage</option>
                             <option value="rejected">Rejected</option>
                         </select>
+                        <jet-input-error :message="changeStatusForm.errors.status" class="mt-2"/>
+                    </div>
+                    <div>
+                        <jet-label for="description" value="Approval Comments"/>
+                        <textarea-input id="description" class="mt-1 block w-full"
+                                        v-model="changeStatusForm.description"/>
+                        <jet-input-error :message="changeStatusForm.errors.description" class="mt-2"/>
+
                     </div>
                 </div>
             </template>
@@ -248,8 +361,38 @@
                 </jet-secondary-button>
 
                 <jet-success-button class="ml-2" @click.native="changeStatus"
-                                    :class="{ 'opacity-25': form.processing }"
-                                    :disabled="form.processing">
+                                    :class="{ 'opacity-25': changeStatusForm.processing }"
+                                    :disabled="changeStatusForm.processing">
+                    Save
+                </jet-success-button>
+            </template>
+        </jet-dialog-modal>
+        <jet-dialog-modal :show="showAssignApproverModal" @close="showAssignApproverModal = false">
+            <template #title>
+                Assign Approver
+            </template>
+            <template #content>
+                <div class="grid grid-cols-1 gap-2 mt-4">
+                    <div>
+                        <jet-label for="approver_id" value="Approver"/>
+                        <select
+                            class="border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 rounded-md shadow-sm w-full"
+                            name="approver_id" v-model="assignApproverForm.approver_id" id="approver_id"
+                            required>
+                            <option v-for="item in approvers" :value="item.id">{{ item.name }} (#{{ item.id }})</option>
+                        </select>
+                    </div>
+                </div>
+            </template>
+
+            <template #footer>
+                <jet-secondary-button @click.native="showAssignApproverModal = false">
+                    Cancel
+                </jet-secondary-button>
+
+                <jet-success-button class="ml-2" @click.native="assignApprover"
+                                    :class="{ 'opacity-25': assignApproverForm.processing }"
+                                    :disabled="assignApproverForm.processing">
                     Save
                 </jet-success-button>
             </template>
@@ -308,7 +451,6 @@ export default {
     },
     data() {
         return {
-            showChangeStatusModal: false,
             showAddAttributeModal: false,
             confirmItemDeletion: false,
             editingItem: false,
@@ -318,8 +460,20 @@ export default {
             form: this.$inertia.form({
                 status: this.application.status,
             }),
+            assignApproverForm: this.$inertia.form({
+                approver_id: '',
+                stage_id: '',
+            }),
+            changeStatusForm: this.$inertia.form({
+                status: '',
+                stage_id: '',
+                description: '',
+            }),
+            approvers: [],
             readyToSave: false,
             confirmingDeletion: false,
+            showAssignApproverModal: false,
+            showChangeStatusModal: false,
             selectedGroup: null,
             selectedAttribute: null,
             selectedRecord: null,
@@ -336,13 +490,33 @@ export default {
 
     },
     methods: {
+
+        assignApproverAction(id) {
+            this.approvers = [];
+            Object.keys(this.application.linked_stages).forEach(key => {
+                let item = this.application.linked_stages[key]
+                if (item.stage) {
+                    axios.get(this.route('users.search') + "?role_id=" + item.stage.role_id).then(response => {
+                        this.approvers = response.data
+                    })
+                }
+            })
+            this.showAssignApproverModal = true
+            this.assignApproverForm.stage_id = id
+        },
+        assignApprover() {
+            this.assignApproverForm.post(this.route('loan_applications.assign_approver', this.application.id), {
+                preserveState: false,
+            })
+            this.showAssignApproverModal = false
+        },
+        changeStatusAction(id) {
+            this.showChangeStatusModal = true
+            this.changeStatusForm.stage_id = id
+        },
         changeStatus() {
-            this.form.post(this.route('loan_applications.change_status', this.application.id), {
-                preserveScroll: true,
-                onSuccess: () => {
-                    this.showChangeStatusModal = false
-                    this.$inertia.reload()
-                },
+            this.changeStatusForm.post(this.route('loan_applications.change_status', this.application.id), {
+                preserveState: false,
             })
         },
         deleteAction(id) {
@@ -359,6 +533,7 @@ export default {
             this.confirmingDeletion = false
             window.location = route('loan_applications.index')
         },
+
 
     },
     computed: {},

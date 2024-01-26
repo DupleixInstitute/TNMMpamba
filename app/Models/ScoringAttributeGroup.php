@@ -4,10 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class ScoringAttributeGroup extends Model
 {
-    use HasFactory;
+    use LogsActivity, HasFactory;
 
     protected $appends = [
         'total_attributes'
@@ -46,4 +48,11 @@ class ScoringAttributeGroup extends Model
     {
         return ScoringAttribute::where('scoring_attribute_group_id', $this->id)->count();
     }
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logAll()
+            ->logOnlyDirty();
+    }
+
 }

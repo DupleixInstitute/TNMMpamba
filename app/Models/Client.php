@@ -9,10 +9,12 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Laravel\Jetstream\Features;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class Client extends Model
 {
-    use HasFactory;
+    use LogsActivity, HasFactory;
     use SoftDeletes;
 
     protected $appends = [
@@ -243,4 +245,11 @@ class Client extends Model
     {
         return $this->email === 'patient@localhost.com';
     }
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logAll()
+            ->logOnlyDirty();
+    }
+
 }

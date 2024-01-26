@@ -10,7 +10,9 @@ use App\Models\LoanApplication;
 use App\Models\Currency;
 use App\Models\Invoice;
 use App\Models\InvoiceItem;
+use App\Models\LoanApplicationLinkedApprovalStage;
 use App\Models\LoanApplicationScore;
+use App\Models\LoanApprovalStage;
 use App\Models\LoanProduct;
 use App\Models\LoanProductCategory;
 use App\Models\Client;
@@ -18,6 +20,9 @@ use App\Models\LoanProductScoringAttribute;
 use App\Models\LoanProductScoringAttributeOptionValue;
 use App\Models\Setting;
 use App\Models\Tariff;
+use App\Notifications\LoanApplicationApprovalStageAssigned;
+use App\Notifications\LoanApplicationApprovalStageIsCurrent;
+use App\Notifications\LoanApplicationApprovalStageReturned;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
@@ -26,6 +31,7 @@ use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Spatie\Permission\Models\Role;
 use Webit\Util\EvalMath\EvalMath;
+use function React\Promise\Stream\first;
 
 class LoanApplicationsController extends Controller
 {
@@ -49,7 +55,7 @@ class LoanApplicationsController extends Controller
         $staffID = null;
         $nurseID = null;
         $receptionistID = null;
-        $applications = LoanApplication::with(['staff', 'client', 'product'])
+        $applications = LoanApplication::with(['staff', 'client', 'product', 'currentLinkedStage', 'currentLinkedStage.stage', 'currentLinkedStage.approver', 'currentLinkedStage.assignedBy'])
             ->filter(\request()->only('search', 'client_id', 'loan_product_id', 'province_id', 'branch_id', 'district_id', 'ward_id', 'date_range', 'village_id', 'staff_id', 'status'))
             ->orderBy('created_at', 'desc')
             ->paginate(20);
@@ -75,10 +81,10 @@ class LoanApplicationsController extends Controller
     public function create()
     {
         $products = LoanProduct::with(['scoringAttributes', 'scoringAttributes.attribute', 'scoringAttributes.options'])->get();
-
-        $products->each(function (&$product) {
+        $allAttributes = LoanProductScoringAttribute::get();
+        $products->each(function (&$product) use ($allAttributes) {
             $groups = LoanProductScoringAttribute::where('is_group', 1)->where('loan_product_id', $product->id)->get();
-            $groups->transform(function ($group) use ($product) {
+            $groups->transform(function ($group) use ($product, $allAttributes) {
                 $attributes = LoanProductScoringAttribute::with(['attribute'])->where('is_group', 0)->where('scoring_attribute_group_id', $group->scoring_attribute_group_id)->where('loan_product_id', $product->id)->orderBy('order_position')->get();
                 $attributes->transform(function ($item) {
                     if (!empty($item->attribute)) {
@@ -361,6 +367,14 @@ class LoanApplicationsController extends Controller
         $application->score = LoanApplicationScore::where('loan_application_id', $application->id)->sum('score');
         $application->score_percentage = $application->score * 100 / $product->score;
         $application->save();
+        //save linked approval stages
+        $stages = LoanApprovalStage::orderBy('stage_position')->orderBy('id')->get();
+        foreach ($stages as $stage) {
+            $linkedStage = new LoanApplicationLinkedApprovalStage();
+            $linkedStage->loan_application_id = $application->id;
+            $linkedStage->loan_approval_stage_id = $stage->id;
+            $linkedStage->save();
+        }
         event(new LoanApplicationCreated($application));
         activity()
             ->performedOn($application)
@@ -376,7 +390,7 @@ class LoanApplicationsController extends Controller
      */
     public function show(LoanApplication $application)
     {
-        $application->load(['staff', 'client', 'client.shareholders', 'client.industryType', 'client.ratio', 'product']);
+        $application->load(['staff', 'client', 'client.shareholders', 'client.industryType', 'client.ratio', 'product', 'linkedStages', 'linkedStages.stage', 'linkedStages.approver', 'linkedStages.assignedBy', 'currentLinkedStage', 'currentLinkedStage.stage', 'currentLinkedStage.approver', 'currentLinkedStage.assignedBy']);
         $error = '';
         $message = '';
         if ($application->client->type === 'corporate') {
@@ -744,23 +758,79 @@ class LoanApplicationsController extends Controller
 
     public function changeStatus(Request $request, LoanApplication $application)
     {
-        $application->status = $request->status;
-        $application->approved_by_id = Auth::id();
-        if ($application->isDirty('status')) {
-            if ($application->status == 'approved') {
-                $application->approved_at = Carbon::now();
-                $application->amount = $request->amount ?? $application->applied_amount;
-            }
-            if ($application->status == 'rejected') {
-                $application->approved_at = Carbon::now();
+        $application->load(['linkedStages']);
+        $request->validate([
+            'status' => ['required'],
+            'stage_id' => ['required'],
+        ]);
+        $linkedStage = LoanApplicationLinkedApprovalStage::find($request->stage_id);
+        $linkedStage->status = $request->status;
+        $linkedStage->description = $request->description ?: $linkedStage->description;
+        if ($linkedStage->status === 'approved' || $linkedStage->status === 'rejected') {
+            $linkedStage->completed = 1;
+            $linkedStage->stage_finished_at = Carbon::now();
+        }
+        if ($linkedStage->status === 'in_progress') {
+            $linkedStage->stage_started_at = Carbon::now();
+        }
+        $linkedStage->save();
+        $linkedStage->load(['application', 'application.linkedStages']);
+        if ($linkedStage->status === 'sent_back') {
+            $nextStage = $application->linkedStages->where('id', '<', $linkedStage->id)->last();
+            if (!empty($nextStage)) {
+                $nextStage->is_current = 1;
+                $nextStage->status = 'returned';
+                $nextStage->save();
+                $application->current_loan_application_approval_stage_id = $nextStage->id;
+                $application->save();
+                $linkedStage->is_current = 0;
+                $linkedStage->save();
             }
         }
+        if ($linkedStage->status === 'approved') {
+            $nextStage = $application->linkedStages->where('id', '>', $linkedStage->id)->first();
+            if (!empty($nextStage)) {
+                $nextStage->is_current = 1;
+                $nextStage->save();
+                $application->current_loan_application_approval_stage_id = $nextStage->id;
+                $application->save();
+                $linkedStage->is_current = 0;
+                $linkedStage->save();
+            } else {
+                //complete
+                $linkedStage->completed = 1;
+                $linkedStage->save();
+            }
+        }
+        event(new LoanApplicationStatusChanged($linkedStage));
+        return redirect()->route('loan_applications.show', $application->id)->with('success', 'Loan updated successfully.');
+    }
+
+    public function assignApprover(Request $request, LoanApplication $application)
+    {
+        $request->validate([
+            'approver_id' => ['required'],
+            'stage_id' => ['required'],
+        ]);
+        $linkedStage = LoanApplicationLinkedApprovalStage::find($request->stage_id);
+        $linkedStage->approver_id = $request->approver_id;
+        $linkedStage->assigned_by_id = Auth::id();
+        $linkedStage->stage_received_at = Carbon::now();
+        //check if we have current stage
+        if (empty($application->currentLinkedStage)) {
+            if (LoanApplicationLinkedApprovalStage::where('loan_application_id', $application->id)->orderBy('id')->first()->id === $linkedStage->id && !$linkedStage->is_current) {
+                $linkedStage->is_current = 1;
+                $application->current_loan_application_approval_stage_id = $linkedStage->id;
+                $application->current_stage_status = 'pending';
+            }
+        }
+        $linkedStage->save();
         $application->save();
-        activity()
-            ->performedOn($application)
-            ->log('Change Loan Application status');
-        if ($application->wasChanged('status')) {
-            event(new LoanApplicationStatusChanged($application));
+        if ($linkedStage->wasChanged('approver_id')) {
+            event(new LoanApplicationApprovalStageAssigned($linkedStage));
+        }
+        if ($linkedStage->wasChanged('is_current') && $linkedStage->is_current) {
+            event(new LoanApplicationApprovalStageIsCurrent($linkedStage));
         }
         return redirect()->route('loan_applications.show', $application->id)->with('success', 'Loan updated successfully.');
     }

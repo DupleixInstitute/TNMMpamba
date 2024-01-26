@@ -4,10 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class LoanProductScoringAttribute extends Model
 {
-    use HasFactory;
+    use LogsActivity, HasFactory;
 
     protected $casts = [
         'accept_value'=>'array',
@@ -30,6 +32,12 @@ class LoanProductScoringAttribute extends Model
     public function loan()
     {
         return $this->belongsTo(LoanApplication::class, 'loan_id', 'id');
+    }
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logAll()
+            ->logOnlyDirty();
     }
 
 }

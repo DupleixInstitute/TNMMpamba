@@ -5,10 +5,12 @@ namespace App\Models;
 use Cviebrock\EloquentSluggable\Sluggable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class PorterFiveForcesAnalysis extends Model
 {
-    use HasFactory;
+    use LogsActivity, HasFactory;
 
     protected $table = 'porter_five_forces_analysis';
 
@@ -35,4 +37,11 @@ class PorterFiveForcesAnalysis extends Model
     {
         return $this->hasMany(IncomeStatementData::class);
     }
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logAll()
+            ->logOnlyDirty();
+    }
+
 }

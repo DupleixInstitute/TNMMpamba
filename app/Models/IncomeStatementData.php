@@ -5,10 +5,12 @@ namespace App\Models;
 use Cviebrock\EloquentSluggable\Sluggable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class IncomeStatementData extends Model
 {
-    use HasFactory;
+    use LogsActivity, HasFactory;
 
 
     public function scopeFilter($query, array $filters)
@@ -28,4 +30,11 @@ class IncomeStatementData extends Model
     {
         return $this->belongsTo(Client::class, 'client_id');
     }
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logAll()
+            ->logOnlyDirty();
+    }
+
 }
