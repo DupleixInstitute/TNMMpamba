@@ -150,6 +150,7 @@ class Client extends Model
                     ->orWhere('email', 'like', '%' . $search . '%')
                     ->orWhere('mobile', 'like', '%' . $search . '%')
                     ->orWhere('id_number', 'like', '%' . $search . '%')
+                    ->orWhere('trading_name', 'like', '%' . $search . '%')
                     ->orWhere('external_id', 'like', '%' . $search . '%');
             });
         })->when($filters['gender'] ?? null, function ($query, $gender) {
