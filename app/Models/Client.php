@@ -145,14 +145,12 @@ class Client extends Model
     {
         $query->when($filters['search'] ?? null, function ($query, $search) {
             $query->where(function ($query) use ($search) {
-                $query->where('first_name', 'like', '%' . $search . '%')
-                    ->orWhere('last_name', 'like', '%' . $search . '%')
+                $query->where('name', 'like', '%' . $search . '%')
                     ->orWhere('id', 'like', '%' . $search . '%')
                     ->orWhere('email', 'like', '%' . $search . '%')
                     ->orWhere('mobile', 'like', '%' . $search . '%')
                     ->orWhere('id_number', 'like', '%' . $search . '%')
-                    ->orWhere('external_id', 'like', '%' . $search . '%')
-                    ->orWhere('middle_name', 'like', '%' . $search . '%');
+                    ->orWhere('external_id', 'like', '%' . $search . '%');
             });
         })->when($filters['gender'] ?? null, function ($query, $gender) {
             $query->where(function ($query) use ($gender) {
