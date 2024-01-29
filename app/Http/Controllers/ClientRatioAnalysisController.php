@@ -73,7 +73,7 @@ class ClientRatioAnalysisController extends Controller
                 'return_on_investment' => round(($incomeStatement->total_operating_profit / ($sheet->total_assets + $sheet->total_long_term_liabilities)), 2),
                 'gearing_ratio' => !empty($sheet->total_equity)?round($sheet->total_liabilities / $sheet->total_equity, 2):0,
                 'long_term_debt' => !empty($sheet->total_equity)?round($sheet->total_long_term_liabilities / $sheet->total_equity, 2):0,
-                'tangible_net_worth' => !empty($sheet->total_tangible_net_worth)?round($sheet->total_liabilities / $sheet->total_tangible_net_worth, 2):0,
+                'tangible_net_worth' => ($sheet->total_tangible_net_worth>0)?round($sheet->total_liabilities / $sheet->total_tangible_net_worth, 2):0,
                 'total_assets' => !empty($sheet->total_assets)?round($sheet->total_equity / $sheet->total_assets, 2):0,
                 'solvency' => !empty($sheet->total_liabilities) ? round($sheet->total_assets / $sheet->total_liabilities, 2) : 'n/a',
                 'interest_cover' => !empty($incomeStatement->total_net_finance_costs) ? round($incomeStatement->total_operating_profit / $incomeStatement->total_net_finance_costs, 2) : 0,
