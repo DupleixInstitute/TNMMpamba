@@ -24,6 +24,10 @@ class BalanceSheet extends Model
         'total_current_liabilities' => 'double',
         'total_long_term_liabilities' => 'double',
         'total_other_current_assets' => 'double',
+        'total_tangible_net_worth' => 'double',
+        'total_retained_earnings' => 'double',
+        'total_accounts_receivable' => 'double',
+        'total_accounts_payable' => 'double',
         'total_other_assets' => 'double',
         'total_fixed_assets' => 'double',
     ];
