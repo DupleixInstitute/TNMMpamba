@@ -498,4 +498,12 @@ Route::group(['prefix' => 'portal', 'as' => 'portal.'], function () {
     });
 
 });
-
+Route::get('test', function () {
+    $total_tangible_net_worth = 0;
+    $total_liabilities = null;
+    if (!empty($total_tangible_net_worth)) {
+        die('not empty test');
+    } else {
+        die('empty test');
+    }
+});
