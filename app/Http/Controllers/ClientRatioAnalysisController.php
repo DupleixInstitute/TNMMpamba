@@ -35,8 +35,8 @@ class ClientRatioAnalysisController extends Controller
             ->get();
         $data = [
         ];
-        dd($sheets);
         foreach ($sheets as $sheet) {
+            dd($sheet->total_tangible_net_worth);
             $incomeStatement = IncomeStatement::where('year', $sheet->year)->first();
             if (empty($incomeStatement)) {
                 return redirect()->back()->with('error', 'No income statement for year ' . $sheet->year);
