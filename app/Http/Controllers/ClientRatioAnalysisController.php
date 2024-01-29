@@ -35,6 +35,7 @@ class ClientRatioAnalysisController extends Controller
             ->get();
         $data = [
         ];
+        dd($sheets);
         foreach ($sheets as $sheet) {
             $incomeStatement = IncomeStatement::where('year', $sheet->year)->first();
             if (empty($incomeStatement)) {

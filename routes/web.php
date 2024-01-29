@@ -504,6 +504,6 @@ Route::get('test', function () {
     if (!empty($total_tangible_net_worth)) {
         die('not empty test');
     } else {
-        die('empty test');
+        die('empty test yo');
     }
 });
