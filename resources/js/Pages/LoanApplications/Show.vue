@@ -494,12 +494,16 @@ export default {
         assignApproverAction(id) {
             this.approvers = [];
             Object.keys(this.application.linked_stages).forEach(key => {
+
                 let item = this.application.linked_stages[key]
-                if (item.stage) {
-                    axios.get(this.route('users.search') + "?role_id=" + item.stage.role_id).then(response => {
-                        this.approvers = response.data
-                    })
+                if(item.id==id){
+                    if (item.stage) {
+                        axios.get(this.route('users.search') + "?role_id=" + item.stage.role_id).then(response => {
+                            this.approvers = response.data
+                        })
+                    }
                 }
+
             })
             this.showAssignApproverModal = true
             this.assignApproverForm.stage_id = id
