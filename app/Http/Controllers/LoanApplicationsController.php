@@ -827,10 +827,11 @@ class LoanApplicationsController extends Controller
         $linkedStage->save();
         $application->save();
         if ($linkedStage->wasChanged('approver_id')) {
-            event(new LoanApplicationApprovalStageAssigned($linkedStage));
+            $linkedStage->approver->notify(new LoanApplicationApprovalStageAssigned($linkedStage));
+
         }
         if ($linkedStage->wasChanged('is_current') && $linkedStage->is_current) {
-            event(new LoanApplicationApprovalStageIsCurrent($linkedStage));
+            $linkedStage->approver->notify(new LoanApplicationApprovalStageIsCurrent($linkedStage));
         }
         return redirect()->route('loan_applications.show', $application->id)->with('success', 'Loan updated successfully.');
     }
