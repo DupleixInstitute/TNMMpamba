@@ -43,7 +43,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         Schema::defaultStringLength(199);
-        $this->configureEmailSettings();
+        //$this->configureEmailSettings();
         if (Schema::hasTable('settings')) {
             try {
                 $purchaseCode = Setting::where('setting_key', 'purchase_code')->first()->setting_value;
