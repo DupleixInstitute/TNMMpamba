@@ -779,11 +779,13 @@ class LoanApplicationsController extends Controller
             $nextStage = $application->linkedStages->where('id', '<', $linkedStage->id)->last();
             if (!empty($nextStage)) {
                 $nextStage->is_current = 1;
+                $nextStage->completed = 0;
                 $nextStage->status = 'returned';
                 $nextStage->save();
                 $application->current_loan_application_approval_stage_id = $nextStage->id;
                 $application->save();
                 $linkedStage->is_current = 0;
+                $linkedStage->completed = 0;
                 $linkedStage->save();
             }
         }
@@ -796,11 +798,10 @@ class LoanApplicationsController extends Controller
                 $application->save();
                 $linkedStage->is_current = 0;
                 $linkedStage->save();
-            } else {
-                //complete
-                $linkedStage->completed = 1;
-                $linkedStage->save();
             }
+            //complete
+            $linkedStage->completed = 1;
+            $linkedStage->save();
         }
         event(new LoanApplicationStatusChanged($linkedStage));
         return redirect()->route('loan_applications.show', $application->id)->with('success', 'Loan updated successfully.');
