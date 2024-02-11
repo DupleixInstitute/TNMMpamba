@@ -193,6 +193,10 @@
                                               class="px-2 rounded-full bg-green-100 text-green-800">
                                         approved
                                     </span>
+                                     <span v-if="approval.status==='recommend'"
+                                              class="px-2 rounded-full bg-green-100 text-green-800">
+                                        Recommended
+                                    </span>
                                         <span v-if="approval.status==='done'"
                                               class="px-2 rounded-full bg-green-100 text-green-800">
                                         done
@@ -339,6 +343,7 @@
                             required>
                             <option value="pending">Pending</option>
                             <option value="in_progress">In Progress</option>
+                             <option value="recommend">Recommend</option>
                             <option value="approved">Approved</option>
                             <option value="sent_back">Send Back To Last Stage</option>
                             <option value="rejected">Rejected</option>

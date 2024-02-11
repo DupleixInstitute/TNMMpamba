@@ -787,7 +787,7 @@ class LoanApplicationsController extends Controller
                 $linkedStage->save();
             }
         }
-        if ($linkedStage->status === 'approved') {
+        if ($linkedStage->status === 'approved' || $linkedStage->status === 'recommend') {
             $nextStage = $application->linkedStages->where('id', '>', $linkedStage->id)->first();
             if (!empty($nextStage)) {
                 $nextStage->is_current = 1;
@@ -797,7 +797,12 @@ class LoanApplicationsController extends Controller
                 $linkedStage->is_current = 0;
                 $linkedStage->save();
             } else {
-                //complete
+                //if we don't have a next stage, then the application is complete
+                //if status selected is recommend and its the last stage, update the application status to approved
+                if ($linkedStage->status === 'recommend') {
+                    $linkedStage->status = 'approved';
+
+                }
                 $linkedStage->completed = 1;
                 $linkedStage->save();
             }
