@@ -766,8 +766,8 @@ class LoanApplicationsController extends Controller
         $linkedStage = LoanApplicationLinkedApprovalStage::find($request->stage_id);
         $linkedStage->status = $request->status;
         $linkedStage->description = $request->description ?: $linkedStage->description;
-        if ($linkedStage->status === 'approved' || $linkedStage->status === 'rejected') {
-            $linkedStage->completed = 1;
+        if ($linkedStage->status === 'approved' || $linkedStage->status === 'rejected'   || $linkedStage->status === 'recommend') {
+            $linkedStage->status != 'recommend' ?  $linkedStage->completed = 1 : $linkedStage->completed = 0;
             $linkedStage->stage_finished_at = Carbon::now();
         }
         if ($linkedStage->status === 'in_progress') {
