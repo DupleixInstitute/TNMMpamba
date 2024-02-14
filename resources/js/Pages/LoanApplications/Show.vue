@@ -78,6 +78,13 @@
                             </inertia-link>
                                 </span>
                             </div>
+
+                            <div class="grid grid-cols-2 mt-2 mb-2 ">
+                                <span class="font-medium">Product Description</span>
+                                <span>
+                                    {{ application.product_description ? application.product_description : 'N/A' }}
+                                </span>
+                            </div>
                             <div class="grid grid-cols-2 ">
                                 <span class="font-medium">Amount</span>
                                 <span>{{ $filters.formatNumber(application.amount) }}</span>
@@ -130,7 +137,7 @@
                     </div>
                     <div class="bg-white p-5 mt-5">
                         <div class="flex items-center">
-                            <div class="font-medium text-lg">Description</div>
+                            <div class="font-medium text-lg">Loan Motivation</div>
                         </div>
 
                         <div class="mt-4">{{ application.description }}</div>

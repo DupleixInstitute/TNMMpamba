@@ -42,6 +42,14 @@
                             <jet-input-error :message="form.errors.date" class="mt-2"/>
 
                         </div>
+
+
+                        <div>
+                            <jet-label for="product_description" value="Product Description"/>
+                            <textarea-input id="product_description" class="mt-1 block w-full"
+                                            v-model="form.product_description"/>
+                            <jet-input-error :message="form.errors.product_description" class="mt-2"/>
+                        </div>
                     </div>
                     <div class="mt-4">
                         <div v-for="(group,parentIndex) in form.attributes" class="mb-4">
@@ -118,7 +126,7 @@
                         </div>
                     </div>
                     <div class="mt-4">
-                        <jet-label for="description" value="Description"/>
+                        <jet-label for="description" value="Loan Motivation"/>
                         <textarea-input id="description" class="mt-1 block w-full"
                                         v-model="form.description"/>
                         <jet-input-error :message="form.errors.description" class="mt-2"/>
@@ -203,6 +211,7 @@ export default {
                 loan_category_id: this.application.loan_category_id,
                 amount: this.application.amount,
                 description: this.application.description,
+                product_description: this.application.product_description,
                 date: this.application.date,
                 status: this.application.status,
                 attributes: JSON.parse(JSON.stringify(this.application.product.form_attributes))

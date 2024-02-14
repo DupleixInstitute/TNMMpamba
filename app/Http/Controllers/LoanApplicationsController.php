@@ -116,6 +116,7 @@ class LoanApplicationsController extends Controller
      */
     public function store(Request $request)
     {
+
         $request->validate([
             'client_id' => ['required'],
             'amount' => ['required'],
@@ -140,6 +141,7 @@ class LoanApplicationsController extends Controller
         $application->amount = $request->amount;
         $application->applied_amount = $request->amount;
         $application->description = $request->description;
+        $application->product_description = $request->product_description;
         $application->save();
         //save scores
         foreach ($attributes as $group) {
@@ -523,6 +525,7 @@ class LoanApplicationsController extends Controller
         $application->date = $request->date;
         $application->amount = $request->amount;
         $application->description = $request->description;
+        $application->product_description = $request->product_description;
         $application->save();
         //save scores
         LoanApplicationScore::where('loan_application_id', $application->id)->delete();

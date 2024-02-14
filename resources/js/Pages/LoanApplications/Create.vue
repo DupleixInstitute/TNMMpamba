@@ -30,6 +30,16 @@
                         />
                         <jet-input-error :message="form.errors.loan_product_id" class="mt-2"/>
                     </div>
+
+
+                    <div class="mt-4">
+                        <jet-label for="product_description" value="Product Description"/>
+                        <textarea-input id="product_description" class="mt-1 block w-full"
+                                        v-model="form.product_description"
+                                        required
+                                        />
+                        <jet-input-error :message="form.errors.product_description" class="mt-2"/>
+                    </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mt-4">
                         <div>
                             <jet-label for="amount" value="Amount"/>
@@ -126,7 +136,7 @@
                         </div>
                     </div>
                     <div class="mt-4">
-                        <jet-label for="description" value="Description"/>
+                        <jet-label for="description" value="Loan Motivation"/>
                         <textarea-input id="description" class="mt-1 block w-full"
                                         v-model="form.description"/>
                         <jet-input-error :message="form.errors.description" class="mt-2"/>
@@ -216,7 +226,8 @@ export default {
                 description: null,
                 date: moment().format("YYYY-MM-DD"),
                 status: 'pending',
-                attributes: []
+                product_description: null,
+                attributes: [],
             }),
             usersMultiSelect: {
                 value: null,
