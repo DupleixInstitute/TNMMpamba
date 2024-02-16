@@ -2,36 +2,38 @@
 
 namespace App\Http\Controllers;
 
-use App\Events\LoanApplicationCreated;
-use App\Events\LoanApplicationStatusChanged;
-use App\Events\LoanCreated;
-use App\Events\LoanStatusChanged;
-use App\Models\LoanApplication;
-use App\Models\Currency;
-use App\Models\Invoice;
-use App\Models\InvoiceItem;
-use App\Models\LoanApplicationLinkedApprovalStage;
-use App\Models\LoanApplicationScore;
-use App\Models\LoanApprovalStage;
-use App\Models\LoanProduct;
-use App\Models\LoanProductCategory;
+use Carbon\Carbon;
+use App\Models\User;
+use Inertia\Inertia;
 use App\Models\Client;
-use App\Models\LoanProductScoringAttribute;
-use App\Models\LoanProductScoringAttributeOptionValue;
-use App\Models\Setting;
 use App\Models\Tariff;
+use App\Models\Invoice;
+use App\Models\Setting;
+use App\Models\Currency;
+use App\Events\LoanCreated;
+use App\Models\InvoiceItem;
+use App\Models\LoanProduct;
+use Illuminate\Http\Request;
+use App\Models\LoanApplication;
+use App\Events\LoanStatusChanged;
+use App\Models\LoanApprovalStage;
+use Webit\Util\EvalMath\EvalMath;
+use Spatie\Permission\Models\Role;
+use App\Models\LoanProductCategory;
+use Illuminate\Support\Facades\App;
+use App\Models\LoanApplicationScore;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
+use App\Events\LoanApplicationCreated;
+use function React\Promise\Stream\first;
+use Illuminate\Database\Eloquent\Builder;
+use App\Models\LoanProductScoringAttribute;
+use App\Events\LoanApplicationStatusChanged;
+use App\Mail\LoanApplicationApprovalStageReturned;
+use App\Models\LoanApplicationLinkedApprovalStage;
+use App\Models\LoanProductScoringAttributeOptionValue;
 use App\Notifications\LoanApplicationApprovalStageAssigned;
 use App\Notifications\LoanApplicationApprovalStageIsCurrent;
-use App\Notifications\LoanApplicationApprovalStageReturned;
-use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\Auth;
-use Inertia\Inertia;
-use Spatie\Permission\Models\Role;
-use Webit\Util\EvalMath\EvalMath;
-use function React\Promise\Stream\first;
 
 class LoanApplicationsController extends Controller
 {
@@ -761,6 +763,7 @@ class LoanApplicationsController extends Controller
 
     public function changeStatus(Request $request, LoanApplication $application)
     {
+
         $application->load(['linkedStages']);
         $request->validate([
             'status' => ['required'],
@@ -779,7 +782,10 @@ class LoanApplicationsController extends Controller
         $linkedStage->save();
         $linkedStage->load(['application', 'application.linkedStages']);
         if ($linkedStage->status === 'sent_back') {
+
+
             $nextStage = $application->linkedStages->where('id', '<', $linkedStage->id)->last();
+
             if (!empty($nextStage)) {
                 $nextStage->is_current = 1;
                 $nextStage->completed = 0;
@@ -790,6 +796,17 @@ class LoanApplicationsController extends Controller
                 $linkedStage->is_current = 0;
                 $linkedStage->completed = 0;
                 $linkedStage->save();
+
+                //get the user to send email to him/her
+                $user = User::find($nextStage->approver_id);
+                //create a mailable object
+                $mailData = [
+                    'application' => $application,
+                    'to' => $user->email,
+                    'message' => 'A loan application has been returned to you for further review. Please login to the system to review the application and take the necessary action.'
+                ];
+                //send the email
+                Mail::to($user->email)->send(new LoanApplicationApprovalStageReturned($mailData));
             }
         }
         if ($linkedStage->status === 'approved' || $linkedStage->status === 'recommend') {
