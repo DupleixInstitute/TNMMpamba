@@ -34,6 +34,14 @@ class DashboardController extends Controller
 
     public function index()
     {
+        //check if it is the first time the user is logging in
+       if (Auth::user()->first_attempt === 'yes') {
+              //update the first_attempt column to no
+                Auth::user()->first_attempt = 'no';
+                Auth::user()->save();
+           return redirect()->route('profile.show')
+           ->with('success', 'Welcome to your dashboard. Please update your password and profile to continue.');
+         }
         $clients = Client::count();
         $applications = LoanApplication::count();
         $applicationsPending = LoanApplication::where('status', 'pending')->count();

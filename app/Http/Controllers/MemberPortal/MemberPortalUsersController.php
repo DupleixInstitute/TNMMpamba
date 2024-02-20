@@ -65,7 +65,7 @@ class MemberPortalUsersController extends Controller
         ]);
     }
 
-    public function profile(Request $request)
+    public function profile(Request $request, $show)
     {
         return Inertia::render('MemberPortal/Profile/Show', [
             'sessions' => $this->sessions($request)->all(),
