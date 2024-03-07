@@ -43,8 +43,9 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mt-4">
                         <div>
                             <jet-label for="amount" value="Amount"/>
-                            <jet-input id="amount" type="text" class="block w-full"
-                                       v-model="form.amount"
+                            <jet-input id="amount" type="number" min="0.10" step="0.01"
+                            class="block w-full"
+                                       v-model.number="form.amount"
                                        required/>
                             <jet-input-error :message="form.errors.amount" class="mt-2"/>
                         </div>

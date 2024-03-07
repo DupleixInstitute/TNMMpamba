@@ -162,8 +162,10 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <tr v-for="approval in application.linked_stages"
+                                <tr  v-for="approval in application.linked_stages"
                                     class="hover:bg-gray-100 focus-within:bg-gray-100">
+
+
                                     <td class="border-t px-6 py-4">
                                         <span v-if="approval.stage">{{ approval.stage.name }}</span>
                                     </td>
@@ -175,11 +177,11 @@
                                             </inertia-link>
                                         </div>
                                         <div v-else>
-                                            <button v-if="can('loans.applications.assign_approver')"
-                                                    @click="assignApproverAction(approval.id)"
-                                                    type="button" class="btn btn-primary py-1 px-2">
-                                                Assign
-                                            </button>
+                                            <button v-if="can('loans.applications.assign_approver') && approval.status !== 'approved'"
+                                            @click="assignApproverAction(approval.id)"
+                                            type="button" class="btn btn-primary py-1 px-2">
+                                             Assign
+                                              </button>
                                             <span v-else>not assigned</span>
                                         </div>
                                     </td>

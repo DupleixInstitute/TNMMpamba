@@ -51,11 +51,15 @@ class RolesController extends Controller
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'display_name' => ['required', 'string', 'max:255'],
+            // 'send_email_to_role_members' => 'nullable|boolean',
+            // 'group_email' => 'nullable|email',
         ]);
         $role = Role::create([
             'name' => $request->name,
             'display_name' => $request->display_name,
             'guard_name' => 'web',
+            // 'send_email_to_role_members' => $request->send_email_to_role_members,
+            // 'group_email' => $request->group_email,
         ]);
         $role->syncPermissions($request->permissions);
 

@@ -29,6 +29,23 @@
                                 <jet-input-error :message="form.errors.display_name" class="mt-2"/>
                             </div>
                         </div>
+
+                        <div class="grid grid-cols-2 space-x-4">
+                            <div style="display: flex; align-items: center; ">
+                                <jet-label for="send_email_to_role_members" value="Send email to all in role level?"/>
+                                <div>
+                                    <input id="send_email_to_role_members" type="checkbox" v-model="form.send_email_to_role_members" class="ml-4"/>
+                                    <jet-input-error :message="form.errors.send_email_to_role_members" class="mt-2"/>
+                                </div>
+                            </div>
+                            <div class="">
+                                <jet-label for="group_email" value="Group Email"/>
+                                <jet-input id="group_email" type="text" class="mt-1 block w-full"
+                                           v-model="form.group_email"
+                                           required/>
+                                <jet-input-error :message="form.errors.group_email" class="mt-2"/>
+                            </div>
+                        </div>
                         <div class="grid grid-cols-1 mt-4">
                             <div v-for="(permissionCat,key) in permissions">
                                 <h3 class="mt-4">{{ key }}</h3>
@@ -94,6 +111,8 @@ export default {
                 name: null,
                 display_name: null,
                 permissions: [],
+                send_email_to_role_members: false,
+                group_email: null,
             }),
             pageTitle: "Create Role",
             pageDescription: "Create Role",

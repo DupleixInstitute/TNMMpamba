@@ -764,6 +764,7 @@ class LoanApplicationsController extends Controller
     public function changeStatus(Request $request, LoanApplication $application)
     {
 
+
         $application->load(['linkedStages']);
         $request->validate([
             'status' => ['required'],
@@ -771,8 +772,9 @@ class LoanApplicationsController extends Controller
         ]);
         $linkedStage = LoanApplicationLinkedApprovalStage::find($request->stage_id);
         $linkedStage->status = $request->status;
+
         $linkedStage->description = $request->description ?: $linkedStage->description;
-        if ($linkedStage->status === 'approved' || $linkedStage->status === 'rejected'   || $linkedStage->status === 'recommend') {
+        if ($linkedStage->status === 'approved' || $linkedStage->status === 'rejected' || $linkedStage->status === 'recommend') {
             $linkedStage->status != 'recommend' ?  $linkedStage->completed = 1 : $linkedStage->completed = 0;
             $linkedStage->stage_finished_at = Carbon::now();
         }
@@ -811,7 +813,15 @@ class LoanApplicationsController extends Controller
         }
         if ($linkedStage->status === 'approved' || $linkedStage->status === 'recommend') {
             $nextStage = $application->linkedStages->where('id', '>', $linkedStage->id)->first();
-            if (!empty($nextStage)) {
+
+            //if the status is approved , update the application status to approved and   there is no need to send the application to the next stage
+            if ($linkedStage->status === 'approved') {
+                $linkedStage->completed = 1;
+                $linkedStage->save();
+                $application->current_loan_application_approval_stage_id = $linkedStage->id;
+                $application->save();
+            }
+            elseif (!empty($nextStage) and $linkedStage->status === 'recommend' ) {
                 $nextStage->is_current = 1;
                 $nextStage->save();
                 $application->current_loan_application_approval_stage_id = $nextStage->id;
