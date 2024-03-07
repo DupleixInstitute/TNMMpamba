@@ -20,6 +20,7 @@ class LoanFilesController extends Controller
     }
     public function index(LoanApplication $loan)
     {
+        dd($loan);
 
         $files = File::where('record_id', $loan->id)
             ->where('category', 'loans')

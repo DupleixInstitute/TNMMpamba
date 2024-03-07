@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Carbon\Carbon;
 use App\Models\User;
 use Inertia\Inertia;
+use App\Models\Branch;
 use App\Models\Client;
 use App\Models\Tariff;
 use App\Models\Invoice;
@@ -57,7 +58,7 @@ class LoanApplicationsController extends Controller
         $staffID = null;
         $nurseID = null;
         $receptionistID = null;
-        $applications = LoanApplication::with(['staff', 'client', 'product', 'currentLinkedStage', 'currentLinkedStage.stage', 'currentLinkedStage.approver', 'currentLinkedStage.assignedBy'])
+        $applications = LoanApplication::with(['staff', 'client', 'product', 'currentLinkedStage', 'currentLinkedStage.stage', 'currentLinkedStage.approver', 'currentLinkedStage.assignedBy', 'branch'])
             ->filter(\request()->only('search', 'client_id', 'loan_product_id', 'province_id', 'branch_id', 'district_id', 'ward_id', 'date_range', 'village_id', 'staff_id', 'status'))
             ->orderBy('created_at', 'desc')
             ->paginate(20);
@@ -65,6 +66,12 @@ class LoanApplicationsController extends Controller
             'filters' => \request()->all('search', 'client_id', 'loan_product_id', 'province_id', 'branch_id', 'district_id', 'ward_id', 'date_range', 'village_id', 'staff_id', 'status'),
             'applications' => $applications,
             'products' => LoanProduct::get()->map(function ($item) {
+                return [
+                    'value' => $item->id,
+                    'label' => $item->name
+                ];
+            }),
+            'branches' => Branch::get()->map(function ($item) {
                 return [
                     'value' => $item->id,
                     'label' => $item->name
@@ -772,6 +779,7 @@ class LoanApplicationsController extends Controller
         ]);
         $linkedStage = LoanApplicationLinkedApprovalStage::find($request->stage_id);
         $linkedStage->status = $request->status;
+        // $linkedStage->stage_started_at = Carbon::now();
 
         $linkedStage->description = $request->description ?: $linkedStage->description;
         if ($linkedStage->status === 'approved' || $linkedStage->status === 'rejected' || $linkedStage->status === 'recommend') {
@@ -853,6 +861,8 @@ class LoanApplicationsController extends Controller
         $linkedStage->approver_id = $request->approver_id;
         $linkedStage->assigned_by_id = Auth::id();
         $linkedStage->stage_received_at = Carbon::now();
+        $linkedStage->stage_started_at = Carbon::now();
+
         //check if we have current stage
         if (empty($application->currentLinkedStage)) {
             if (LoanApplicationLinkedApprovalStage::where('loan_application_id', $application->id)->orderBy('id')->first()->id === $linkedStage->id && !$linkedStage->is_current) {

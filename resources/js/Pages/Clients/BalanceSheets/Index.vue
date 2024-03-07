@@ -52,6 +52,7 @@
                             </tr>
                             <tr v-for="sheet in sheets.data" :key="sheet.id"
                                 class="hover:bg-gray-100 focus-within:bg-gray-100">
+
                                 <td class="border-t">
                                     <span class="px-6 py-4 flex items-center">
                                     {{ sheet.year }}
@@ -65,17 +66,18 @@
                                 </td>
                                 <td class="border-t">
                                     <span class="px-6 py-4 flex items-center">
-                                    {{ $filters.currency(sheet.total_assets) }}
+                                        {{ numberFormat(sheet.total_assets) }}
+
                                     </span>
                                 </td>
                                 <td class="border-t">
                                     <span class="px-6 py-4 flex items-center">
-                                    {{ $filters.currency(sheet.total_liabilities) }}
+                                    {{ numberFormat(sheet.total_liabilities) }}
                                     </span>
                                 </td>
                                 <td class="border-t">
                                     <span class="px-6 py-4 flex items-center">
-                                    {{ $filters.currency(sheet.total_working_capital) }}
+                                    {{ numberFormat(sheet.total_working_capital) }}
                                     </span>
                                 </td>
                                 <td class="border-t w-px pr-2">
@@ -186,6 +188,10 @@ export default {
             this.$inertia.delete(this.route('clients.balance_sheets.destroy', this.selectedRecord))
             this.confirmingDeletion = false
         },
+        numberFormat(value) {
+            return new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(value);
+        },
+
     },
 }
 </script>
@@ -193,3 +199,5 @@ export default {
 <style scoped>
 
 </style>
+
+

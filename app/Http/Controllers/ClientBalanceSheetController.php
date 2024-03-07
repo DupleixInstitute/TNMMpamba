@@ -27,6 +27,7 @@ class ClientBalanceSheetController extends Controller
         $sheets = BalanceSheet::where('client_id', $client->id)
             ->orderBy('created_at', 'desc')
             ->paginate(20);
+
         return Inertia::render('Clients/BalanceSheets/Index', [
             'client' => $client,
             'sheets' => $sheets,

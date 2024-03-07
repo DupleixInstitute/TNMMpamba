@@ -52,7 +52,7 @@
                                                 </span>
                                                 </td>
                                                 <td class="border-t px-6 py-4">
-                                                    <jet-input id="name" @keyup="updateTotal" type="number"
+                                                    <jet-input id="name" @keyup="updateTotal" type="number" step="0.01" min="0"
                                                                class="mt-1 block w-full"
                                                                v-model="item.amount"/>
                                                 </td>
@@ -66,7 +66,7 @@
                                                 </td>
                                                 <td class="border-t px-6 py-4 text-right">
                                                     <span class="font-bold">{{
-                                                            $filters.currency(form.total_current_assets)
+                                                           numberFormat(form.total_current_assets)
                                                         }}</span>
                                                 </td>
                                             </tr>
@@ -78,7 +78,7 @@
                                                 </span>
                                                 </td>
                                                 <td class="border-t px-6 py-4">
-                                                    <jet-input id="name" @keyup="updateTotal" type="number"
+                                                    <jet-input id="name" @keyup="updateTotal" type="number" step="0.01" min="0"
                                                                class="mt-1 block w-full"
                                                                v-model="item.amount"/>
                                                 </td>
@@ -96,7 +96,7 @@
                                                     </span>
                                                 </td>
                                                 <td class="border-t px-6 py-4">
-                                                    <jet-input id="name" @keyup="updateTotal" type="number"
+                                                    <jet-input id="name" @keyup="updateTotal" type="number" step="0.01" min="0"
                                                                class="mt-1 block w-full"
                                                                v-model="item.amount"/>
                                                 </td>
@@ -110,7 +110,7 @@
                                                 </td>
                                                 <td class="border-t px-6 py-4 text-right">
                                                     <span class="font-bold">{{
-                                                            $filters.currency(form.total_fixed_assets)
+                                                           numberFormat(form.total_fixed_assets)
                                                         }}</span>
                                                 </td>
                                             </tr>
@@ -127,7 +127,7 @@
                                                 </span>
                                                 </td>
                                                 <td class="border-t px-6 py-4">
-                                                    <jet-input id="name" @keyup="updateTotal" type="number"
+                                                    <jet-input id="name" @keyup="updateTotal" type="number" step="0.01" min="0"
                                                                class="mt-1 block w-full"
                                                                v-model="item.amount"/>
                                                 </td>
@@ -140,7 +140,7 @@
                                         class="bg-blue-950 text-white p-4 grid grid-cols-2 font-bold absolute bottom-0 w-full">
                                         <h4>Total Assets</h4>
                                         <h4 class="text-right">{{
-                                                $filters.currency(form.total_assets)
+                                               numberFormat(form.total_assets)
                                             }}</h4>
                                     </div>
                                 </div>
@@ -164,7 +164,7 @@
                                                 </span>
                                                 </td>
                                                 <td class="border-t px-6 py-4">
-                                                    <jet-input id="name" @keyup="updateTotal" type="number"
+                                                    <jet-input id="name" @keyup="updateTotal" type="number" step="0.01" min="0"
                                                                class="mt-1 block w-full"
                                                                v-model="item.amount"/>
                                                 </td>
@@ -178,7 +178,7 @@
                                                 </td>
                                                 <td class="border-t px-6 py-4 text-right">
                                                     <span class="font-bold">{{
-                                                            $filters.currency(form.total_current_liabilities)
+                                                           numberFormat(form.total_current_liabilities)
                                                         }}</span>
                                                 </td>
                                             </tr>
@@ -195,7 +195,7 @@
                                                     </span>
                                                 </td>
                                                 <td class="border-t px-6 py-4">
-                                                    <jet-input id="name" @keyup="updateTotal" type="number"
+                                                    <jet-input id="name" @keyup="updateTotal" type="number" step="0.01" min="0"
                                                                class="mt-1 block w-full"
                                                                v-model="item.amount"/>
                                                 </td>
@@ -209,7 +209,7 @@
                                                 </td>
                                                 <td class="border-t px-6 py-4 text-right">
                                                     <span class="font-bold">{{
-                                                            $filters.currency(form.total_long_term_liabilities)
+                                                           numberFormat(form.total_long_term_liabilities)
                                                         }}</span>
                                                 </td>
                                             </tr>
@@ -222,7 +222,7 @@
                                                 </td>
                                                 <td class="border-t px-6 py-4 text-right">
                                                     <span class="font-bold">{{
-                                                            $filters.currency(form.total_current_liabilities+form.total_long_term_liabilities)
+                                                           numberFormat(form.total_current_liabilities+form.total_long_term_liabilities)
                                                         }}</span>
                                                 </td>
                                             </tr>
@@ -245,7 +245,7 @@
                                                 </span>
                                                 </td>
                                                 <td class="border-t px-6 py-4">
-                                                    <jet-input id="name" @keyup="updateTotal" type="number"
+                                                    <jet-input id="name" @keyup="updateTotal" type="number" step="0.01" min="0"
                                                                class="mt-1 block w-full"
                                                                v-model="item.amount"/>
                                                 </td>
@@ -259,7 +259,7 @@
                                                 </td>
                                                 <td class="border-t px-6 py-4 text-right">
                                                     <span class="font-bold">{{
-                                                            $filters.currency(form.total_equity)
+                                                           numberFormat(form.total_equity)
                                                         }}</span>
                                                 </td>
                                             </tr>
@@ -269,7 +269,7 @@
                                     <div class="bg-blue-950 text-white p-4 grid grid-cols-2 font-bold  bottom-0 w-ful">
                                         <h4>Total Equity/Liabilities</h4>
                                         <h4 class="text-right">{{
-                                                $filters.currency(form.total_equity_liabilities)
+                                               numberFormat(form.total_equity_liabilities)
                                             }}</h4>
                                     </div>
                                 </div>
@@ -462,7 +462,11 @@ export default {
             this.form.total_liabilities = this.form.total_current_liabilities + this.form.total_long_term_liabilities;
             this.form.total_equity_liabilities =  this.form.total_liabilities+ this.form.total_equity;
 
-        }
+        },
+        numberFormat(value) {
+            return new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(value);
+        },
+
     },
 }
 </script>

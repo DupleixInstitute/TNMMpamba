@@ -2,10 +2,11 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use App\Models\Branch;
 use Spatie\Activitylog\LogOptions;
+use Illuminate\Database\Eloquent\Model;
 use Spatie\Activitylog\Traits\LogsActivity;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class LoanApplication extends Model
 {
@@ -98,5 +99,9 @@ class LoanApplication extends Model
         return LogOptions::defaults()
             ->logAll()
             ->logOnlyDirty();
+    }
+    public function branch()
+    {
+        return $this->belongsTo(Branch::class);
     }
 }

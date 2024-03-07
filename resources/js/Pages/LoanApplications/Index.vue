@@ -26,6 +26,14 @@
                             :options="products"
                         />
                     </div>
+                    <div class="mb-2">
+                        <jet-label for="branch_id" value="Branch"/>
+                        <Multiselect
+                            id="branch_id"
+                            v-model="form.branch_id"
+                            :options="branches"
+                        />
+                    </div>
                 </div>
             </filter-search>
             <inertia-link class="btn btn-blue" v-if="can('loans.applications.create')"
@@ -46,6 +54,8 @@
                         <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Score</th>
                         <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Status</th>
                         <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Date</th>
+                        <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Branch</th>
+
                         <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Action</th>
                     </tr>
                     </thead>
@@ -133,6 +143,11 @@
                                  {{ application.date }}
                             </span>
                         </td>
+                        <td class="border-t">
+                            <span class="px-6 py-4 flex items-center">
+                                 {{ application.branch.name }}
+                            </span>
+                        </td>
 
                         <td class="border-t w-px pr-2">
                             <div class=" flex items-center gap-4">
@@ -218,6 +233,7 @@ export default {
         applications: Object,
         filters: Object,
         products: Object,
+        branches: Object,
 
     },
     data() {

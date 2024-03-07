@@ -87,7 +87,7 @@
                                     </span>
                                     </td>
                                     <td class="border-t px-6 py-4 text-right">
-                                        <span class="font-bold">{{ $filters.currency(form.total_sales) }}</span>
+                                        <span class="font-bold">{{numberFormat(form.total_sales) }}</span>
                                     </td>
                                 </tr>
                                 <tr v-for="(item,index) in form.charts.sales" :key="index"
@@ -98,7 +98,7 @@
                                     </span>
                                     </td>
                                     <td class="border-t px-6 py-4">
-                                        <jet-input id="name" @keyup="updateTotal" type="number"
+                                        <jet-input id="name" @keyup="updateTotal" type="number" step="0.01" min="0"
                                                    class="mt-1 block w-full"
                                                    v-model="item.amount"/>
                                     </td>
@@ -109,7 +109,7 @@
                                     </td>
                                     <td class="px-6 py-4 text-right">
                                         <span class="font-bold">{{
-                                                $filters.currency(form.total_cost_of_goods_sold)
+                                               numberFormat(form.total_cost_of_goods_sold)
                                             }}</span>
                                     </td>
                                 </tr>
@@ -121,7 +121,7 @@
                                     </span>
                                     </td>
                                     <td class="border-t px-6 py-4">
-                                        <jet-input id="name" @keyup="updateTotal" type="number"
+                                        <jet-input id="name" @keyup="updateTotal" type="number" step="0.01" min="0"
                                                    class="mt-1 block w-full"
                                                    v-model="item.amount"/>
                                     </td>
@@ -134,7 +134,7 @@
                                     </span>
                                     </td>
                                     <td class="border-t px-6 py-4 text-right">
-                                        <span class="font-bold">{{ $filters.currency(form.total_gross_margin) }}</span>
+                                        <span class="font-bold">{{numberFormat(form.total_gross_margin) }}</span>
                                     </td>
                                 </tr>
                                 <tr>
@@ -150,7 +150,7 @@
                                     </span>
                                     </td>
                                     <td class="border-t px-6 py-4">
-                                        <jet-input id="name" @keyup="updateTotal" type="number"
+                                        <jet-input id="name" @keyup="updateTotal" type="number" step="0.01" min="0"
                                                    class="mt-1 block w-full"
                                                    v-model="item.amount"/>
                                     </td>
@@ -162,7 +162,7 @@
                                     </td>
                                     <td class="px-6 py-4 text-right">
                                         <span class="font-bold">({{
-                                                $filters.currency(form.total_operating_expenses)
+                                               numberFormat(form.total_operating_expenses)
                                             }})</span>
                                     </td>
                                 </tr>
@@ -174,7 +174,7 @@
                                     </span>
                                     </td>
                                     <td class="border-t px-6 py-4">
-                                        <jet-input id="name" @keyup="updateTotal" type="number"
+                                        <jet-input id="name" @keyup="updateTotal" type="number" step="0.01" min="0"
                                                    class="mt-1 block w-full"
                                                    v-model="item.amount"/>
                                     </td>
@@ -193,7 +193,7 @@
                                     </span>
                                     </td>
                                     <td class="border-t px-6 py-4">
-                                        <jet-input id="name" @keyup="updateTotal" type="number"
+                                        <jet-input id="name" @keyup="updateTotal" type="number" step="0.01" min="0"
                                                    class="mt-1 block w-full"
                                                    v-model="item.amount"/>
                                     </td>
@@ -207,7 +207,7 @@
                                     </td>
                                     <td class="border-t px-6 py-4 text-right">
                                         <span class="font-bold">{{
-                                                $filters.currency(form.total_operating_profit)
+                                               numberFormat(form.total_operating_profit)
                                             }}</span>
                                     </td>
                                 </tr>
@@ -219,7 +219,7 @@
                                     </span>
                                     </td>
                                     <td class="border-t px-6 py-4">
-                                        <jet-input id="name" @keyup="updateTotal" type="number"
+                                        <jet-input id="name" @keyup="updateTotal" type="number" step="0.01" min="0"
                                                    class="mt-1 block w-full"
                                                    v-model="item.amount"/>
                                     </td>
@@ -233,7 +233,7 @@
                                     </td>
                                     <td class="border-t px-6 py-4 text-right">
                                         <span class="font-bold">{{
-                                                $filters.currency(form.total_income_before_tax)
+                                               numberFormat(form.total_income_before_tax)
                                             }}</span>
                                     </td>
                                 </tr>
@@ -245,7 +245,7 @@
                                     </span>
                                     </td>
                                     <td class="border-t px-6 py-4">
-                                        <jet-input id="name" @keyup="updateTotal" type="number"
+                                        <jet-input id="name" @keyup="updateTotal" type="number" step="0.01" min="0"
                                                    class="mt-1 block w-full"
                                                    v-model="item.amount"/>
                                     </td>
@@ -259,7 +259,7 @@
                                     </td>
                                     <td class="border-t px-6 py-4 text-right">
                                         <span class="font-bold">{{
-                                                $filters.currency(form.total_income_tax)
+                                               numberFormat(form.total_income_tax)
                                             }}</span>
                                     </td>
                                 </tr>
@@ -271,7 +271,7 @@
                                     </span>
                                     </td>
                                     <td class="border-t px-6 py-4 text-right">
-                                        <span class="font-bold">{{ $filters.currency(form.net_profit) }}</span>
+                                        <span class="font-bold">{{numberFormat(form.net_profit) }}</span>
                                     </td>
                                 </tr>
                                 </tbody>
@@ -470,7 +470,10 @@ export default {
                 this.form.total_income_tax += parseFloat(item.amount || '0')
             })
             this.form.net_profit = this.form.total_income_before_tax - this.form.total_income_tax;
-        }
+        },
+        numberFormat(value) {
+            return new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(value);
+        },
     },
 }
 </script>

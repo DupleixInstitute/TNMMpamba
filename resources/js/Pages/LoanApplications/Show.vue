@@ -149,7 +149,8 @@
                             <h2 class="font-semibold text-xl text-gray-800 leading-tight">Approvals</h2>
                         </div>
                         <div class="mt-4 overflow-x-auto">
-                            <table class="w-full whitespace-no-wrap table-auto mt-4">
+                            <div class="table-container">
+                                <table class="w-full whitespace-no-wrap table-auto mt-4">
                                 <thead>
                                 <tr class="text-left font-bold">
                                     <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Name</th>
@@ -165,7 +166,6 @@
                                 <tr  v-for="approval in application.linked_stages"
                                     class="hover:bg-gray-100 focus-within:bg-gray-100">
 
-
                                     <td class="border-t px-6 py-4">
                                         <span v-if="approval.stage">{{ approval.stage.name }}</span>
                                     </td>
@@ -177,11 +177,11 @@
                                             </inertia-link>
                                         </div>
                                         <div v-else>
-                                            <button v-if="can('loans.applications.assign_approver') && approval.status !== 'approved'"
-                                            @click="assignApproverAction(approval.id)"
-                                            type="button" class="btn btn-primary py-1 px-2">
-                                             Assign
-                                              </button>
+                                            <button v-if="can('loans.applications.assign_approver')"
+                                                @click="assignApproverAction(approval.id)"
+                                                type="button" class="btn btn-primary py-1 px-2">
+                                                Assign
+                                            </button>
                                             <span v-else>not assigned</span>
                                         </div>
                                     </td>
@@ -240,11 +240,12 @@
                                             }}</span>
                                     </td>
                                     <td class="border-t px-6 py-4">
-                                        <span class="text-sm">{{ approval.description }}</span>
+                                        <span class="text-sm">{{approval.description}}</span>
                                     </td>
                                 </tr>
                                 </tbody>
                             </table>
+                        </div>
                         </div>
                     </div>
                     <div class="flex justify-between mb-4">
@@ -553,11 +554,13 @@ export default {
         },
 
 
+
     },
     computed: {},
     watch: {}
 }
 </script>
 <style scoped>
+
 
 </style>

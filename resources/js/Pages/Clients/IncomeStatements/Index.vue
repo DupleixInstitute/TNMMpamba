@@ -90,52 +90,52 @@
                                 </td>
                                 <td class="border-t">
                                     <span class="px-6 py-4 flex items-center">
-                                    {{ $filters.currency(statement.total_sales) }}
+                                    {{ numberFormat(statement.total_sales) }}
                                     </span>
                                 </td>
                                 <td class="border-t">
                                     <span class="px-6 py-4 flex items-center">
-                                    {{ $filters.currency(statement.total_cost_of_goods_sold) }}
+                                    {{ numberFormat(statement.total_cost_of_goods_sold) }}
                                     </span>
                                 </td>
                                 <td class="border-t">
                                     <span class="px-6 py-4 flex items-center">
-                                    {{ $filters.currency(statement.total_gross_margin) }}
+                                    {{ numberFormat(statement.total_gross_margin) }}
                                     </span>
                                 </td>
                                 <td class="border-t">
                                     <span class="px-6 py-4 flex items-center">
-                                    {{ $filters.currency(statement.total_operating_expenses) }}
+                                    {{ numberFormat(statement.total_operating_expenses) }}
                                     </span>
                                 </td>
                                 <td class="border-t">
                                     <span class="px-6 py-4 flex items-center">
-                                    {{ $filters.currency(statement.total_operating_profit) }}
+                                    {{ numberFormat(statement.total_operating_profit) }}
                                     </span>
                                 </td>
                                 <td class="border-t">
                                     <span class="px-6 py-4 flex items-center">
-                                    {{ $filters.currency(statement.total_other_expenses) }}
+                                    {{ numberFormat(statement.total_other_expenses) }}
                                     </span>
                                 </td>
                                 <td class="border-t">
                                     <span class="px-6 py-4 flex items-center">
-                                    {{ $filters.currency(statement.total_other_income) }}
+                                    {{ numberFormat(statement.total_other_income) }}
                                     </span>
                                 </td>
                                 <td class="border-t">
                                     <span class="px-6 py-4 flex items-center">
-                                    {{ $filters.currency(statement.total_income_before_tax) }}
+                                    {{ numberFormat(statement.total_income_before_tax) }}
                                     </span>
                                 </td>
                                 <td class="border-t">
                                     <span class="px-6 py-4 flex items-center">
-                                    {{ $filters.currency(statement.total_income_tax) }}
+                                    {{ numberFormat(statement.total_income_tax) }}
                                     </span>
                                 </td>
                                 <td class="border-t">
                                     <span class="px-6 py-4 flex items-center">
-                                    {{ $filters.currency(statement.net_profit) }}
+                                    {{ numberFormat(statement.net_profit) }}
                                     </span>
                                 </td>
                                 <td class="border-t w-px pr-2">
@@ -243,6 +243,9 @@ export default {
 
             this.$inertia.delete(this.route('clients.income_statements.destroy', this.selectedRecord))
             this.confirmingDeletion = false
+        },
+        numberFormat(value) {
+            return new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(value);
         },
     },
 }
