@@ -16,7 +16,7 @@
                             <option value="pending">Pending</option>
                             <option value="approved">Approved</option>
                             <option value="rejected">Rejected</option>
-                            
+
                         </select>
                     </div>
                     <div class="mb-2">
@@ -244,6 +244,7 @@ export default {
                 client_id: this.filters.client_id,
                 status: this.filters.status,
                 processing: false
+
             },
             confirmingLoanDeletion: false,
             selectedRecord: null,
