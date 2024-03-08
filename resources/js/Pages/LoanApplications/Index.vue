@@ -12,7 +12,7 @@
                         <jet-label for="status" value="Status"/>
                         <select v-model="form.status"
                                 class="mt-1 w-full border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 rounded-md shadow-sm">
-                            <option :value="null"/>
+                            <option disabled value="">Please select a status</option>
                             <option value="pending">Pending</option>
                             <option value="approved">Approved</option>
                             <option value="rejected">Rejected</option>
@@ -235,14 +235,8 @@ export default {
         products: Object,
         branches: Object,
 
-    },
-    data() {
-        return {
-            form: {
-                search: this.filters.search,
-                province_id: this.filters.province_id,
-                branch_id: this.filters.branch_id,
-                district_id: this.filters.district_id,
+        products: Object,
+: this.filters.district_id,
                 ward_id: this.filters.ward_id,
                 village_id: this.filters.village_id,
                 loan_product_id: this.filters.loan_product_id,
