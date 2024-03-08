@@ -98,7 +98,7 @@
                                     </span>
                                     </td>
                                     <td class="border-t px-6 py-4">
-                                        <jet-input id="name" @keyup="updateTotal" type="number" step="0.01" min="0"
+                                        <jet-input id="name" @keyup="updateTotal" type="number" step="0.01"
                                                    class="mt-1 block w-full"
                                                    v-model="item.amount"/>
                                     </td>
@@ -121,7 +121,7 @@
                                     </span>
                                     </td>
                                     <td class="border-t px-6 py-4">
-                                        <jet-input id="name" @keyup="updateTotal" type="number" step="0.01" min="0"
+                                        <jet-input id="name" @keyup="updateTotal" type="number" step="0.01"
                                                    class="mt-1 block w-full"
                                                    v-model="item.amount"/>
                                     </td>
@@ -150,7 +150,7 @@
                                     </span>
                                     </td>
                                     <td class="border-t px-6 py-4">
-                                        <jet-input id="name" @keyup="updateTotal" type="number" step="0.01" min="0"
+                                        <jet-input id="name" @keyup="updateTotal" type="number" step="0.01"
                                                    class="mt-1 block w-full"
                                                    v-model="item.amount"/>
                                     </td>
@@ -174,7 +174,7 @@
                                     </span>
                                     </td>
                                     <td class="border-t px-6 py-4">
-                                        <jet-input id="name" @keyup="updateTotal" type="number" step="0.01" min="0"
+                                        <jet-input id="name" @keyup="updateTotal" type="number" step="0.01"
                                                    class="mt-1 block w-full"
                                                    v-model="item.amount"/>
                                     </td>
@@ -193,7 +193,7 @@
                                     </span>
                                     </td>
                                     <td class="border-t px-6 py-4">
-                                        <jet-input id="name" @keyup="updateTotal" type="number" step="0.01" min="0"
+                                        <jet-input id="name" @keyup="updateTotal" type="number" step="0.01"
                                                    class="mt-1 block w-full"
                                                    v-model="item.amount"/>
                                     </td>
@@ -219,7 +219,7 @@
                                     </span>
                                     </td>
                                     <td class="border-t px-6 py-4">
-                                        <jet-input id="name" @keyup="updateTotal" type="number" step="0.01" min="0"
+                                        <jet-input id="name" @keyup="updateTotal" type="number" step="0.01"
                                                    class="mt-1 block w-full"
                                                    v-model="item.amount"/>
                                     </td>
@@ -245,7 +245,7 @@
                                     </span>
                                     </td>
                                     <td class="border-t px-6 py-4">
-                                        <jet-input id="name" @keyup="updateTotal" type="number" step="0.01" min="0"
+                                        <jet-input id="name" @keyup="updateTotal" type="number" step="0.01"
                                                    class="mt-1 block w-full"
                                                    v-model="item.amount"/>
                                     </td>
