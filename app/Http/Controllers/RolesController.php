@@ -48,18 +48,19 @@ class RolesController extends Controller
 
     public function store(Request $request)
     {
+
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'display_name' => ['required', 'string', 'max:255'],
-            // 'send_email_to_role_members' => 'nullable|boolean',
-            // 'group_email' => 'nullable|email',
+            'send_email_to_role_members' => 'nullable|boolean',
+            'group_email' => 'nullable|email',
         ]);
         $role = Role::create([
             'name' => $request->name,
             'display_name' => $request->display_name,
             'guard_name' => 'web',
-            // 'send_email_to_role_members' => $request->send_email_to_role_members,
-            // 'group_email' => $request->group_email,
+            'send_email_to_role_members' => $request->send_email_to_role_members,
+            'group_email' => $request->group_email,
         ]);
         $role->syncPermissions($request->permissions);
 
@@ -89,15 +90,20 @@ class RolesController extends Controller
 
     public function update(Request $request, Role $role)
     {
+       
         if (App::environment('demo')) {
             return redirect()->back()->with('error', 'Updating the demo role is not allowed.');
         }
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'display_name' => ['required', 'string', 'max:255'],
+            'send_email_to_role_members' => 'nullable|boolean',
+            'group_email' => 'nullable|email',
         ]);
         $data = [
             'display_name' => $request->display_name,
+            'send_email_to_role_members' => $request->send_email_to_role_members,
+            'group_email' => $request->group_email,
         ];
         if ($role->is_system === 0) {
             $data['name'] = $request->name;

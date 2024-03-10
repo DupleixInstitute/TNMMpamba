@@ -142,6 +142,7 @@ class UsersController extends Controller
 
     public function store(Request $request)
     {
+
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'gender' => ['required'],
@@ -150,7 +151,9 @@ class UsersController extends Controller
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'confirmed'],
             'photo' => ['nullable', 'image', 'max:1024'],
+            'group_email' => ['nullable', 'string', 'email', 'max:255'],
         ]);
+
         $user = User::create([
             'name' => $request->name,
             'branch_id' => $request->branch_id,
@@ -166,7 +169,9 @@ class UsersController extends Controller
             'address' => $request->address,
             'active' => $request->active,
             'password' => Hash::make($request->password),
+            'group_email' => $request->group_email,
         ]);
+
         foreach ($request->roles as $key) {
             $user->assignRole(Role::findById($key));
         }
@@ -277,6 +282,7 @@ class UsersController extends Controller
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
             'password' => ['nullable', 'confirmed'],
             'photo' => ['nullable', 'image', 'max:1024'],
+            'group_email' => ['nullable', 'string', 'email', 'max:255'],
         ]);
         $user->update([
             'name' => $request->name,
@@ -292,6 +298,7 @@ class UsersController extends Controller
             'description' => $request->description,
             'address' => $request->address,
             'active' => $request->active,
+            'group_email' => $request->group_email,
         ]);
         if ($request->password) {
             $user->update(['password' => Hash::make($request->password)]);

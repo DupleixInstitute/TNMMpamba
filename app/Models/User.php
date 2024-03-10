@@ -49,7 +49,8 @@ class User extends Authenticatable
         'branch_id',
         'slack_webhook_url',
         'telegram_user_id',
-        'member_id'
+        'member_id',
+        'group_email',
     ];
 
     /**
