@@ -46,8 +46,31 @@ class DashboardController extends Controller
         $applications = LoanApplication::count();
         $applicationsPending = LoanApplication::where('status', 'pending')->count();
         $applicationsApproved = LoanApplication::where('status', 'approved')->count();
-        $applicationsRejected = LoanApplication::where('status', 'rejected')->count();
+        $applicationsRejected = LoanApplication::with('linkedStages')
+        ->whereHas('linkedStages', function ($query) {
+            $query->where('status', 'rejected');
+        })->count();
         $applicationsApprovedAmount = LoanApplication::where('status', 'approved')->sum('amount');
+        $applicationsRecommended = LoanApplication::with('linkedStages')
+            ->whereHas('linkedStages', function ($query) {
+                $query->where('status', 'recommend');
+            })->count();
+
+
+        $totalAmountAppliedAmt = (float) LoanApplication::sum('amount');
+        $totalRecommendedAmt = (float)LoanApplication::with('linkedStages')
+            ->whereHas('linkedStages', function ($query) {
+                $query->where('status', 'recommend');
+            })->sum('amount');
+        $totalApprovedAmt = LoanApplication::where('status', 'approved')->sum('amount');
+        //check among the linked stages, check if there is that has a status of rejected
+        $totalRejectedAmt = (float)LoanApplication::with('linkedStages')
+            ->whereHas('linkedStages', function ($query) {
+                $query->where('status', 'rejected');
+            })->sum('amount');
+
+
+
 
         return Inertia::render('Dashboard', [
             'clients' => $clients,
@@ -56,6 +79,11 @@ class DashboardController extends Controller
             'applicationsApproved' => $applicationsApproved,
             'applicationsRejected' => $applicationsRejected,
             'applicationsApprovedAmount' => $applicationsApprovedAmount,
+            'totalAmountAppliedAmt' => $totalAmountAppliedAmt,
+            'totalRecommendedAmt' => $totalRecommendedAmt,
+            'totalApprovedAmt' => $totalApprovedAmt,
+            'totalRejectedAmt' => $totalRejectedAmt,
+            'applicationsRecommended' => $applicationsRecommended,
         ]);
     }
 
