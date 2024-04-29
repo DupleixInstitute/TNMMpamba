@@ -145,7 +145,7 @@
                             </span>
                         </td>
                         <td class="border-t">
-                            <span class="px-6 py-4 flex items-center">
+                            <span class="px-6 py-4 flex items-center" v-if="application.branch">
                                  {{ application.branch.name }}
                             </span>
                         </td>
