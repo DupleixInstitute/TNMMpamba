@@ -17,7 +17,7 @@
                     <div class="flex-auto p-4">
                       <div class="flex flex-wrap">
                         <div class="relative w-full pr-4 max-w-full flex-grow flex-1">
-                          <h5 class="text-gray-500 uppercase font-bold text-xs"> LOANS APPLIED </h5>
+                          <h5 class="text-gray-500 uppercase font-bold text-xs"> LOANS APPLIED  </h5>
                           <span class="font-semibold text-xl text-gray-800"> {{ applicationsCount }} </span>
                         </div>
                         <div class="relative w-auto pl-4 flex-initial">
