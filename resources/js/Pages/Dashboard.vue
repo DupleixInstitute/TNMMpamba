@@ -106,7 +106,7 @@
                             <div class="flex flex-wrap">
                                 <div class="relative w-full pr-4 max-w-full flex-grow flex-1">
                                     <h5 class="text-gray-500 uppercase font-bold text-xs">TOTAL LOANS APPLIED AMT</h5>
-                                    <span class="font-semibold text-xl text-gray-800">{{ totalAmountAppliedAmt }}</span>
+                                    <span class="font-semibold text-xl text-gray-800">{{ $filters.formatNumber(totalAmountAppliedAmt) }}</span>
                                 </div>
                                 <div class="relative w-auto pl-4 flex-initial">
                                     <div class="text-white p-3 text-center inline-flex items-center justify-center w-12 h-12 shadow-lg rounded-full bg-yellow-500">
@@ -124,7 +124,7 @@
                             <div class="flex flex-wrap">
                                 <div class="relative w-full pr-4 max-w-full flex-grow flex-1">
                                     <h5 class="text-gray-500 uppercase font-bold text-xs">LOANS PENDING AMT</h5>
-                                    <span class="font-semibold text-xl text-gray-800">{{ totalPendingAmount }}</span>
+                                    <span class="font-semibold text-xl text-gray-800">{{ $filters.formatNumber(totalPendingAmount) }}</span>
                                 </div>
                                 <div class="relative w-auto pl-4 flex-initial">
                                     <div class="text-white p-3 text-center inline-flex items-center justify-center w-12 h-12 shadow-lg rounded-full bg-blue-500">
@@ -137,13 +137,13 @@
                 </div>
 
                 <!-- Loans Repaid -->
-                <div class="mt-2">
+                <div class="">
                     <div class="relative flex flex-col min-w-0 break-words bg-white rounded mb-6 xl:mb-0 shadow-lg">
                         <div class="flex-auto p-4">
                             <div class="flex flex-wrap">
                                 <div class="relative w-full pr-4 max-w-full flex-grow flex-1">
                                     <h5 class="text-gray-500 uppercase font-bold text-xs">LOANS REJECTED AMT</h5>
-                                    <span class="font-semibold text-xl text-gray-800">{{ totalRejectedAmt }}</span>
+                                    <span class="font-semibold text-xl text-gray-800">{{ $filters.formatNumber(totalRejectedAmt) }}</span>
                                 </div>
                                 <div class="relative w-auto pl-4 flex-initial">
                                     <div class="text-white p-3 text-center inline-flex items-center justify-center w-12 h-12 shadow-lg rounded-full bg-red-500">
@@ -162,7 +162,7 @@
                             <div class="flex flex-wrap">
                                 <div class="relative w-full pr-4 max-w-full flex-grow flex-1">
                                     <h5 class="text-gray-500 uppercase font-bold text-xs">LOANS APPROVED AMT</h5>
-                                    <span class="font-semibold text-xl text-gray-800">{{ applicationsApprovedAmount }}</span>
+                                    <span class="font-semibold text-xl text-gray-800">{{ $filters.formatNumber(applicationsApprovedAmount) }}</span>
                                 </div>
                                 <div class="relative w-auto pl-4 flex-initial">
                                     <div class="text-white p-3 text-center inline-flex items-center justify-center w-12 h-12 shadow-lg rounded-full bg-green-500">
