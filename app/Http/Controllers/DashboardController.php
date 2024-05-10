@@ -2,57 +2,71 @@
 
 namespace App\Http\Controllers;
 
-use App\Actions\Reports\Reports;
-use App\Models\Article;
-use App\Models\Course;
-use App\Models\CourseRegistration;
+use Carbon\Carbon;
+use Inertia\Inertia;
 use App\Models\Event;
-use App\Models\Consultation;
-use App\Models\CourseMaterial;
-use App\Models\Currency;
-use App\Models\Invoice;
-use App\Models\InvoicePayment;
-use App\Models\LoanApplication;
+use App\Models\Vital;
+use App\Models\Branch;
 use App\Models\Client;
+use App\Models\Course;
+use App\Models\Article;
+use App\Models\Invoice;
+use App\Models\Currency;
+use App\Models\Province;
+use App\Models\LoanProduct;
 use App\Models\PaymentType;
 use App\Models\UserWidgets;
-use App\Models\Vital;
-use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Model;
+use App\Models\Consultation;
 use Illuminate\Http\Request;
+use App\Models\CourseMaterial;
+use App\Models\InvoicePayment;
+use App\Models\LoanApplication;
+use App\Actions\Reports\Reports;
+use App\Models\CourseRegistration;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
-use Inertia\Inertia;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\LoanApplicationsExport;
+use App\Models\User;
+use Illuminate\Database\Eloquent\Model;
 
 class DashboardController extends Controller
 {
+    public $filterOptions;
     public function __construct()
     {
         $this->middleware('auth');
-
+        $this->filterOptions = [];
     }
 
     public function index()
     {
         //check if it is the first time the user is logging in
-       if (Auth::user()->first_attempt === 'yes') {
-              //update the first_attempt column to no
-                Auth::user()->first_attempt = 'no';
-                Auth::user()->save();
-           return redirect()->route('profile.show')
-           ->with('success', 'Welcome to your dashboard. Please update your password and profile to continue.');
-         }
+        if (Auth::user()->first_attempt === 'yes') {
+            //update the first_attempt column to no
+            Auth::user()->first_attempt = 'no';
+            Auth::user()->save();
+            return redirect()->route('profile.show')
+                ->with('success', 'Welcome to your dashboard. Please update your password and profile to continue.');
+        }
         $clients = Client::count();
-        $applications = LoanApplication::count();
-        $applicationsPending = LoanApplication::where('status', 'pending')->count();
-        $applicationsApproved = LoanApplication::where('status', 'approved')->count();
-        $applicationsRejected = LoanApplication::with('linkedStages')
-        ->whereHas('linkedStages', function ($query) {
-            $query->where('status', 'rejected');
+        $applicationsCount = LoanApplication::count();
+        $applicationsPending =  LoanApplication::whereHas('currentLinkedStage', function ($query) {
+            $query->where('status', '!=','approved')
+                ->where('status', '!=','rejected');
+
         })->count();
-        $applicationsApprovedAmount = LoanApplication::where('status', 'approved')->sum('amount');
-        $applicationsRecommended = LoanApplication::with('linkedStages')
-            ->whereHas('linkedStages', function ($query) {
+        $applicationsApproved = LoanApplication::whereHas('currentLinkedStage', function ($query) {
+            $query->where('status', 'approved');
+        })->count();
+        // dd($applicationsApproved);
+        $applicationsRejected = LoanApplication::whereHas('currentLinkedStage', function ($query) {
+                $query->where('status', 'rejected');
+            })->count();
+        $applicationsApprovedAmount = LoanApplication::whereHas('currentLinkedStage', function ($query) {
+            $query->where('status', 'approved');
+        })->sum('amount');
+        $applicationsRecommended = LoanApplication::whereHas('currentLinkedStage', function ($query) {
                 $query->where('status', 'recommend');
             })->count();
 
@@ -64,17 +78,23 @@ class DashboardController extends Controller
             })->sum('amount');
         $totalApprovedAmt = LoanApplication::where('status', 'approved')->sum('amount');
         //check among the linked stages, check if there is that has a status of rejected
-        $totalRejectedAmt = (float)LoanApplication::with('linkedStages')
-            ->whereHas('linkedStages', function ($query) {
+        $totalRejectedAmt = (float)LoanApplication::whereHas('currentLinkedStage', function ($query) {
                 $query->where('status', 'rejected');
             })->sum('amount');
+
+            $totalPendingAmount = (float)LoanApplication::whereHas('currentLinkedStage', function ($query) {
+                $query->where('status', '!=','approved')
+                    ->where('status', '!=','rejected');
+
+            })->sum('amount');
+            // dd($totalPendingAmount);
 
 
 
 
         return Inertia::render('Dashboard', [
             'clients' => $clients,
-            'applications' => $applications,
+            'applicationsCount' => $applicationsCount,
             'applicationsPending' => $applicationsPending,
             'applicationsApproved' => $applicationsApproved,
             'applicationsRejected' => $applicationsRejected,
@@ -84,14 +104,13 @@ class DashboardController extends Controller
             'totalApprovedAmt' => $totalApprovedAmt,
             'totalRejectedAmt' => $totalRejectedAmt,
             'applicationsRecommended' => $applicationsRecommended,
+            'totalPendingAmount' =>$totalPendingAmount
         ]);
     }
 
     public function test()
     {
-        return Inertia::render('Test', [
-
-        ]);
+        return Inertia::render('Test', []);
     }
 
     public function saveWidgets(Request $request)
@@ -428,5 +447,170 @@ class DashboardController extends Controller
             'period' => $request->period,
         ]);
         return response()->json($data);
+    }
+
+    public function filter($scope)
+    {
+        $provinces = Province::filter(\request()->only('search'))
+            ->with(['country'])
+            ->get();
+        // dd($provinces);
+        $products = LoanProduct::with(['category', 'createdBy'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+        $branches = Branch::get();
+        $filterScope = $scope;
+
+        return Inertia::render('Dashboard/CreateFilter', [
+            'scope' => $filterScope,
+            'provinces' => $provinces,
+            'products' => $products,
+            'branches' => $branches,
+
+        ]);
+    }
+
+    public function filterResults(Request $request)
+    {
+        $this->filterOptions = $request->all();
+
+        // dd($this->filterOptions);
+        switch($request->scope){
+            case 'all':
+                $applications = LoanApplication::with(['staff', 'client', 'product', 'currentLinkedStage', 'currentLinkedStage.stage', 'currentLinkedStage.approver', 'currentLinkedStage.assignedBy', 'branch'])
+            ->filter(\request()->only('search', 'client_id', 'loan_product_id', 'province_id', 'district_id', 'ward_id', 'date_range', 'village_id', 'staff_id', 'status'));
+            break;
+
+            case 'pending':
+                $applications = LoanApplication::with(['staff', 'client', 'product', 'currentLinkedStage', 'currentLinkedStage.stage', 'currentLinkedStage.approver', 'currentLinkedStage.assignedBy', 'branch'])
+            ->filter(\request()->only('search', 'client_id', 'loan_product_id', 'province_id', 'district_id', 'ward_id', 'date_range', 'village_id', 'staff_id', 'status'))
+            ->whereHas('currentLinkedStage', function ($query) {
+                $query->where('status', '!=','approved')
+                    ->where('status', '!=','rejected');
+            });
+            break;
+            case 'rejected':
+                $applications = LoanApplication::with(['staff', 'client', 'product', 'currentLinkedStage', 'currentLinkedStage.stage', 'currentLinkedStage.approver', 'currentLinkedStage.assignedBy', 'branch'])
+            ->filter(\request()->only('search', 'client_id', 'loan_product_id', 'province_id', 'district_id', 'ward_id', 'date_range', 'village_id', 'staff_id', 'status'))
+            ->whereHas('currentLinkedStage', function ($query) {
+                $query->where('status', 'rejected');
+            });
+            break;
+            case 'approved':
+                $applications = LoanApplication::with(['staff', 'client', 'product', 'currentLinkedStage', 'currentLinkedStage.stage', 'currentLinkedStage.approver', 'currentLinkedStage.assignedBy', 'branch'])
+            ->filter(\request()->only('search', 'client_id', 'loan_product_id', 'province_id', 'district_id', 'ward_id', 'date_range', 'village_id', 'staff_id', 'status'))
+            ->whereHas('currentLinkedStage', function ($query) {
+                $query->where('status', 'approved');
+            });
+            break;
+            default:
+            return redirect()->back()->with('error', 'Invalid filter scope');
+            break;
+
+        }
+
+             // Apply start date and end date logic
+        $endDate = $request->filled('loan_end_date') ? $request->loan_end_date : Carbon::today()->format('Y-m-d');
+        $startDate = $request->loan_start_date;
+
+        $applications = $applications->whereBetween('date', [$startDate, $endDate]);
+
+
+        // Handle optional branch ID
+        if ($request->filled('branch')) {
+            $applications = $applications->whereHas('client.branch', function ($query) use ($request) {
+                $query->where('id', $request->branch);
+            });
+        }
+
+        //handle region
+        if ($request->filled('region')) {
+            $applications = $applications->whereHas('client.province', function ($query) use ($request) {
+                $query->where('id', $request->region);
+            });
+        }
+
+        if ($request->filled('product')) {
+            $applications = $applications->where('loan_product_id', $request->product);
+        }
+
+        // Apply loan amount logic based on operator
+        $loanAmount = $request->loan_amount;
+        $operator = $request->loan_amount_operator;
+
+        switch ($operator) {
+            case 'greater':
+                $applications = $applications->where('amount', '>', $loanAmount);
+                break;
+            case 'less':
+                $applications = $applications->where('amount', '<', $loanAmount);
+                break;
+            case 'equal':
+                $applications = $applications->where('amount', '=', $loanAmount);
+                break;
+            default:
+                // Handle invalid operator (optional)
+                break;
+        }
+        $applicationCount = $applications->count();
+        $applications = $applications->orderBy('created_at', 'desc')
+            ->paginate($applicationCount);
+
+        // region in in the client table and branch
+
+        return Inertia::render('LoanApplications/Filtered', [
+            'filters' => \request()->all('search', 'client_id', 'loan_product_id', 'province_id', 'branch_id', 'district_id', 'ward_id', 'date_range', 'village_id', 'staff_id', 'status'),
+            'applications' => $applications,
+            'products' => LoanProduct::get()->map(function ($item) {
+                return [
+                    'value' => $item->id,
+                    'label' => $item->name
+                ];
+            }),
+            'branches' => Branch::get()->map(function ($item) {
+                return [
+                    'value' => $item->id,
+                    'label' => $item->name
+                ];
+            }),
+            'scope' => $request->scope,
+            'startDate' => $startDate,
+            'endDate' => $endDate,
+        ]);
+
+        // For example, you might want to redirect back with a success message
+        // return redirect()->back()->with('success', 'Filter applied successfully!');
+    }
+
+    public function export(Request $request)
+    {
+
+        $formData = json_decode($request->get('applications'), true);
+        $applications = $formData['data'];
+
+
+        $exportData = [];
+        foreach ($applications as $application) {
+            $exportData[] = [
+                'ID' => $application['id'],
+                'Loan Date' => $application['date'],
+                'Client' => Client::find($application['client_id'])->name,
+                'Product' => LoanProduct::find($application['loan_product_id'])->name,
+                'Amount' => $application['amount'],
+                'Score' => $application['score'],
+                'Status' => $application['current_stage_status'],
+                'Created At' => $application['created_at'],
+                'Created By' => User::find($application['created_by_id'])->name,
+            ];
+        }
+        // dd($exportData);
+
+        // Instantiate the export class
+        $export = new LoanApplicationsExport($exportData);
+
+    // Optionally, you can modify the export class properties or methods here if needed
+
+    // Use Laravel Excel to export data
+    return Excel::download($export, 'loan_applications.xlsx');
     }
 }
