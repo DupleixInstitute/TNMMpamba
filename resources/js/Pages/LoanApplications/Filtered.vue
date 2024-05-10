@@ -169,10 +169,7 @@ import SelectInput from '@/Jetstream/SelectInput.vue'
 import JetConfirmationModal from '@/Jetstream/ConfirmationModal.vue'
 import JetDangerButton from '@/Jetstream/DangerButton.vue'
 import JetSecondaryButton from '@/Jetstream/SecondaryButton.vue'
-import DataTable from 'datatables.net-vue3';
-import DataTablesCore from 'datatables.net';
 
-DataTable.use(DataTablesCore);
 
 export default {
     components: {
