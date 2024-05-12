@@ -131,6 +131,7 @@ class LoanApplicationsController extends Controller
             'amount' => ['required'],
             'date' => ['required'],
         ]);
+        dd($request->all());
 
         $attributes = $request->json('attributes');
         $client = Client::find($request->client_id);

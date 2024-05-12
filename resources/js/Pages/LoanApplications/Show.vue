@@ -163,7 +163,7 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <tr  v-for="approval in application.linked_stages"
+                                <tr  v-for="approval in filteredStages"
                                     class="hover:bg-gray-100 focus-within:bg-gray-100">
 
                                     <td class="border-t px-6 py-4">
@@ -244,7 +244,7 @@
                                     </td>
                                 </tr>
                                 </tbody>
-                            </table>
+                                </table>
                         </div>
                         </div>
                     </div>
@@ -556,7 +556,16 @@ export default {
 
 
     },
-    computed: {},
+    computed: {
+            filteredStages() {
+                const approvedIndex = this.application.linked_stages.findIndex(stage => stage.status === 'approved');
+                if (approvedIndex === -1) {
+                    return this.application.linked_stages;
+                } else {
+                    return this.application.linked_stages.slice(0, approvedIndex + 1);
+                }
+            }
+        },
     watch: {}
 }
 </script>

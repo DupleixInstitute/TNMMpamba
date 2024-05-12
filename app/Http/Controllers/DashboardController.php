@@ -460,21 +460,25 @@ class DashboardController extends Controller
             ->get();
         $branches = Branch::get();
         $filterScope = $scope;
+        $users = User::where('active', 1)->get();
 
         return Inertia::render('Dashboard/CreateFilter', [
             'scope' => $filterScope,
             'provinces' => $provinces,
             'products' => $products,
             'branches' => $branches,
+            'users' => $users
 
         ]);
     }
 
     public function filterResults(Request $request)
     {
+
         $this->filterOptions = $request->all();
 
         // dd($this->filterOptions);
+
         switch($request->scope){
             case 'all':
                 $applications = LoanApplication::with(['staff', 'client', 'product', 'currentLinkedStage', 'currentLinkedStage.stage', 'currentLinkedStage.approver', 'currentLinkedStage.assignedBy', 'branch'])
@@ -533,6 +537,21 @@ class DashboardController extends Controller
         if ($request->filled('product')) {
             $applications = $applications->where('loan_product_id', $request->product);
         }
+        if($request->filled('loan_description'))
+        {
+            $applications = $applications->where('description', 'like', '%'. $request->loan_description. '%');
+        }
+
+        if ($request->filled('cif')) {
+            $applications = $applications->whereHas('client', function ($query) use ($request) {
+                $query->where('external_id', $request->cif);
+            });
+        }
+        if ($request->filled('user_id')) {
+            $applications = $applications->where('created_by_id',  $request->user_id);
+        }
+
+
 
         // Apply loan amount logic based on operator
         $loanAmount = $request->loan_amount;

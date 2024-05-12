@@ -9,39 +9,45 @@
         </template>
         <div class="mx-auto">
             <h3 class="text-2xl font-semibold mb-4 flex items-center justify-center">
-                <font-awesome-icon icon="list" class="mr-2 text-gray-600"/>
+                <font-awesome-icon icon="list" class="mr-2 text-gray-600" />
                 Loan Counts
             </h3>
             <div class="grid sm:grid-cols-1 md:grid-cols-4 gap-2">
-                  <inertia-link :href="route('dashboard.filter','all')" class="relative flex flex-col min-w-0 break-words bg-white rounded mb-6 xl:mb-0 shadow-lg">
-                    <div class="flex-auto p-4">
-                      <div class="flex flex-wrap">
-                        <div class="relative w-full pr-4 max-w-full flex-grow flex-1">
-                          <h5 class="text-gray-500 uppercase font-bold text-xs"> LOANS APPLIED  </h5>
-                          <span class="font-semibold text-xl text-gray-800"> {{ applicationsCount }} </span>
+                <div class="tooltip-wrapper">
+                    <inertia-link :href="route('dashboard.filter', 'all')"
+                        class="relative flex flex-col min-w-0 break-words bg-white rounded mb-6 xl:mb-0 shadow-lg"
+                        title="Click to apply filter" >
+                        <div class="flex-auto p-4">
+                            <div class="flex flex-wrap">
+                                <div class="relative w-full pr-4 max-w-full flex-grow flex-1">
+                                    <h5 class="text-gray-500 uppercase font-bold text-xs"> LOANS APPLIED </h5>
+                                    <span class="font-semibold text-xl text-gray-800"> {{ applicationsCount }} </span>
+                                </div>
+                                <div class="relative w-auto pl-4 flex-initial">
+                                    <div
+                                        class="text-white p-3 text-center inline-flex items-center justify-center w-12 h-12 shadow-lg rounded-full bg-yellow-500">
+                                        <font-awesome-icon icon="money-bill" />
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="relative w-auto pl-4 flex-initial">
-                          <div class="text-white p-3 text-center inline-flex items-center justify-center w-12 h-12 shadow-lg rounded-full bg-yellow-500">
-                            <font-awesome-icon icon="money-bill"/>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </inertia-link>
-                <div class="">
-                    <inertia-link  :href="route('dashboard.filter','pending')" class="relative flex flex-col min-w-0 break-words bg-white rounded mb-6 xl:mb-0 shadow-lg">
+                    </inertia-link>
+                </div>
+                <div class="tooltip-wrapper">
+                    <inertia-link :href="route('dashboard.filter', 'pending')"
+                        class="relative flex flex-col min-w-0 break-words bg-white rounded mb-6 xl:mb-0 shadow-lg"
+                        title="Click to apply filter">
 
                         <div class="flex-auto p-4">
                             <div class="flex flex-wrap">
-                                <div class="relative w-full pr-4 max-w-full flex-grow flex-1"><h5
-                                    class="text-gray-500 uppercase font-bold text-xs"> Loans Pending </h5>
-                                    <span
-                                        class="font-semibold text-xl text-gray-800"> {{ applicationsPending }} </span>
+                                <div class="relative w-full pr-4 max-w-full flex-grow flex-1">
+                                    <h5 class="text-gray-500 uppercase font-bold text-xs"> Loans Pending </h5>
+                                    <span class="font-semibold text-xl text-gray-800"> {{ applicationsPending }} </span>
                                 </div>
                                 <div class="relative w-auto pl-4 flex-initial">
                                     <div
                                         class="text-white p-3 text-center inline-flex items-center justify-center w-12 h-12 shadow-lg rounded-full bg-blue-500">
-                                        <font-awesome-icon icon="money-bill"/>
+                                        <font-awesome-icon icon="money-bill" />
                                     </div>
                                 </div>
                             </div>
@@ -49,40 +55,44 @@
                     </inertia-link>
                 </div>
 
-                <div class="">
-                    <inertia-link :href="route('dashboard.filter','rejected')" class="relative flex flex-col min-w-0 break-words bg-white rounded mb-6 xl:mb-0 shadow-lg">
+                <div class="tooltip-wrapper">
+                    <inertia-link :href="route('dashboard.filter', 'rejected')"
+                        class="relative flex flex-col min-w-0 break-words bg-white rounded mb-6 xl:mb-0 shadow-lg"
+                        title="Click to apply filter">
 
                         <div class="flex-auto p-4">
                             <div class="flex flex-wrap">
-                                <div class="relative w-full pr-4 max-w-full flex-grow flex-1"><h5
-                                    class="text-gray-500 uppercase font-bold text-xs">Loans Rejected</h5>
-                                    <span
-                                        class="font-semibold text-xl text-gray-800"> {{ applicationsRejected }} </span>
+                                <div class="relative w-full pr-4 max-w-full flex-grow flex-1">
+                                    <h5 class="text-gray-500 uppercase font-bold text-xs">Loans Rejected</h5>
+                                    <span class="font-semibold text-xl text-gray-800"> {{ applicationsRejected }}
+                                    </span>
                                 </div>
                                 <div class="relative w-auto pl-4 flex-initial">
                                     <div
                                         class="text-white p-3 text-center inline-flex items-center justify-center w-12 h-12 shadow-lg rounded-full bg-red-500">
-                                        <font-awesome-icon icon="minus"/>
+                                        <font-awesome-icon icon="minus" />
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </inertia-link>
                 </div>
-                <div class="">
-                    <inertia-link :href="route('dashboard.filter','approved')" class="relative flex flex-col min-w-0 break-words bg-white rounded mb-6 xl:mb-0 shadow-lg">
+                <div class="tooltip-wrapper">
+                    <inertia-link :href="route('dashboard.filter', 'approved')"
+                        class="relative flex flex-col min-w-0 break-words bg-white rounded mb-6 xl:mb-0 shadow-lg"
+                        title="Click to apply filter">
 
                         <div class="flex-auto p-4">
                             <div class="flex flex-wrap">
-                                <div class="relative w-full pr-4 max-w-full flex-grow flex-1"><h5
-                                    class="text-gray-500 uppercase font-bold text-xs"> Approved Loans </h5>
-                                    <span
-                                        class="font-semibold text-xl text-gray-800"> {{ applicationsApproved }} </span>
+                                <div class="relative w-full pr-4 max-w-full flex-grow flex-1">
+                                    <h5 class="text-gray-500 uppercase font-bold text-xs"> Approved Loans </h5>
+                                    <span class="font-semibold text-xl text-gray-800"> {{ applicationsApproved }}
+                                    </span>
                                 </div>
                                 <div class="relative w-auto pl-4 flex-initial">
                                     <div
                                         class="text-white p-3 text-center inline-flex items-center justify-center w-12 h-12 shadow-lg rounded-full bg-green-500">
-                                        <font-awesome-icon icon="dollar-sign"/>
+                                        <font-awesome-icon icon="check-circle" />
                                     </div>
                                 </div>
                             </div>
@@ -95,9 +105,9 @@
         <!-- Loan Amounts Section -->
         <div class="mx-auto mt-4">
             <h3 class="text-2xl font-semibold mb-4 flex items-center justify-center">
-                <font-awesome-icon icon="dollar-sign" class="mr-2 text-gray-600"/>
-                Loan Amounts
+                Loan Amounts - Eswatini Currency (SZL)
             </h3>
+
             <div class="grid sm:grid-cols-1 md:grid-cols-4 gap-2">
                 <!-- Loans Pending -->
                 <div class="">
@@ -106,11 +116,13 @@
                             <div class="flex flex-wrap">
                                 <div class="relative w-full pr-4 max-w-full flex-grow flex-1">
                                     <h5 class="text-gray-500 uppercase font-bold text-xs">TOTAL LOANS APPLIED AMT</h5>
-                                    <span class="font-semibold text-xl text-gray-800">{{ $filters.formatNumber(totalAmountAppliedAmt) }}</span>
+                                    <span class="font-semibold text-xl text-gray-800">{{
+                                        $filters.formatNumber(totalAmountAppliedAmt) }}</span>
                                 </div>
                                 <div class="relative w-auto pl-4 flex-initial">
-                                    <div class="text-white p-3 text-center inline-flex items-center justify-center w-12 h-12 shadow-lg rounded-full bg-yellow-500">
-                                        <font-awesome-icon icon="hourglass-half"/>
+                                    <div
+                                        class="text-white p-3 text-center inline-flex items-center justify-center w-12 h-12 shadow-lg rounded-full bg-yellow-500">
+                                        <font-awesome-icon icon="hourglass-half" />
                                     </div>
                                 </div>
                             </div>
@@ -124,11 +136,13 @@
                             <div class="flex flex-wrap">
                                 <div class="relative w-full pr-4 max-w-full flex-grow flex-1">
                                     <h5 class="text-gray-500 uppercase font-bold text-xs">LOANS PENDING AMT</h5>
-                                    <span class="font-semibold text-xl text-gray-800">{{ $filters.formatNumber(totalPendingAmount) }}</span>
+                                    <span class="font-semibold text-xl text-gray-800">{{
+                                        $filters.formatNumber(totalPendingAmount) }}</span>
                                 </div>
                                 <div class="relative w-auto pl-4 flex-initial">
-                                    <div class="text-white p-3 text-center inline-flex items-center justify-center w-12 h-12 shadow-lg rounded-full bg-blue-500">
-                                        <font-awesome-icon icon="hand-holding-usd"/>
+                                    <div
+                                        class="text-white p-3 text-center inline-flex items-center justify-center w-12 h-12 shadow-lg rounded-full bg-blue-500">
+                                        <font-awesome-icon icon="hand-holding-usd" />
                                     </div>
                                 </div>
                             </div>
@@ -143,11 +157,14 @@
                             <div class="flex flex-wrap">
                                 <div class="relative w-full pr-4 max-w-full flex-grow flex-1">
                                     <h5 class="text-gray-500 uppercase font-bold text-xs">LOANS REJECTED AMT</h5>
-                                    <span class="font-semibold text-xl text-gray-800">{{ $filters.formatNumber(totalRejectedAmt) }}</span>
+                                    <span class="font-semibold text-xl text-gray-800">{{
+                                        $filters.formatNumber(totalRejectedAmt)
+                                        }}</span>
                                 </div>
                                 <div class="relative w-auto pl-4 flex-initial">
-                                    <div class="text-white p-3 text-center inline-flex items-center justify-center w-12 h-12 shadow-lg rounded-full bg-red-500">
-                                        <font-awesome-icon icon="exclamation-triangle"/>
+                                    <div
+                                        class="text-white p-3 text-center inline-flex items-center justify-center w-12 h-12 shadow-lg rounded-full bg-red-500">
+                                        <font-awesome-icon icon="exclamation-triangle" />
 
                                     </div>
                                 </div>
@@ -155,18 +172,20 @@
                         </div>
                     </div>
                 </div>
-                 <!-- Loans Defaulted -->
-                 <div class="">
+                <!-- Loans Defaulted -->
+                <div class="">
                     <div class="relative flex flex-col min-w-0 break-words bg-white rounded mb-6 xl:mb-0 shadow-lg">
                         <div class="flex-auto p-4">
                             <div class="flex flex-wrap">
                                 <div class="relative w-full pr-4 max-w-full flex-grow flex-1">
                                     <h5 class="text-gray-500 uppercase font-bold text-xs">LOANS APPROVED AMT</h5>
-                                    <span class="font-semibold text-xl text-gray-800">{{ $filters.formatNumber(applicationsApprovedAmount) }}</span>
+                                    <span class="font-semibold text-xl text-gray-800">{{
+                                        $filters.formatNumber(applicationsApprovedAmount) }}</span>
                                 </div>
                                 <div class="relative w-auto pl-4 flex-initial">
-                                    <div class="text-white p-3 text-center inline-flex items-center justify-center w-12 h-12 shadow-lg rounded-full bg-green-500">
-                                        <font-awesome-icon icon="check-circle"/>
+                                    <div
+                                        class="text-white p-3 text-center inline-flex items-center justify-center w-12 h-12 shadow-lg rounded-full bg-green-500">
+                                        <font-awesome-icon icon="check-circle" />
 
                                     </div>
                                 </div>
@@ -230,8 +249,8 @@ export default {
         totalRecommendedAmt: Number,
         totalApprovedAmt: Number,
         totalRejectedAmt: Number,
-        applicationsRecommended : Number,
-        totalPendingAmount : Number
+        applicationsRecommended: Number,
+        totalPendingAmount: Number
 
 
     },
@@ -255,6 +274,16 @@ export default {
         closeModal(modalName) {
             this.showModal = null;
         },
+        showTooltip(event) {
+            // Get the tooltip element
+            const tooltip = event.target.getAttribute('title');
+            // Show tooltip
+            event.target.setAttribute('data-tooltip', tooltip);
+        },
+        hideTooltip(event) {
+            // Remove tooltip when mouse out
+            event.target.removeAttribute('data-tooltip');
+        }
 
     },
     computed: {},
@@ -263,6 +292,54 @@ export default {
     }
 }
 </script>
-<style scoped>
+<style>
+/* Style for the tooltip */
+.tooltip-wrapper {
+    position: relative;
+}
 
+.tooltip-wrapper:after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 100%;
+    /* Tooltip position */
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 0.5em 1em;
+    /* Tooltip padding */
+    font-size: 0.8em;
+    /* Tooltip font size */
+  
+    /* Tooltip background color */
+    color: white;
+    /* Tooltip text color */
+    border-radius: 0.25em;
+    /* Tooltip border radius */
+    pointer-events: none;
+    white-space: nowrap;
+    /* Prevent line breaks */
+    opacity: 0;
+    /* Initially hidden */
+    transition: opacity 0.3s ease;
+    /* Smooth transition */
+}
+
+.tooltip-wrapper:hover:after {
+    opacity: 1;
+    /* Show tooltip on hover */
+}
+
+/* Add bounce animation to the card */
+.tooltip-wrapper:hover .shadow-lg {
+    animation: bounce 0.5s;
+}
+
+@keyframes bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-5px);
+    }
+}
 </style>

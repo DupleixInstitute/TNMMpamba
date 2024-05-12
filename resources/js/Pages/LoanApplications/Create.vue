@@ -285,6 +285,7 @@ export default {
             if (val) {
                 this.form.attributes = []
                 this.products.forEach(item => {
+                    
                     if (item.id == val) {
                         this.fields = item.form_attributes
                         this.form.attributes = JSON.parse(JSON.stringify(item.form_attributes))

@@ -87,6 +87,36 @@
                                 </select>
                                 <jet-input-error :message="form.errors.branch" class="mt-2" />
                             </div>
+
+                            <div>
+                                <jet-label for="loan_description" value="Loan Description" />
+                                <div class="flex items-center">
+
+                                    <jet-input id="loan_description" type="text" class="mt-1 block w-full"
+                                        v-model="form.loan_description"  />
+                                </div>
+                                <jet-input-error :message="form.errors.loan_description" class="mt-2" />
+                            </div>
+
+                            <div>
+                                <jet-label for="cif" value="Client's CIF" />
+                                <div class="flex items-center">
+
+                                    <jet-input id="cif" type="text" class="mt-1 block w-full"
+                                        v-model="form.cif"  />
+                                </div>
+                                <jet-input-error :message="form.errors.cif" class="mt-2" />
+                            </div>
+                            <div>
+                                <jet-label for="user_id" value="Select Initiator" />
+                                <select id="user_id" v-model="form.user_id" class="mt-1 block w-full">
+                                    <option value="">Select Initiator</option>
+                                    <option v-for="user in users" :key="user.id" :value="user.id">{{
+                                        user.name }}
+                                    </option>
+                                </select>
+                                <jet-input-error :message="form.errors.user_id" class="mt-2" />
+                            </div>
                         </div>
                         <div class="flex items-center justify-end mt-6">
 
@@ -121,6 +151,7 @@ export default {
         provinces: Object,
         products: Object,
         branches: Object,
+        users : Object
     },
     components: {
         AppLayout,
@@ -142,6 +173,9 @@ export default {
                 branch: null,
                 //take the scope which was passed as a prop
                 scope : this.scope,
+                loan_description : null,
+                cif :null,
+                user_id :null,
             }),
             pageTitle: "Create Filter",
             pageDescription: "Create Filter",
@@ -149,7 +183,7 @@ export default {
         }
     },
     mounted() {
-        console.log('Scope prop:', this.scope);
+        // console.log('Scope prop:', this.users);
 
         // console.log('province prop:', this.provinces);
     },
