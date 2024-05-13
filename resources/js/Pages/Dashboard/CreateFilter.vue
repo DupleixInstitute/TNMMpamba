@@ -32,7 +32,7 @@
                                 <div class="flex items-center">
 
                                     <jet-input id="loan_end_date" type="date" class="mt-1 block w-full"
-                                        v-model="form.loan_end_date"  />
+                                        v-model="form.loan_end_date" />
                                 </div>
                                 <div class="flex justify-between">
                                     <jet-input-error :message="form.errors.loan_end_date_start" class="mt-2" />
@@ -88,40 +88,29 @@
                                 <jet-input-error :message="form.errors.branch" class="mt-2" />
                             </div>
 
-                            <div>
-                                <jet-label for="loan_description" value="Loan Description" />
-                                <div class="flex items-center">
+                            <h2 class="extra-column-header">Select Extra Columns To Appear On Results</h2>
 
-                                    <jet-input id="loan_description" type="text" class="mt-1 block w-full"
-                                        v-model="form.loan_description"  />
-                                </div>
-                                <jet-input-error :message="form.errors.loan_description" class="mt-2" />
+                            <div class="checkbox-container">
+                                <input type="checkbox" id="loan_description" v-model="form.loan_description" />
+                                <label for="loan_description">Loan Description</label>
                             </div>
 
-                            <div>
-                                <jet-label for="cif" value="Client's CIF" />
-                                <div class="flex items-center">
+                            <div class="checkbox-container">
+                                <input type="checkbox" id="cif" v-model="form.cif" />
+                                <label for="cif">Client's CIF</label>
+                            </div>
 
-                                    <jet-input id="cif" type="text" class="mt-1 block w-full"
-                                        v-model="form.cif"  />
-                                </div>
-                                <jet-input-error :message="form.errors.cif" class="mt-2" />
+                            <div class="checkbox-container">
+                                <input type="checkbox" id="user_id" v-model="form.user_id" />
+                                <label for="user_id">Loan Initiator</label>
                             </div>
-                            <div>
-                                <jet-label for="user_id" value="Select Initiator" />
-                                <select id="user_id" v-model="form.user_id" class="mt-1 block w-full">
-                                    <option value="">Select Initiator</option>
-                                    <option v-for="user in users" :key="user.id" :value="user.id">{{
-                                        user.name }}
-                                    </option>
-                                </select>
-                                <jet-input-error :message="form.errors.user_id" class="mt-2" />
-                            </div>
+
                         </div>
                         <div class="flex items-center justify-end mt-6">
 
-                            <inertia-link class="text-indigo-400 hover:text-indigo-600" :href="route('dashboard')">Cancel
-                </inertia-link>
+                            <inertia-link class="text-indigo-400 hover:text-indigo-600"
+                                :href="route('dashboard')">Cancel
+                            </inertia-link>
                             <jet-button class="ml-4" :class="{ 'opacity-25': form.processing }"
                                 :disabled="form.processing">
                                 Apply Filter
@@ -151,7 +140,7 @@ export default {
         provinces: Object,
         products: Object,
         branches: Object,
-        users : Object
+        users: Object
     },
     components: {
         AppLayout,
@@ -172,10 +161,10 @@ export default {
                 loan_amount: null,
                 branch: null,
                 //take the scope which was passed as a prop
-                scope : this.scope,
-                loan_description : null,
-                cif :null,
-                user_id :null,
+                scope: this.scope,
+                loan_description: null,
+                cif: null,
+                user_id: null,
             }),
             pageTitle: "Create Filter",
             pageDescription: "Create Filter",
@@ -211,4 +200,19 @@ export default {
 
 <style scoped>
 /* Add your custom styling here */
+.checkbox-container {
+    margin-bottom: 10px;
+
+}
+.extra-column-header {
+
+    grid-column: span 2;
+    font-weight: bold;
+    font-size: 1.2rem;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    color: #4a5568;
+}
+
+
 </style>

@@ -243,7 +243,7 @@ export default {
         applicationsCount: Number,
         applicationsApproved: Number,
         applicationsRejected: Number,
-        applicationsApprovedAmount: Number,
+        applicationsApprovedAmount: String,
         applicationsPending: Number,
         totalAmountAppliedAmt: Number,
         totalRecommendedAmt: Number,
@@ -309,7 +309,7 @@ export default {
     /* Tooltip padding */
     font-size: 0.8em;
     /* Tooltip font size */
-  
+
     /* Tooltip background color */
     color: white;
     /* Tooltip text color */

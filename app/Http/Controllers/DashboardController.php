@@ -481,12 +481,12 @@ class DashboardController extends Controller
 
         switch($request->scope){
             case 'all':
-                $applications = LoanApplication::with(['staff', 'client', 'product', 'currentLinkedStage', 'currentLinkedStage.stage', 'currentLinkedStage.approver', 'currentLinkedStage.assignedBy', 'branch'])
+                $applications = LoanApplication::with(['staff', 'client', 'product', 'currentLinkedStage', 'currentLinkedStage.stage', 'currentLinkedStage.approver', 'currentLinkedStage.assignedBy', 'branch', 'createdBy'])
             ->filter(\request()->only('search', 'client_id', 'loan_product_id', 'province_id', 'district_id', 'ward_id', 'date_range', 'village_id', 'staff_id', 'status'));
             break;
 
             case 'pending':
-                $applications = LoanApplication::with(['staff', 'client', 'product', 'currentLinkedStage', 'currentLinkedStage.stage', 'currentLinkedStage.approver', 'currentLinkedStage.assignedBy', 'branch'])
+                $applications = LoanApplication::with(['staff', 'client', 'product', 'currentLinkedStage', 'currentLinkedStage.stage', 'currentLinkedStage.approver', 'currentLinkedStage.assignedBy', 'branch', 'createdBy'])
             ->filter(\request()->only('search', 'client_id', 'loan_product_id', 'province_id', 'district_id', 'ward_id', 'date_range', 'village_id', 'staff_id', 'status'))
             ->whereHas('currentLinkedStage', function ($query) {
                 $query->where('status', '!=','approved')
@@ -494,14 +494,14 @@ class DashboardController extends Controller
             });
             break;
             case 'rejected':
-                $applications = LoanApplication::with(['staff', 'client', 'product', 'currentLinkedStage', 'currentLinkedStage.stage', 'currentLinkedStage.approver', 'currentLinkedStage.assignedBy', 'branch'])
+                $applications = LoanApplication::with(['staff', 'client', 'product', 'currentLinkedStage', 'currentLinkedStage.stage', 'currentLinkedStage.approver', 'currentLinkedStage.assignedBy', 'branch', 'createdBy'])
             ->filter(\request()->only('search', 'client_id', 'loan_product_id', 'province_id', 'district_id', 'ward_id', 'date_range', 'village_id', 'staff_id', 'status'))
             ->whereHas('currentLinkedStage', function ($query) {
                 $query->where('status', 'rejected');
             });
             break;
             case 'approved':
-                $applications = LoanApplication::with(['staff', 'client', 'product', 'currentLinkedStage', 'currentLinkedStage.stage', 'currentLinkedStage.approver', 'currentLinkedStage.assignedBy', 'branch'])
+                $applications = LoanApplication::with(['staff', 'client', 'product', 'currentLinkedStage', 'currentLinkedStage.stage', 'currentLinkedStage.approver', 'currentLinkedStage.assignedBy', 'branch', 'createdBy'])
             ->filter(\request()->only('search', 'client_id', 'loan_product_id', 'province_id', 'district_id', 'ward_id', 'date_range', 'village_id', 'staff_id', 'status'))
             ->whereHas('currentLinkedStage', function ($query) {
                 $query->where('status', 'approved');
@@ -537,19 +537,19 @@ class DashboardController extends Controller
         if ($request->filled('product')) {
             $applications = $applications->where('loan_product_id', $request->product);
         }
-        if($request->filled('loan_description'))
-        {
-            $applications = $applications->where('description', 'like', '%'. $request->loan_description. '%');
-        }
+        // if($request->filled('loan_description'))
+        // {
+        //     $applications = $applications->where('description', 'like', '%'. $request->loan_description. '%');
+        // }
 
-        if ($request->filled('cif')) {
-            $applications = $applications->whereHas('client', function ($query) use ($request) {
-                $query->where('external_id', $request->cif);
-            });
-        }
-        if ($request->filled('user_id')) {
-            $applications = $applications->where('created_by_id',  $request->user_id);
-        }
+        // if ($request->filled('cif')) {
+        //     $applications = $applications->whereHas('client', function ($query) use ($request) {
+        //         $query->where('external_id', $request->cif);
+        //     });
+        // }
+        // if ($request->filled('user_id')) {
+        //     $applications = $applications->where('created_by_id',  $request->user_id);
+        // }
 
 
 
@@ -575,6 +575,15 @@ class DashboardController extends Controller
         $applications = $applications->orderBy('created_at', 'desc')
             ->paginate($applicationCount);
 
+
+        $hiddenColumns =  [
+            'loan_description' => $request->loan_description,
+            'cif' =>$request->cif,
+            'user_id' => $request->user_id
+        ];
+
+
+
         // region in in the client table and branch
 
         return Inertia::render('LoanApplications/Filtered', [
@@ -595,6 +604,7 @@ class DashboardController extends Controller
             'scope' => $request->scope,
             'startDate' => $startDate,
             'endDate' => $endDate,
+            'hiddenColumns' => $hiddenColumns
         ]);
 
         // For example, you might want to redirect back with a success message
@@ -603,9 +613,13 @@ class DashboardController extends Controller
 
     public function export(Request $request)
     {
+        // dd('ok');
 
         $formData = json_decode($request->get('applications'), true);
         $applications = $formData['data'];
+
+        $extraColumns = json_decode($request->get('hiddenColumns'), true);
+
 
 
         $exportData = [];
@@ -618,14 +632,18 @@ class DashboardController extends Controller
                 'Amount' => $application['amount'],
                 'Score' => $application['score'],
                 'Status' => $application['current_stage_status'],
-                'Created At' => $application['created_at'],
-                'Created By' => User::find($application['created_by_id'])->name,
+                'Created At' =>  $application['created_at'],
+                'loan_description' => $extraColumns['loan_description'] != null ? $application['description'] : null,
+                'Created By' =>   $extraColumns['user_id'] != null ? User::find($application['created_by_id'])->name : null,
+                'CIF' =>  $extraColumns['cif'] != null ? Client::find($application['client_id'])->external_id : null,
             ];
+
         }
-        // dd($exportData);
+        // dd($extraColumns);
+
 
         // Instantiate the export class
-        $export = new LoanApplicationsExport($exportData);
+        $export = new LoanApplicationsExport($exportData, $extraColumns);
 
     // Optionally, you can modify the export class properties or methods here if needed
 

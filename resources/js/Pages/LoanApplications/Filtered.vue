@@ -23,13 +23,28 @@
                     <thead class="bg-gray-50">
                         <tr class="text-left font-bold">
                             <th class="px-6 pt-4 pb-4 font-medium text-gray-500">ID</th>
+                            <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Date</th>
+
                             <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Client</th>
                             <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Product</th>
                             <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Amount</th>
                             <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Score</th>
                             <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Status</th>
-                            <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Date</th>
                             <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Branch</th>
+
+                            <!-- conditionally show the loan description -->
+                            <th v-if="!hiddenColumns.loan_description == ''"
+                                class="px-6 pt-4 pb-4 font-medium text-gray-500">Description</th>
+
+                            <!-- conditionally show the loan officer -->
+                            <th v-if="!hiddenColumns.user_id == ''"
+                            class="px-6 pt-4 pb-4 font-medium text-gray-500">Loan Officer</th>
+                            <th v-if="!hiddenColumns.cif == ''"
+                            class="px-6 pt-4 pb-4 font-medium text-gray-500">Client's CIF</th>
+
+
+
+
 
                             <!-- <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Action</th> -->
                         </tr>
@@ -47,6 +62,11 @@
                                     :href="route('loan_applications.show', application.id)" tabindex="-1">
                                     {{ application.id }}
                                 </inertia-link>
+                            </td>
+                            <td class="border-t">
+                                <span class="px-6 py-4 flex items-center">
+                                    {{ application.date }}
+                                </span>
                             </td>
                             <td class="border-t">
                                 <inertia-link class="px-6 py-4 flex items-center focus:text-indigo-500"
@@ -110,16 +130,33 @@
                                     </span>
                                 </div>
                             </td>
-                            <td class="border-t">
-                                <span class="px-6 py-4 flex items-center">
-                                    {{ application.date }}
-                                </span>
-                            </td>
+
                             <td class="border-t">
                                 <span class="px-6 py-4 flex items-center" v-if="application.branch">
                                     {{ application.branch.name }}
                                 </span>
                             </td>
+
+                            <td v-if="!hiddenColumns.loan_description == ''"
+                            class="px-6 pt-4 pb-4 font-medium text-gray-500">
+                            {{ application.description }}
+                             </td>
+
+                             <!-- <td v-if="!hiddenColumns.user_id == ''"
+                             class="px-6 pt-4 pb-4 font-medium text-gray-500">
+                             {{ application.createdBy.name }}
+                              </td> -->
+                              <td v-if="!hiddenColumns.user_id  == ''" class="border-t">
+                                <span class="px-6 py-4 flex items-center" v-if="application.created_by">
+                                    {{ application.created_by.name }}
+                                </span>
+                            </td>
+                              <td v-if="!hiddenColumns.cif == ''"
+                             class="px-6 pt-4 pb-4 font-medium text-gray-500">
+                             {{ application.client.external_id }}
+                              </td>
+
+
 
                             <!-- <td class="border-t w-px pr-2">
                             <div class=" flex items-center gap-4">
@@ -144,7 +181,7 @@
                 </table>
 
             </div>
-            <pagination :links="applications.links" />
+            <!-- <pagination :links="applications.links" /> -->
 
         </div>
 
@@ -191,6 +228,7 @@ export default {
         startDate: String,
         endDate: String,
         scope: String,
+        hiddenColumns : Object
 
     },
     data() {
@@ -207,6 +245,8 @@ export default {
         exportToExcel() {
     // Get CSRF token value from the meta tag
     let csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+    console.log(csrfToken);
 
     let form = document.createElement('form');
     form.method = 'POST';
@@ -225,9 +265,15 @@ export default {
     applicationsInput.name = 'applications';
     applicationsInput.value = JSON.stringify(this.applications);
 
+    let extraColumnsInput = document.createElement('input');
+    extraColumnsInput.type = 'hidden';
+    extraColumnsInput.name = 'hiddenColumns';
+    extraColumnsInput.value = JSON.stringify(this.hiddenColumns);
+
     // Append inputs to form
     form.appendChild(csrfInput);
     form.appendChild(applicationsInput);
+    form.appendChild(extraColumnsInput);
 
     // Append form to document body
     document.body.appendChild(form);
@@ -236,7 +282,7 @@ export default {
     form.submit();
 
     // Clean up: Remove form from document body
-    document.body.removeChild(form);
+    // document.body.removeChild(form);
 },
         exportToPDF() {
             // Access the DataTable instance using $refs
@@ -256,7 +302,7 @@ export default {
 
     mounted() {
         this.dataTableReady = true;
-        console.log('Scope prop:', this.scope);
+        console.log('Scope prop:', this.hiddenColumns);
         // console.log('province prop:', this.provinces);
     },
 

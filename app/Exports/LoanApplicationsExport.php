@@ -14,10 +14,13 @@ use Maatwebsite\Excel\Concerns\WithEvents;
 class LoanApplicationsExport implements FromArray, WithHeadings, ShouldAutoSize, WithStyles, WithEvents
 {
     protected $data;
+    protected $hiddenColumns;
 
-    public function __construct(array $data)
+    public function __construct(array $data, array $hiddenColumns)
     {
         $this->data = $data;
+        $this->hiddenColumns = $hiddenColumns;
+
     }
 
     /**
@@ -31,7 +34,7 @@ class LoanApplicationsExport implements FromArray, WithHeadings, ShouldAutoSize,
     // Define the headings
     public function headings(): array
     {
-        return [
+        $headers = [
             'ID',
             'Loan Date',
             'Client',
@@ -40,8 +43,24 @@ class LoanApplicationsExport implements FromArray, WithHeadings, ShouldAutoSize,
             'Score',
             'Status',
             'Created At',
-            'Created By',
+
         ];
+
+        if ($this->hiddenColumns['loan_description'] != null) {
+            $headers[] = 'Description';
+        }
+        // dd($headers);
+        if ($this->hiddenColumns['user_id'] != null) {
+
+
+            $headers[] = 'Created By';
+        }
+
+        if ($this->hiddenColumns['cif'] != null) {
+            $headers[] = 'CIF';
+        }
+       
+        return $headers;
     }
 
     // Apply styles to the Excel file
@@ -59,15 +78,15 @@ class LoanApplicationsExport implements FromArray, WithHeadings, ShouldAutoSize,
         ]);
     }
 
-     // Lock the sheet
-     public function registerEvents(): array
-     {
-         return [
-             AfterSheet::class => function(AfterSheet $event) {
-                 $sheet = $event->sheet->getDelegate();
-                 $sheet->getProtection()->setSheet(true);
-                 $sheet->getProtection()->setPassword('1234');
-             },
-         ];
-     }
+    // Lock the sheet
+    public function registerEvents(): array
+    {
+        return [
+            AfterSheet::class => function (AfterSheet $event) {
+                $sheet = $event->sheet->getDelegate();
+                $sheet->getProtection()->setSheet(true);
+                $sheet->getProtection()->setPassword('1234');
+            },
+        ];
+    }
 }
