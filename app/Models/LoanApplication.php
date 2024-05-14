@@ -15,6 +15,7 @@ class LoanApplication extends Model
     protected $casts = [
 
     ];
+    protected $appends = ['approver_name'];
 
 
     public function client()
@@ -107,5 +108,10 @@ class LoanApplication extends Model
 
     public function createdBy(){
         return $this->belongsTo(User::class, 'created_by_id');
+    }
+    public function getApproverNameAttribute()
+    {
+        $result = $this->currentLinkedStage?->status == 'approved' ? User::find($this->currentLinkedStage->approver_id)->name : 'Not Approved Yet';
+        return $result;
     }
 }

@@ -537,20 +537,14 @@ class DashboardController extends Controller
         if ($request->filled('product')) {
             $applications = $applications->where('loan_product_id', $request->product);
         }
-        // if($request->filled('loan_description'))
-        // {
-        //     $applications = $applications->where('description', 'like', '%'. $request->loan_description. '%');
-        // }
 
-        // if ($request->filled('cif')) {
-        //     $applications = $applications->whereHas('client', function ($query) use ($request) {
-        //         $query->where('external_id', $request->cif);
-        //     });
-        // }
-        // if ($request->filled('user_id')) {
-        //     $applications = $applications->where('created_by_id',  $request->user_id);
-        // }
+        if ($request->filled('loan_initiator_id')) {
+            $applications = $applications->where('created_by_id',  $request->loan_initiator_id);
+        }
 
+        if ($request->filled('loan_approver_id')) {
+            $applications = $applications->where('approved_by_id', $request->loan_approver_id);
+        }
 
 
         // Apply loan amount logic based on operator
@@ -574,6 +568,8 @@ class DashboardController extends Controller
         $applicationCount = $applications->count();
         $applications = $applications->orderBy('created_at', 'desc')
             ->paginate($applicationCount);
+
+            // dd($applications);
 
 
         $hiddenColumns =  [

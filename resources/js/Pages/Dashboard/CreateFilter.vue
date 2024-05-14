@@ -88,6 +88,27 @@
                                 <jet-input-error :message="form.errors.branch" class="mt-2" />
                             </div>
 
+                            <div>
+                                <jet-label for="loan_initiator" value="Loan Initiator" />
+                                <select id="loan_initiator" v-model="form.loan_initiator_id" class="mt-1 block w-full">
+                                    <option value="">Select User</option>
+                                    <option v-for="user in users" :key="user.id" :value="user.id">{{
+                                        user.name }}
+                                    </option>
+                                </select>
+                                <jet-input-error :message="form.errors.loan_initiator_id" class="mt-2" />
+                            </div>
+                            <div>
+                                <jet-label for="loan_approver" value="Loan Approver" />
+                                <select id="loan_approver" v-model="form.loan_approver_id" class="mt-1 block w-full">
+                                    <option value="">Select User</option>
+                                    <option v-for="user in users" :key="user.id" :value="user.id">{{
+                                        user.name }}
+                                    </option>
+                                </select>
+                                <jet-input-error :message="form.errors.loan_approver_id" class="mt-2" />
+                            </div>
+
                             <h2 class="extra-column-header">Select Extra Columns To Appear On Results</h2>
 
                             <div class="checkbox-container">
@@ -165,6 +186,8 @@ export default {
                 loan_description: null,
                 cif: null,
                 user_id: null,
+                loan_initiator_id: null,
+                loan_approver_id: null,
             }),
             pageTitle: "Create Filter",
             pageDescription: "Create Filter",
