@@ -78,7 +78,7 @@
                                         <option value="equal">Equal To</option>
                                     </select>
                                     <jet-input id="loan_amount" type="number" class="mt-1 block w-2/3"
-                                        v-model="form.loan_amount" required />
+                                        v-model="form.loan_amount" min="0" required />
                                 </div>
                                 <jet-input-error :message="form.errors.loan_amount" class="mt-2" />
                             </div>
@@ -131,6 +131,10 @@
                             <div class="checkbox-container">
                                 <input type="checkbox" id="user_id" v-model="form.user_id" />
                                 <label for="user_id">Loan Initiator</label>
+                            </div>
+                            <div class="checkbox-container">
+                                <input type="checkbox" id="show_loan_approver" v-model="form.show_loan_approver" />
+                                <label for="show_loan_approver">Loan Approver</label>
                             </div>
                             <div class="checkbox-container">
                                 <input type="checkbox" id="show_branch" v-model="form.show_branch" />
@@ -204,7 +208,8 @@ export default {
                 loan_initiator_id: null,
                 loan_approver_id: null,
                 show_branch : null,
-                show_region :null
+                show_region :null,
+                show_loan_approver : null,
             }),
             pageTitle: "Create Filter",
             pageDescription: "Create Filter",

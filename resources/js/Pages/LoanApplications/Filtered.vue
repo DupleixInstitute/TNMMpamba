@@ -43,7 +43,8 @@
                             class="px-6 pt-4 pb-4 font-medium text-gray-500">Loan Initiator</th>
                             <th v-if="!hiddenColumns.cif == ''"
                             class="px-6 pt-4 pb-4 font-medium text-gray-500">Client's CIF</th>
-                            <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Approved By</th>
+                            <th v-if="!hiddenColumns.show_loan_approver == ''"
+                             class="px-6 pt-4 pb-4 font-medium text-gray-500">Approved By</th>
 
 
 
@@ -164,7 +165,7 @@
                              class="px-6 pt-4 pb-4 font-medium text-gray-500">
                              {{ application.client.external_id }}
                               </td>
-                              <td>
+                              <td  v-if="!hiddenColumns.show_loan_approver == ''">
                                 <span class="px-6 py-4 flex items-center">
                                     {{
                                         application.approver_name

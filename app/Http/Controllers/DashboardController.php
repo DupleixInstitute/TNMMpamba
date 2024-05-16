@@ -554,6 +554,10 @@ class DashboardController extends Controller
 
         // Apply loan amount logic based on operator
         $loanAmount = $request->loan_amount;
+        //validate the loan amount, it shoulf be 0 or greater
+        if ($loanAmount < 0) {
+            return redirect()->back()->with('error', 'Invalid loan amount');
+        }
         $operator = $request->loan_amount_operator;
 
         switch ($operator) {
@@ -582,7 +586,8 @@ class DashboardController extends Controller
             'cif' =>$request->cif,
             'user_id' => $request->user_id,
             'show_branch' =>$request->show_branch,
-            'show_region' => $request->show_region
+            'show_region' => $request->show_region,
+            'show_loan_approver' => $request->show_loan_approver,
         ];
 
 
