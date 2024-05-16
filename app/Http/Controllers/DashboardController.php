@@ -451,22 +451,29 @@ class DashboardController extends Controller
 
     public function filter($scope)
     {
-        $provinces = Province::filter(\request()->only('search'))
-            ->with(['country'])
-            ->get();
-        // dd($provinces);
+
         $products = LoanProduct::with(['category', 'createdBy'])
             ->orderBy('created_at', 'desc')
             ->get();
-        $branches = Branch::get();
+        // $branches = Branch::get();
         $filterScope = $scope;
         $users = User::where('active', 1)->get();
 
         return Inertia::render('Dashboard/CreateFilter', [
             'scope' => $filterScope,
-            'provinces' => $provinces,
+            'provinces' =>  Province::all()->transform(function ($province) {
+                return [
+                    'value' => $province->id,
+                    'label' => $province->name,
+                ];
+            }),
             'products' => $products,
-            'branches' => $branches,
+            'branches' => Branch::all()->transform(function ($branch) {
+                return [
+                    'value' => $branch->id,
+                    'label' => $branch->name,
+                ];
+            }),
             'users' => $users
 
         ]);
@@ -481,12 +488,12 @@ class DashboardController extends Controller
 
         switch($request->scope){
             case 'all':
-                $applications = LoanApplication::with(['staff', 'client', 'product', 'currentLinkedStage', 'currentLinkedStage.stage', 'currentLinkedStage.approver', 'currentLinkedStage.assignedBy', 'branch', 'createdBy'])
+                $applications = LoanApplication::with(['staff', 'client', 'product', 'currentLinkedStage', 'currentLinkedStage.stage', 'currentLinkedStage.approver', 'currentLinkedStage.assignedBy', 'branch', 'createdBy', 'client.province'])
             ->filter(\request()->only('search', 'client_id', 'loan_product_id', 'province_id', 'district_id', 'ward_id', 'date_range', 'village_id', 'staff_id', 'status'));
             break;
 
             case 'pending':
-                $applications = LoanApplication::with(['staff', 'client', 'product', 'currentLinkedStage', 'currentLinkedStage.stage', 'currentLinkedStage.approver', 'currentLinkedStage.assignedBy', 'branch', 'createdBy'])
+                $applications = LoanApplication::with(['staff', 'client', 'product', 'currentLinkedStage', 'currentLinkedStage.stage', 'currentLinkedStage.approver', 'currentLinkedStage.assignedBy', 'branch', 'createdBy',  'client.province'])
             ->filter(\request()->only('search', 'client_id', 'loan_product_id', 'province_id', 'district_id', 'ward_id', 'date_range', 'village_id', 'staff_id', 'status'))
             ->whereHas('currentLinkedStage', function ($query) {
                 $query->where('status', '!=','approved')
@@ -494,14 +501,14 @@ class DashboardController extends Controller
             });
             break;
             case 'rejected':
-                $applications = LoanApplication::with(['staff', 'client', 'product', 'currentLinkedStage', 'currentLinkedStage.stage', 'currentLinkedStage.approver', 'currentLinkedStage.assignedBy', 'branch', 'createdBy'])
+                $applications = LoanApplication::with(['staff', 'client', 'product', 'currentLinkedStage', 'currentLinkedStage.stage', 'currentLinkedStage.approver', 'currentLinkedStage.assignedBy', 'branch', 'createdBy',  'client.province'])
             ->filter(\request()->only('search', 'client_id', 'loan_product_id', 'province_id', 'district_id', 'ward_id', 'date_range', 'village_id', 'staff_id', 'status'))
             ->whereHas('currentLinkedStage', function ($query) {
                 $query->where('status', 'rejected');
             });
             break;
             case 'approved':
-                $applications = LoanApplication::with(['staff', 'client', 'product', 'currentLinkedStage', 'currentLinkedStage.stage', 'currentLinkedStage.approver', 'currentLinkedStage.assignedBy', 'branch', 'createdBy'])
+                $applications = LoanApplication::with(['staff', 'client', 'product', 'currentLinkedStage', 'currentLinkedStage.stage', 'currentLinkedStage.approver', 'currentLinkedStage.assignedBy', 'branch', 'createdBy',  'client.province'])
             ->filter(\request()->only('search', 'client_id', 'loan_product_id', 'province_id', 'district_id', 'ward_id', 'date_range', 'village_id', 'staff_id', 'status'))
             ->whereHas('currentLinkedStage', function ($query) {
                 $query->where('status', 'approved');
@@ -522,15 +529,13 @@ class DashboardController extends Controller
 
         // Handle optional branch ID
         if ($request->filled('branch')) {
-            $applications = $applications->whereHas('client.branch', function ($query) use ($request) {
-                $query->where('id', $request->branch);
-            });
+            $applications = $applications->whereIn('branch_id', $request->branch);
         }
 
         //handle region
         if ($request->filled('region')) {
             $applications = $applications->whereHas('client.province', function ($query) use ($request) {
-                $query->where('id', $request->region);
+                $query->whereIn('id', $request->region);
             });
         }
 
@@ -575,7 +580,9 @@ class DashboardController extends Controller
         $hiddenColumns =  [
             'loan_description' => $request->loan_description,
             'cif' =>$request->cif,
-            'user_id' => $request->user_id
+            'user_id' => $request->user_id,
+            'show_branch' =>$request->show_branch,
+            'show_region' => $request->show_region
         ];
 
 

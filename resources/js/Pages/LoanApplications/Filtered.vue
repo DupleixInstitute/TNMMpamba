@@ -30,7 +30,9 @@
                             <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Amount</th>
                             <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Score</th>
                             <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Status</th>
-                            <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Branch</th>
+                            <th v-if="!hiddenColumns.show_branch == ''" class="px-6 pt-4 pb-4 font-medium text-gray-500">Branch</th>
+                            <th v-if="!hiddenColumns.show_region == ''" class="px-6 pt-4 pb-4 font-medium text-gray-500">Region</th>
+
 
                             <!-- conditionally show the loan description -->
                             <th v-if="!hiddenColumns.loan_description == ''"
@@ -133,9 +135,14 @@
                                 </div>
                             </td>
 
-                            <td class="border-t">
+                            <td v-if="!hiddenColumns.show_branch == ''" class="border-t">
                                 <span class="px-6 py-4 flex items-center" v-if="application.branch">
                                     {{ application.branch.name }}
+                                </span>
+                            </td>
+                            <td v-if="!hiddenColumns.show_region == ''" class="border-t">
+                                <span class="px-6 py-4 flex items-center" v-if="application.client">
+                                    {{ application.client.province?.name }}
                                 </span>
                             </td>
 

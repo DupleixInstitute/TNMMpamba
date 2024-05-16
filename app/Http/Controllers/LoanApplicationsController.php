@@ -899,4 +899,9 @@ class LoanApplicationsController extends Controller
             ->log('Delete Loan Application');
         return redirect()->route('loan_applications.index')->with('success', 'Loan deleted successfully.');
     }
+
+    public function showComments()
+    {
+        dd('show comments');
+    }
 }

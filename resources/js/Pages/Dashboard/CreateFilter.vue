@@ -42,12 +42,18 @@
                             <!-- Select Region -->
                             <div>
                                 <jet-label for="region" value="Select Region" />
-                                <select id="region" v-model="form.region" class="mt-1 block w-full">
+                                <!-- <select id="region" v-model="form.region" class="mt-1 block w-full">
                                     <option value="">Select Region</option>
                                     <option v-for="region in provinces" :key="region.id" :value="region.id">{{
                                         region.name }}
                                     </option>
-                                </select>
+                                </select> -->
+                                <Multiselect
+                                v-model="form.region"
+                                :options="provinces"
+                                mode="tags"
+
+                            />
                                 <jet-input-error :message="form.errors.region" class="mt-2" />
                             </div>
                             <!-- Select Product -->
@@ -79,12 +85,13 @@
                             <!-- Select Branch -->
                             <div>
                                 <jet-label for="branch" value="Select Branch" />
-                                <select id="branch" v-model="form.branch" class="mt-1 block w-full">
-                                    <option value="">Select Branch</option>
-                                    <option v-for="branch in branches" :key="branch.id" :value="branch.id">{{
-                                        branch.name }}
-                                    </option>
-                                </select>
+                                <Multiselect
+                                v-model="form.branch"
+                                :options="branches"
+                                mode="tags"
+
+                            />
+
                                 <jet-input-error :message="form.errors.branch" class="mt-2" />
                             </div>
 
@@ -124,6 +131,14 @@
                             <div class="checkbox-container">
                                 <input type="checkbox" id="user_id" v-model="form.user_id" />
                                 <label for="user_id">Loan Initiator</label>
+                            </div>
+                            <div class="checkbox-container">
+                                <input type="checkbox" id="show_branch" v-model="form.show_branch" />
+                                <label for="show_branch">Branch</label>
+                            </div>
+                            <div class="checkbox-container">
+                                <input type="checkbox" id="show_region" v-model="form.show_region" />
+                                <label for="show_region">Region</label>
                             </div>
 
                         </div>
@@ -176,11 +191,11 @@ export default {
             form: this.$inertia.form({
                 loan_start_date: null,
                 loan_end_date: null,
-                region: null,
+                region: [],
                 product: null,
-                loan_amount_operator: null,
-                loan_amount: null,
-                branch: null,
+                loan_amount_operator: 'greater',
+                loan_amount: 0,
+                branch: [],
                 //take the scope which was passed as a prop
                 scope: this.scope,
                 loan_description: null,
@@ -188,6 +203,8 @@ export default {
                 user_id: null,
                 loan_initiator_id: null,
                 loan_approver_id: null,
+                show_branch : null,
+                show_region :null
             }),
             pageTitle: "Create Filter",
             pageDescription: "Create Filter",
@@ -195,7 +212,7 @@ export default {
         }
     },
     mounted() {
-        // console.log('Scope prop:', this.users);
+        // console.log('Scope prop:', this.branches);
 
         // console.log('province prop:', this.provinces);
     },
@@ -217,6 +234,7 @@ export default {
                 console.error('Form submission error:', error);
             }
         },
+
     }
 }
 </script>

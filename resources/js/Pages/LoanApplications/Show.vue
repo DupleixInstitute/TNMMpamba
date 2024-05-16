@@ -142,6 +142,18 @@
 
                         <div class="mt-4">{{ application.description }}</div>
                     </div>
+
+                    <inertia-link :href="route('loan_applications.show_comments', application.id)">
+                        <div class="bg-white p-5 mt-5">
+                            <div class="flex items-center">
+                                <i class="fas fa-comments mr-2"></i>
+                                <div class="font-medium text-lg">Reviewer Comments</div>
+                            </div>
+                        </div>
+                    </inertia-link>
+
+
+
                 </div>
                 <div class="w-full md:w-9/12 p-4 md:ml-4 bg-white">
                     <div v-if="can('loans.applications.view_approvals')">
