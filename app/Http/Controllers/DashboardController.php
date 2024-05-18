@@ -588,6 +588,7 @@ class DashboardController extends Controller
             'show_branch' =>$request->show_branch,
             'show_region' => $request->show_region,
             'show_loan_approver' => $request->show_loan_approver,
+
         ];
 
 

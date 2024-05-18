@@ -569,15 +569,31 @@ export default {
 
     },
     computed: {
-            filteredStages() {
-                const approvedIndex = this.application.linked_stages.findIndex(stage => stage.status === 'approved');
-                if (approvedIndex === -1) {
-                    return this.application.linked_stages;
-                } else {
-                    return this.application.linked_stages.slice(0, approvedIndex + 1);
-                }
-            }
-        },
+    filteredStages() {
+        const stages = this.application.linked_stages;
+        const approvedIndex = stages.findIndex(stage => stage.status === 'approved');
+        const rejectedIndex = stages.findIndex(stage => stage.status === 'rejected');
+
+        // Find the earliest occurrence of approved or rejected status
+        let cutoffIndex;
+        if (approvedIndex !== -1 && rejectedIndex !== -1) {
+            cutoffIndex = Math.min(approvedIndex, rejectedIndex);
+        } else if (approvedIndex !== -1) {
+            cutoffIndex = approvedIndex;
+        } else if (rejectedIndex !== -1) {
+            cutoffIndex = rejectedIndex;
+        } else {
+            cutoffIndex = -1;
+        }
+
+        if (cutoffIndex === -1) {
+            return stages;
+        } else {
+            return stages.slice(0, cutoffIndex + 1);
+        }
+    }
+},
+
     watch: {}
 }
 </script>

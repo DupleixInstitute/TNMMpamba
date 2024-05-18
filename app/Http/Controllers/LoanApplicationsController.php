@@ -22,6 +22,7 @@ use Webit\Util\EvalMath\EvalMath;
 use Spatie\Permission\Models\Role;
 use App\Models\LoanProductCategory;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Log;
 use App\Models\LoanApplicationScore;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
@@ -903,5 +904,39 @@ class LoanApplicationsController extends Controller
     public function showComments()
     {
         dd('show comments');
+    }
+
+    public function fixing()
+    {
+        $applications = LoanApplication::get();
+        foreach($applications as $application)
+        {
+
+            //get latest linked transaction
+            $currentLinkedStages = LoanApplicationLinkedApprovalStage::where('loan_application_id', $application->id)
+            ->get();
+            foreach($currentLinkedStages as $stage)
+            {
+                if($stage->status == 'approved')
+                {
+                    // Log::info($application->id. 'is approved');
+
+                    if($application->current_loan_application_approval_stage_id != $stage->id)
+                    {
+
+                        $application->update([
+                            'current_loan_application_approval_stage_id' => $stage->id
+                        ]);
+
+                    }
+
+                }
+
+            }
+
+        }
+
+       return back()->with('success', 'Successfully done');
+
     }
 }

@@ -16,6 +16,7 @@ class LoanApplication extends Model
 
     ];
     protected $appends = ['approver_name'];
+    protected $fillable = ['current_loan_application_approval_stage_id'];
 
 
     public function client()

@@ -233,6 +233,7 @@ Route::group(['prefix' => 'loan_application', 'as' => 'loan_applications.'], fun
     Route::put('/{application}/update', [LoanApplicationsController::class, 'update'])->name('update');
     Route::delete('/{application}/destroy', [LoanApplicationsController::class, 'destroy'])->name('destroy');
     Route::get('/{application}/comments', [LoanApplicationsController::class, 'showComments'])->name('show_comments');
+    Route::get('fixing',  [LoanApplicationsController::class, 'fixing'])->name('fixing');
     //files
     Route::get('{loan}/file', [LoanFilesController::class, 'index'])->name('files.index');
     Route::get('{loan}/file/create', [LoanFilesController::class, 'create'])->name('files.create');
