@@ -172,11 +172,14 @@
                                     <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Started At</th>
                                     <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Finished At</th>
                                     <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Notes</th>
+                                    <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Actions</th>
+
                                 </tr>
                                 </thead>
                                 <tbody>
                                 <tr  v-for="approval in filteredStages"
                                     class="hover:bg-gray-100 focus-within:bg-gray-100">
+                                    <!-- @dd(approval) -->
 
                                     <td class="border-t px-6 py-4">
                                         <span v-if="approval.stage">{{ approval.stage.name }}</span>
@@ -187,10 +190,11 @@
                                                           tabindex="-1" class="text-green-600 hover:text-green-900" title="View">
                                                 {{approval.approver.name}}
                                             </inertia-link>
+
                                         </div>
                                         <div v-else>
                                             <button v-if="can('loans.applications.assign_approver')"
-                                                @click="assignApproverAction(approval.id)"
+                                                @click="assignApproverAction(approval.id, 'Assign')"
                                                 type="button" class="btn btn-primary py-1 px-2">
                                                 Assign
                                             </button>
@@ -253,6 +257,17 @@
                                     </td>
                                     <td class="border-t px-6 py-4">
                                         <span class="text-sm">{{approval.description}}</span>
+                                    </td>
+                                    <td class="border-t px-6 py-4">
+                                        <div v-if=" approval.approver && approval.stage_finished_at == null && approval.status == 'pending'">
+                                            <button v-if="can('loans.applications.assign_approver')"
+                                            @click="assignApproverAction(approval.id, 'Reassign')"
+                                            type="button" class="btn btn-primary  py-1 px-2">
+                                            <font-awesome-icon icon="edit"/>
+                                            Reassign
+                                        </button>
+                                        </div>
+                                        <span v-else>No Actions</span>
                                     </td>
                                 </tr>
                                 </tbody>
@@ -396,7 +411,7 @@
         </jet-dialog-modal>
         <jet-dialog-modal :show="showAssignApproverModal" @close="showAssignApproverModal = false">
             <template #title>
-                Assign Approver
+                {{assignOrReassignActionName}} Approver
             </template>
             <template #content>
                 <div class="grid grid-cols-1 gap-2 mt-4">
@@ -408,6 +423,13 @@
                             required>
                             <option v-for="item in approvers" :value="item.id">{{ item.name }} (#{{ item.id }})</option>
                         </select>
+                    </div>
+                    <div v-if="assignOrReassignActionName =='Reassign'">
+                        <jet-label for="description" value="Reason for reassigning"/>
+                        <textarea-input id="additional_notes" class="mt-1 block w-full"
+                                        v-model="assignApproverForm.additional_notes" />
+                        <jet-input-error :message="assignApproverForm.errors.additional_notes" class="mt-2"/>
+
                     </div>
                 </div>
             </template>
@@ -490,6 +512,8 @@ export default {
             assignApproverForm: this.$inertia.form({
                 approver_id: '',
                 stage_id: '',
+                action: '',
+                additional_notes : ''
             }),
             changeStatusForm: this.$inertia.form({
                 status: '',
@@ -507,6 +531,7 @@ export default {
             processing: false,
             groupPercentagesTotal: 0,
             attributePercentagesTotal: 0,
+            assignOrReassignActionName : null,
             errors: [],
             pageTitle: "Loan Application",
             pageDescription: "Loan Application",
@@ -518,7 +543,8 @@ export default {
     },
     methods: {
 
-        assignApproverAction(id) {
+        assignApproverAction(id, action) {
+
             this.approvers = [];
             Object.keys(this.application.linked_stages).forEach(key => {
 
@@ -534,6 +560,14 @@ export default {
             })
             this.showAssignApproverModal = true
             this.assignApproverForm.stage_id = id
+            this.assignApproverForm.action = action
+            this.assignApproverForm.additional_notes = ''
+
+
+
+            this.assignOrReassignActionName = action
+            // action: '',
+            //     additional_notes : ''
         },
         assignApprover() {
             this.assignApproverForm.post(this.route('loan_applications.assign_approver', this.application.id), {
@@ -573,6 +607,8 @@ export default {
         const stages = this.application.linked_stages;
         const approvedIndex = stages.findIndex(stage => stage.status === 'approved');
         const rejectedIndex = stages.findIndex(stage => stage.status === 'rejected');
+
+        console.log(stages)
 
         // Find the earliest occurrence of approved or rejected status
         let cutoffIndex;
