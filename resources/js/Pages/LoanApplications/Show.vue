@@ -561,6 +561,12 @@ export default {
                     if (item.stage) {
                         axios.get(this.route('users.search') + "?role_id=" + item.stage.role_id).then(response => {
                             this.approvers = response.data
+                            //exclude the current approver from the list and the current logged in user
+                            this.approvers = this.approvers.filter(function (item) {
+                                return item.id !== this.application.current_linked_stage.approver_id && item.id !== this.$attrs.auth.user.id
+                            }.bind(this))
+                            // console.log(this.approvers)
+
                         })
                     }
                 }
