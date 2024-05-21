@@ -380,10 +380,10 @@
                             required>
                             <option value="pending">Pending</option>
                             <option value="in_progress">In Progress</option>
-                             <option value="recommend">Recommend</option>
-                            <option value="approved">Approved</option>
+                             <option v-if="recommenderAccessRight" value="recommend">Recommend</option>
+                            <option  v-if="approverAccessRight" value="approved">Approved</option>
                             <option value="sent_back">Send Back To Last Stage</option>
-                            <option value="rejected">Rejected</option>
+                            <option  v-if="approverAccessRight" value="rejected">Rejected</option>
                         </select>
                         <jet-input-error :message="changeStatusForm.errors.status" class="mt-2"/>
                     </div>
@@ -476,6 +476,10 @@ export default {
     props: {
         application: Object,
         groups: Object,
+        approverAccessRight: Boolean,
+        recommenderAccessRight: Boolean
+
+
     },
     components: {
         FontAwesomeIcon,
@@ -539,6 +543,10 @@ export default {
 
     },
     mounted() {
+   console.log(this.recommenderAccessRight)
+
+
+   console.log(this.approverAccessRight)
 
     },
     methods: {
@@ -608,7 +616,7 @@ export default {
         const approvedIndex = stages.findIndex(stage => stage.status === 'approved');
         const rejectedIndex = stages.findIndex(stage => stage.status === 'rejected');
 
-        console.log(stages)
+
 
         // Find the earliest occurrence of approved or rejected status
         let cutoffIndex;

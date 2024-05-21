@@ -14,7 +14,7 @@ class PermissionsTableSeeder extends Seeder
      */
     public function run()
     {
-        DB::table('permissions')->insert([
+        $permissions = [
             [
                 'name' => 'users',
                 'module' => 'Users',
@@ -479,6 +479,12 @@ class PermissionsTableSeeder extends Seeder
                 'guard_name' => 'web',
             ],
             [
+                'name' => 'loans.applications.recommend',
+                'module' => 'Loans',
+                'display_name' => 'Recommend Loan Applications',
+                'guard_name' => 'web',
+            ],
+            [
                 'name' => 'loans.applications.destroy',
                 'module' => 'Loans',
                 'display_name' => 'Delete Loan Applications',
@@ -673,6 +679,14 @@ class PermissionsTableSeeder extends Seeder
                 'guard_name' => 'web',
             ],
 
-        ]);
+        ];
+        foreach ($permissions as $permission) {
+            // dd($permission);
+            // Check if the permission already exists in the database
+            $exists = DB::table('permissions')->where('name', $permission['name'])->exists();
+            if (!$exists) {
+                DB::table('permissions')->insert($permission);
+            }
+        }
     }
 }

@@ -464,8 +464,28 @@ class LoanApplicationsController extends Controller
             session()->flash('success', $message);
         }
         $application->product->scoring_attributes = $groups;
+        //check if the authenticated user is a recommender or approver or both
+
+       $auth_roles = Auth::user()->roles->pluck('id');
+       $recommendPermission = DB::table('permissions')->where('name', 'loans.applications.recommend')->first();
+       $approvePermission = DB::table('permissions')->where('name', 'loans.applications.approve')->first();
+       $recommenderAccessRight = DB::table('role_has_permissions')
+       ->whereIn('role_id', $auth_roles)
+       ->where('permission_id', $recommendPermission->id)
+       ->first() ? true : false;
+       $approverAccessRight = DB::table('role_has_permissions')
+       ->whereIn('role_id', $auth_roles)
+       ->where('permission_id', $approvePermission->id)
+       ->first() ? true : false;
+
+
+
+
         return Inertia::render('LoanApplications/Show', [
             'application' => $application,
+            'recommenderAccessRight' => $recommenderAccessRight,
+            'approverAccessRight' => $approverAccessRight,
+
         ]);
     }
 

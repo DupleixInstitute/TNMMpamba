@@ -79,6 +79,7 @@ class RolesController extends Controller
     }
     public function edit(Role $role)
     {
+        
         $role->permissions->transform(function ($item) {
             return $item->name;
         });
@@ -90,7 +91,7 @@ class RolesController extends Controller
 
     public function update(Request $request, Role $role)
     {
-       
+
         if (App::environment('demo')) {
             return redirect()->back()->with('error', 'Updating the demo role is not allowed.');
         }

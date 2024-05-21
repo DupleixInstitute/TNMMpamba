@@ -5,9 +5,9 @@
                 Loan Applications
             </h2>
         </template>
-        <inertia-link class="text-indigo-400 hover:text-indigo-600 ml-2" :href="route('loan_applications.fixing')">
+        <!-- <inertia-link class="text-indigo-400 hover:text-indigo-600 ml-2" :href="route('loan_applications.fixing')">
             Correct Loan Applications
-        </inertia-link>
+        </inertia-link> -->
         <div class=" mx-auto  mb-4 flex justify-between items-center">
 
             <filter-search v-model="form.search" class="w-full max-w-md mr-4" @reset="reset">
