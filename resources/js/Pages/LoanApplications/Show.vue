@@ -594,6 +594,7 @@ export default {
             this.changeStatusForm.stage_id = id
         },
         changeStatus() {
+            console.log(this.changeStatusForm)
             this.changeStatusForm.post(this.route('loan_applications.change_status', this.application.id), {
                 preserveState: false,
             })

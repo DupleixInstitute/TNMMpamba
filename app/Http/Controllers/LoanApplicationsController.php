@@ -48,7 +48,9 @@ class LoanApplicationsController extends Controller
         $this->middleware(['permission:loans.applications.create'])->only(['create', 'store']);
         $this->middleware(['permission:loans.applications.update'])->only(['edit', 'update']);
         $this->middleware(['permission:loans.applications.destroy'])->only(['destroy']);
-        $this->middleware(['permission:loans.applications.approve'])->only(['changeStatus']);
+        $this->middleware(['permission:loans.applications.recommend|loans.applications.approve'])->only(['changeStatus']);
+
+
     }
 
     /**
@@ -789,7 +791,6 @@ class LoanApplicationsController extends Controller
 
     public function changeStatus(Request $request, LoanApplication $application)
     {
-
 
         $application->load(['linkedStages']);
         $request->validate([
