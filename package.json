@@ -2,7 +2,8 @@
     "private": true,
     "scripts": {
         "dev": "vite",
-        "build": "vite build"
+        "build": "vite build",
+        "watch": "npm run development -- --watch"
     },
     "devDependencies": {
         "@inertiajs/inertia": "^0.11",

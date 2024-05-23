@@ -19,9 +19,11 @@ use App\Models\LoanApplication;
 use App\Events\LoanStatusChanged;
 use App\Models\LoanApprovalStage;
 use Webit\Util\EvalMath\EvalMath;
+use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Role;
 use App\Models\LoanProductCategory;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Log;
 use App\Models\LoanApplicationScore;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
@@ -32,6 +34,7 @@ use App\Models\LoanProductScoringAttribute;
 use App\Events\LoanApplicationStatusChanged;
 use App\Mail\LoanApplicationApprovalStageReturned;
 use App\Models\LoanApplicationLinkedApprovalStage;
+use App\Models\LoanApplicationApprovalStageHistory;
 use App\Models\LoanProductScoringAttributeOptionValue;
 use App\Notifications\LoanApplicationApprovalStageAssigned;
 use App\Notifications\LoanApplicationApprovalStageIsCurrent;
@@ -45,7 +48,9 @@ class LoanApplicationsController extends Controller
         $this->middleware(['permission:loans.applications.create'])->only(['create', 'store']);
         $this->middleware(['permission:loans.applications.update'])->only(['edit', 'update']);
         $this->middleware(['permission:loans.applications.destroy'])->only(['destroy']);
-        $this->middleware(['permission:loans.applications.approve'])->only(['changeStatus']);
+        $this->middleware(['permission:loans.applications.recommend|loans.applications.approve'])->only(['changeStatus']);
+
+
     }
 
     /**
@@ -78,7 +83,6 @@ class LoanApplicationsController extends Controller
                 ];
             }),
         ]);
-
     }
 
 
@@ -131,6 +135,7 @@ class LoanApplicationsController extends Controller
             'amount' => ['required'],
             'date' => ['required'],
         ]);
+        // dd($request->all());
 
         $attributes = $request->json('attributes');
         $client = Client::find($request->client_id);
@@ -352,7 +357,6 @@ class LoanApplicationsController extends Controller
                         $accepted = 1;
                     }
                 }
-
             }
             if ($attribute->productAttribute->is_industry_analysis) {
                 if ($attribute->productAttribute->system_name === 'porters_five_forces_analysis') {
@@ -423,7 +427,6 @@ class LoanApplicationsController extends Controller
                     $item->attribute->options = $item->options ?: [];
                 } else {
                     abort(422, 'A linked scoring attribute with id ' . $item->scoring_attribute_id . ' was deleted');
-
                 }
                 //get value
                 $score = LoanApplicationScore::where('loan_application_id', $application->id)->where('loan_product_scoring_attribute_id', $item->id)->first();
@@ -463,8 +466,28 @@ class LoanApplicationsController extends Controller
             session()->flash('success', $message);
         }
         $application->product->scoring_attributes = $groups;
+        //check if the authenticated user is a recommender or approver or both
+
+       $auth_roles = Auth::user()->roles->pluck('id');
+       $recommendPermission = DB::table('permissions')->where('name', 'loans.applications.recommend')->first();
+       $approvePermission = DB::table('permissions')->where('name', 'loans.applications.approve')->first();
+       $recommenderAccessRight = DB::table('role_has_permissions')
+       ->whereIn('role_id', $auth_roles)
+       ->where('permission_id', $recommendPermission->id)
+       ->first() ? true : false;
+       $approverAccessRight = DB::table('role_has_permissions')
+       ->whereIn('role_id', $auth_roles)
+       ->where('permission_id', $approvePermission->id)
+       ->first() ? true : false;
+
+
+
+
         return Inertia::render('LoanApplications/Show', [
             'application' => $application,
+            'recommenderAccessRight' => $recommenderAccessRight,
+            'approverAccessRight' => $approverAccessRight,
+
         ]);
     }
 
@@ -485,7 +508,6 @@ class LoanApplicationsController extends Controller
                     $item->attribute->options = $item->options ?: [];
                 } else {
                     abort(422, 'A linked scoring attribute with id ' . $item->scoring_attribute_id . ' was deleted');
-
                 }
                 //get value
                 $score = LoanApplicationScore::where('loan_application_id', $application->id)->where('loan_product_scoring_attribute_id', $item->id)->first();
@@ -736,7 +758,6 @@ class LoanApplicationsController extends Controller
                         $accepted = 1;
                     }
                 }
-
             }
             if ($attribute->productAttribute->is_industry_analysis) {
                 if ($attribute->productAttribute->system_name === 'porters_five_forces_analysis') {
@@ -770,7 +791,6 @@ class LoanApplicationsController extends Controller
 
     public function changeStatus(Request $request, LoanApplication $application)
     {
-
 
         $application->load(['linkedStages']);
         $request->validate([
@@ -828,8 +848,7 @@ class LoanApplicationsController extends Controller
                 $linkedStage->save();
                 $application->current_loan_application_approval_stage_id = $linkedStage->id;
                 $application->save();
-            }
-            elseif (!empty($nextStage) and $linkedStage->status === 'recommend' ) {
+            } elseif (!empty($nextStage) and $linkedStage->status === 'recommend') {
                 $nextStage->is_current = 1;
                 $nextStage->save();
                 $application->current_loan_application_approval_stage_id = $nextStage->id;
@@ -841,7 +860,6 @@ class LoanApplicationsController extends Controller
                 //if status selected is recommend and its the last stage, update the application status to approved
                 if ($linkedStage->status === 'recommend') {
                     $linkedStage->status = 'approved';
-
                 }
                 $linkedStage->completed = 1;
                 $linkedStage->save();
@@ -853,34 +871,51 @@ class LoanApplicationsController extends Controller
 
     public function assignApprover(Request $request, LoanApplication $application)
     {
-        $request->validate([
+        $validated = $request->validate([
             'approver_id' => ['required'],
             'stage_id' => ['required'],
+            'action' => ['required'],
+            'additional_notes' => ['nullable'],
         ]);
-        $linkedStage = LoanApplicationLinkedApprovalStage::find($request->stage_id);
-        $linkedStage->approver_id = $request->approver_id;
-        $linkedStage->assigned_by_id = Auth::id();
-        $linkedStage->stage_received_at = Carbon::now();
-        $linkedStage->stage_started_at = Carbon::now();
+        try {
+            DB::beginTransaction();
 
-        //check if we have current stage
-        if (empty($application->currentLinkedStage)) {
-            if (LoanApplicationLinkedApprovalStage::where('loan_application_id', $application->id)->orderBy('id')->first()->id === $linkedStage->id && !$linkedStage->is_current) {
-                $linkedStage->is_current = 1;
-                $application->current_loan_application_approval_stage_id = $linkedStage->id;
-                $application->current_stage_status = 'pending';
+            $linkedStage = LoanApplicationLinkedApprovalStage::find($request->stage_id);
+            $linkedStage->approver_id = $request->approver_id;
+            $linkedStage->assigned_by_id = Auth::id();
+            $linkedStage->stage_received_at = Carbon::now();
+            $linkedStage->stage_started_at = Carbon::now();
+
+            //check if we have current stage
+            if (empty($application->currentLinkedStage)) {
+                if (LoanApplicationLinkedApprovalStage::where('loan_application_id', $application->id)->orderBy('id')->first()->id === $linkedStage->id && !$linkedStage->is_current) {
+                    $linkedStage->is_current = 1;
+                    $application->current_loan_application_approval_stage_id = $linkedStage->id;
+                    $application->current_stage_status = 'pending';
+                }
             }
-        }
-        $linkedStage->save();
-        $application->save();
-        if ($linkedStage->wasChanged('approver_id')) {
-            $linkedStage->approver->notify(new LoanApplicationApprovalStageAssigned($linkedStage));
+            $linkedStage->save();
+            $application->save();
+            if ($linkedStage->wasChanged('approver_id')) {
+                $linkedStage->approver->notify(new LoanApplicationApprovalStageAssigned($linkedStage));
+            }
+            if ($linkedStage->wasChanged('is_current') && $linkedStage->is_current) {
+                $linkedStage->approver->notify(new LoanApplicationApprovalStageIsCurrent($linkedStage));
+            }
 
+            LoanApplicationApprovalStageHistory::create([
+                'approver_id' => $validated['approver_id'],
+                'stage_id' => $validated['stage_id'],
+                'actioned_by' => Auth::id(),
+                'action' => $validated['action'],
+                'additional_notes' => $validated['additional_notes']
+            ]);
+            DB::commit();
+            return redirect()->route('loan_applications.show', $application->id)->with('success', 'Loan updated successfully.');
+        } catch (\Exception $exception) {
+            DB::rollback();
+            return redirect()->route('loan_applications.show', $application->id)->with('error', 'Something went wrong'. $exception->getMessage());
         }
-        if ($linkedStage->wasChanged('is_current') && $linkedStage->is_current) {
-            $linkedStage->approver->notify(new LoanApplicationApprovalStageIsCurrent($linkedStage));
-        }
-        return redirect()->route('loan_applications.show', $application->id)->with('success', 'Loan updated successfully.');
     }
 
     /**
@@ -897,5 +932,35 @@ class LoanApplicationsController extends Controller
             ->performedOn($application)
             ->log('Delete Loan Application');
         return redirect()->route('loan_applications.index')->with('success', 'Loan deleted successfully.');
+    }
+
+    public function showComments()
+    {
+        dd('show comments');
+    }
+
+    public function fixing()
+    {
+        $applications = LoanApplication::get();
+        foreach ($applications as $application) {
+
+            //get latest linked transaction
+            $currentLinkedStages = LoanApplicationLinkedApprovalStage::where('loan_application_id', $application->id)
+                ->get();
+            foreach ($currentLinkedStages as $stage) {
+                if ($stage->status == 'approved') {
+                    // Log::info($application->id. 'is approved');
+
+                    if ($application->current_loan_application_approval_stage_id != $stage->id) {
+
+                        $application->update([
+                            'current_loan_application_approval_stage_id' => $stage->id
+                        ]);
+                    }
+                }
+            }
+        }
+
+        return back()->with('success', 'Successfully done');
     }
 }

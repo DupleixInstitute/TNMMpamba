@@ -88,6 +88,14 @@
                                 <jet-input-error :message="form.errors.email" class="mt-2"/>
 
                             </div>
+                            <div>
+                                <jet-label for="group_email" value="Group Email"/>
+                                <jet-input id="group_email" type="email" class="block w-full" v-model="form.group_email"
+                                           required/>
+                                <jet-input-error :message="form.errors.group_email" class="mt-2"/>
+
+                            </div>
+
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2">
                             <div>
@@ -202,6 +210,7 @@ export default {
 
                 gender: null,
                 email: null,
+                group_email: null,
                 password: null,
                 password_confirmation: null,
                 mobile: null,

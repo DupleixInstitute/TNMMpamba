@@ -64,6 +64,10 @@
                             <td class="w-1/2 border border-gray-300 p-4 text-gray-500">{{ profile.email }}</td>
                         </tr>
                         <tr>
+                            <td class="w-1/2 border border-gray-300 font-semibold p-4 text-gray-900">Group Email</td>
+                            <td class="w-1/2 border border-gray-300 p-4 text-gray-500">{{ profile.group_email ?? "N/A" }}</td>
+                        </tr>
+                        <tr>
                             <td class="w-1/2 border border-gray-300 font-semibold p-4 text-gray-900">Zip</td>
                             <td class="w-1/2 border border-gray-300 p-4 text-gray-500">{{ profile.zip }}</td>
                         </tr>

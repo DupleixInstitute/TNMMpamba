@@ -2,11 +2,12 @@
 
 namespace App\Notifications;
 
-use App\Models\LoanApplicationLinkedApprovalStage;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Messages\MailMessage;
+use Spatie\Permission\Models\Role;
 use Illuminate\Notifications\Notification;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use App\Models\LoanApplicationLinkedApprovalStage;
+use Illuminate\Notifications\Messages\MailMessage;
 
 class LoanApplicationApprovalStageAssigned extends Notification implements ShouldQueue
 {
@@ -37,12 +38,21 @@ class LoanApplicationApprovalStageAssigned extends Notification implements Shoul
      */
     public function toMail(object $notifiable): MailMessage
     {
+
+        //cc field preparation
+        $ccField[]= $this->linkedStage->approver->group_email;
+        $ccField[] = Role::whereName($this->linkedStage->approver->current_role)->first()->group_email;
+
+
+
+
         return (new MailMessage)
             ->subject('Loan Application Approval Assigned')
             ->line('You have been assigned a loan application to approve.')
             ->line('Stage:' . $this->linkedStage->stage->name)
             ->action('View Loan Application', route('loan_applications.show', $this->linkedStage->loan_application_id))
-            ->line('Thank you for using our application!');
+            ->line('Thank you for using our application!')
+            ->cc($ccField);
     }
 
     /**

@@ -22,6 +22,8 @@
                     <tr class="text-left font-bold">
                         <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Name</th>
                         <th class="px-6 pt-4 pb-4 font-medium text-gray-500">System</th>
+                        <th class="font-medium text-gray-500">Group Email</th>
+                        <th class="font-medium text-gray-500">Send Group Email To All In Role?</th>
                         <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Action</th>
                     </tr>
                     </thead>
@@ -36,6 +38,14 @@
                         <td class="border-t">
                             <span class="px-6 py-4 flex items-center" v-if="role.is_system=='0'">No</span>
                             <span class="px-6 py-4 flex items-center" v-if="role.is_system=='1'">Yes</span>
+                        </td>
+                        <td class="border-t">
+                            <span v-if="role.group_email">{{ role.group_email }}</span>
+                            <span v-else class="text-red-500">N/A</span>
+                        </td>
+                        <td class="border-t">
+                            <span class="px-6 py-4 flex items-center text-green-500" v-if="role.send_email_to_role_members=='1'">Yes</span>
+                            <span class="px-6 py-4 flex items-center text-red-500" v-if="role.send_email_to_role_members=='0'">No</span>
                         </td>
                         <td class="border-t w-px pr-2">
                             <div class=" flex items-center space-x-2">
