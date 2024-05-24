@@ -48,12 +48,13 @@ class RolesController extends Controller
 
     public function store(Request $request)
     {
-
+        
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'display_name' => ['required', 'string', 'max:255'],
             'send_email_to_role_members' => 'nullable|boolean',
             'group_email' => 'nullable|email',
+            'can_reassign_role_members' => 'nullable|boolean',
         ]);
         $role = Role::create([
             'name' => $request->name,
@@ -61,6 +62,7 @@ class RolesController extends Controller
             'guard_name' => 'web',
             'send_email_to_role_members' => $request->send_email_to_role_members,
             'group_email' => $request->group_email,
+            'can_reassign' => $request->can_reassign_role_members
         ]);
         $role->syncPermissions($request->permissions);
 
@@ -79,7 +81,7 @@ class RolesController extends Controller
     }
     public function edit(Role $role)
     {
-        
+
         $role->permissions->transform(function ($item) {
             return $item->name;
         });

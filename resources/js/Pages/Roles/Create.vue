@@ -45,6 +45,14 @@
                                            required/>
                                 <jet-input-error :message="form.errors.group_email" class="mt-2"/>
                             </div>
+
+                        </div>
+                        <div style="display: flex; align-items: center; ">
+                            <jet-label for="can_reassign_role_members" value="Reassign application to role members?"/>
+                            <div>
+                                <input id="can_reassign_role_members" type="checkbox" v-model="form.can_reassign_role_members" class="ml-4"/>
+                                <jet-input-error :message="form.errors.can_reassign_role_members" class="mt-2"/>
+                            </div>
                         </div>
                         <div class="grid grid-cols-1 mt-4">
                             <div v-for="(permissionCat,key) in permissions">
@@ -113,6 +121,7 @@ export default {
                 permissions: [],
                 send_email_to_role_members: false,
                 group_email: null,
+                can_reassign_role_members: false,
             }),
             pageTitle: "Create Role",
             pageDescription: "Create Role",
