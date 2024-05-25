@@ -165,6 +165,13 @@
                                               tabindex="-1" class="text-indigo-600 hover:text-indigo-900" title="Edit">
                                     <font-awesome-icon icon="edit"/>
                                 </inertia-link>
+                                <inertia-link v-if="can('loans.applications.resend') && application.current_linked_stage?.status=='sent_back'"
+
+                                              :href="route('loan_applications.resend', application.id)"
+                                              tabindex="-1" class="text-indigo-600 hover:text-indigo-900" title="Resend">
+                                    <font-awesome-icon icon="share"/>
+                                </inertia-link>
+
                                 <a href="#" v-if="can('loans.applications.destroy')"
                                    @click="deleteAction(application.id)"
                                    class="text-red-600 hover:text-red-900" title="Delete">

@@ -812,9 +812,13 @@ class LoanApplicationsController extends Controller
         $linkedStage->save();
         $linkedStage->load(['application', 'application.linkedStages']);
         if ($linkedStage->status === 'sent_back') {
+            // dd('sent back');
+
+            // dd($application->current_loan_application_approval_stage_id);
 
 
             $nextStage = $application->linkedStages->where('id', '<', $linkedStage->id)->last();
+            // dd($nextStage);
 
             if (!empty($nextStage)) {
                 $nextStage->is_current = 1;
@@ -828,12 +832,21 @@ class LoanApplicationsController extends Controller
                 $linkedStage->save();
 
                 //get the user to send email to him/her
-                $user = User::find($nextStage->approver_id);
-                //create a mailable object
+
+                // //create a mailable object
+
+            }
+            // $previousStages = $application->linkedStages->where('id', '<', $linkedStage->id)->get();
+            $previousStages = LoanApplicationLinkedApprovalStage::where('loan_application_id', $application->id)->where('id', '<', $linkedStage->id)->get();
+            $array =  $previousStages->pluck('approver_id');
+            //push created by id to the array
+            $array->push($application->created_by_id);
+            $previousApprovers = User::whereIn('id', $array)->get();
+            foreach ($previousApprovers as $user) {
                 $mailData = [
                     'application' => $application,
                     'to' => $user->email,
-                    'message' => 'A loan application has been returned to you for further review. Please login to the system to review the application and take the necessary action.'
+                    'message' => 'A loan application has been returned  for further review. Please login to the system to review the application and take the necessary action.'
                 ];
                 //send the email
                 Mail::to($user->email)->send(new LoanApplicationApprovalStageReturned($mailData));
@@ -962,5 +975,27 @@ class LoanApplicationsController extends Controller
         }
 
         return back()->with('success', 'Successfully done');
+    }
+    public function resendEmail($id)
+    {
+       $application = LoanApplication::findOrfail($id);
+
+        $application->load(['linkedStages']);
+        $linkedStages = $application->linkedStages->pluck('approver_id');
+
+        $previousApprovers = User::whereIn('id', $linkedStages)->get();
+            foreach ($previousApprovers as $user) {
+                $mailData = [
+                    'application' => $application,
+                    'to' => $user->email,
+                    'message' => 'Loan Application # ' . $application->id . ' has been updated  for further review. Please login to the system to review the application and take the necessary action.',
+                    'subject' => 'Updates on Loan Application # ' . $application->id,
+                ];
+                //send the email
+                Mail::to($user->email)->send(new LoanApplicationApprovalStageReturned($mailData));
+            }
+            //
+
+        return redirect()->route('loan_applications.show', $application->id)->with('success', 'Email sent successfully.');
     }
 }

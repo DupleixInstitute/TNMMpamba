@@ -46,7 +46,7 @@ class LoanApplication extends Model
 
     public function currentLinkedStage()
     {
-        return $this->belongsTo(LoanApplicationLinkedApprovalStage::class, 'current_loan_application_approval_stage_id');
+        return $this->belongsTo(LoanApplicationLinkedApprovalStage::class, 'current_loan_application_approval_stage_id', 'id');
     }
 
     public function scopeFilter($query, array $filters)

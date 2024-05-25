@@ -485,6 +485,12 @@ class PermissionsTableSeeder extends Seeder
                 'guard_name' => 'web',
             ],
             [
+                'name' => 'loans.applications.resend',
+                'module' => 'Loans',
+                'display_name' => 'Resend returned Loan Applications(notify previous approvers)',
+                'guard_name' => 'web',
+            ],
+            [
                 'name' => 'loans.applications.destroy',
                 'module' => 'Loans',
                 'display_name' => 'Delete Loan Applications',
@@ -678,6 +684,7 @@ class PermissionsTableSeeder extends Seeder
                 'display_name' => 'Access Dashboard',
                 'guard_name' => 'web',
             ],
+
 
         ];
         foreach ($permissions as $permission) {
