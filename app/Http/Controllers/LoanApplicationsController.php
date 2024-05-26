@@ -480,6 +480,10 @@ class LoanApplicationsController extends Controller
        ->where('permission_id', $approvePermission->id)
        ->first() ? true : false;
 
+       $currentUserRoles =  $auth_roles = Auth::user()->roles->pluck('can_reassign')->toArray();
+       $canReassignViaRole = in_array(1, $currentUserRoles);
+
+
 
 
 
@@ -487,6 +491,7 @@ class LoanApplicationsController extends Controller
             'application' => $application,
             'recommenderAccessRight' => $recommenderAccessRight,
             'approverAccessRight' => $approverAccessRight,
+            'canReassignViaRole' =>$canReassignViaRole
 
         ]);
     }
@@ -796,6 +801,7 @@ class LoanApplicationsController extends Controller
         $request->validate([
             'status' => ['required'],
             'stage_id' => ['required'],
+            'description' => ['required']
         ]);
         $linkedStage = LoanApplicationLinkedApprovalStage::find($request->stage_id);
         $linkedStage->status = $request->status;

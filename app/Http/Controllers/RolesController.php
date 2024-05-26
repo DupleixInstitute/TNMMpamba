@@ -48,7 +48,7 @@ class RolesController extends Controller
 
     public function store(Request $request)
     {
-        
+
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'display_name' => ['required', 'string', 'max:255'],
@@ -94,6 +94,7 @@ class RolesController extends Controller
     public function update(Request $request, Role $role)
     {
 
+
         if (App::environment('demo')) {
             return redirect()->back()->with('error', 'Updating the demo role is not allowed.');
         }
@@ -102,11 +103,13 @@ class RolesController extends Controller
             'display_name' => ['required', 'string', 'max:255'],
             'send_email_to_role_members' => 'nullable|boolean',
             'group_email' => 'nullable|email',
+            'can_reassign' => 'boolean|required'
         ]);
         $data = [
             'display_name' => $request->display_name,
             'send_email_to_role_members' => $request->send_email_to_role_members,
             'group_email' => $request->group_email,
+            'can_reassign' =>$request->can_reassign
         ];
         if ($role->is_system === 0) {
             $data['name'] = $request->name;

@@ -79,6 +79,10 @@
                             <td class="w-1/2 border border-gray-300 font-semibold p-4 text-gray-900">Last Login</td>
                             <td class="w-1/2 border border-gray-300 p-4 text-gray-500">{{ profile.last_login }}</td>
                         </tr>
+                        <tr>
+                            <td class="w-1/2 border border-gray-300 font-semibold p-4 text-gray-900">Can reasign application to other users?</td>
+                            <td class="w-1/2 border border-gray-300 p-4 text-gray-500">{{ profile.can_reassign ? 'Yes' : 'No' }}</td>
+                        </tr>
                         </tbody>
                     </table>
                 </div>

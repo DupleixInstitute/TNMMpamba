@@ -138,7 +138,7 @@
                     </div>
                     <div class="mt-4">
                         <jet-label for="description" value="Loan Motivation"/>
-                        <textarea-input id="description" class="mt-1 block w-full"
+                        <textarea-input id="description" class="mt-1 block w-full" required
                                         v-model="form.description"/>
                         <jet-input-error :message="form.errors.description" class="mt-2"/>
 
@@ -285,7 +285,7 @@ export default {
             if (val) {
                 this.form.attributes = []
                 this.products.forEach(item => {
-                    
+
                     if (item.id == val) {
                         this.fields = item.form_attributes
                         this.form.attributes = JSON.parse(JSON.stringify(item.form_attributes))

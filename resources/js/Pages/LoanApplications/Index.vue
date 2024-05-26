@@ -160,7 +160,7 @@
                                               tabindex="-1" class="text-green-600 hover:text-green-900" title="View">
                                     <font-awesome-icon icon="search"/>
                                 </inertia-link>
-                                <inertia-link v-if="can('loans.applications.update')"
+                                <inertia-link v-if="can('loans.applications.update') && application.current_linked_stage?.status!='approved'  && application.current_linked_stage?.status!='rejected' "
                                               :href="route('loan_applications.edit', application.id)"
                                               tabindex="-1" class="text-indigo-600 hover:text-indigo-900" title="Edit">
                                     <font-awesome-icon icon="edit"/>
@@ -172,7 +172,7 @@
                                     <font-awesome-icon icon="share"/>
                                 </inertia-link>
 
-                                <a href="#" v-if="can('loans.applications.destroy')"
+                                <a href="#" v-if="can('loans.applications.destroy')  && application.current_linked_stage?.status!='approved' && application.current_linked_stage?.status!='rejected'"
                                    @click="deleteAction(application.id)"
                                    class="text-red-600 hover:text-red-900" title="Delete">
                                     <font-awesome-icon icon="trash"/>

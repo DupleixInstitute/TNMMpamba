@@ -48,7 +48,7 @@
 
                         </div>
                         <div style="display: flex; align-items: center; ">
-                            <jet-label for="can_reassign_role_members" value="Reassign application to role members?"/>
+                            <jet-label for="can_reassign_role_members" value="Reassign application to other role members?"/>
                             <div>
                                 <input id="can_reassign_role_members" type="checkbox" v-model="form.can_reassign_role_members" class="ml-4"/>
                                 <jet-input-error :message="form.errors.can_reassign_role_members" class="mt-2"/>

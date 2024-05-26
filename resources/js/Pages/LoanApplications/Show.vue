@@ -179,7 +179,7 @@
                                 <tbody>
                                 <tr  v-for="approval in filteredStages"
                                     class="hover:bg-gray-100 focus-within:bg-gray-100">
-                                    <!-- @dd(approval) -->
+
 
                                     <td class="border-t px-6 py-4">
                                         <span v-if="approval.stage">{{ approval.stage.name }}</span>
@@ -259,7 +259,7 @@
                                         <span class="text-sm">{{approval.description}}</span>
                                     </td>
                                     <td class="border-t px-6 py-4">
-                                        <div v-if=" approval.approver && approval.stage_finished_at == null && approval.status == 'pending'">
+                                        <div v-if=" approval.approver && approval.stage_finished_at == null && approval.status == 'pending' && $attrs.auth.user.can_reassign == true && canReassignViaRole && approval.was_sent_back == false">
                                             <button v-if="can('loans.applications.assign_approver')"
                                             @click="assignApproverAction(approval.id, 'Reassign')"
                                             type="button" class="btn btn-primary  py-1 px-2">
@@ -267,7 +267,8 @@
                                             Reassign
                                         </button>
                                         </div>
-                                        <span v-else>No Actions</span>
+                                        <span   class="px-2 rounded-full bg-green-100 text-green-800" v-else-if="approval.was_sent_back== true">Reassigned</span>
+                                        <span   class="px-2 rounded-full bg-red-100 text-red-800" v-else>No Actions</span>
                                     </td>
                                 </tr>
                                 </tbody>
@@ -388,7 +389,7 @@
                         <jet-input-error :message="changeStatusForm.errors.status" class="mt-2"/>
                     </div>
                     <div>
-                        <jet-label for="description" value="Approval Comments"/>
+                        <jet-label for="description" value="Approval Comments "/>
                         <textarea-input id="description" class="mt-1 block w-full"
                                         v-model="changeStatusForm.description"/>
                         <jet-input-error :message="changeStatusForm.errors.description" class="mt-2"/>
@@ -477,7 +478,8 @@ export default {
         application: Object,
         groups: Object,
         approverAccessRight: Boolean,
-        recommenderAccessRight: Boolean
+        recommenderAccessRight: Boolean,
+        canReassignViaRole : Boolean,
 
 
     },
@@ -543,10 +545,7 @@ export default {
 
     },
     mounted() {
-   console.log(this.recommenderAccessRight)
 
-
-   console.log(this.approverAccessRight)
 
     },
     methods: {

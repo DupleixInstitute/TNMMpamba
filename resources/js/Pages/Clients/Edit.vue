@@ -16,6 +16,7 @@
                             id="branch_id"
                             v-model="form.branch_id"
                             :options="branches"
+                            :required="true"
                         />
                         <jet-input-error :message="form.errors.branch_id" class="mt-2"/>
                     </div>
@@ -79,6 +80,7 @@
                                 id="registration_country_id"
                                 v-model="form.registration_country_id"
                                 :options="countries"
+                                :required="true"
                             />
                             <jet-input-error :message="form.errors.registration_country_id" class="mt-2"/>
                         </div>
@@ -244,6 +246,7 @@
                                 id="province_id"
                                 v-model="form.province_id"
                                 :options="availableProvinces"
+                                :required="true"
                             />
                             <jet-input-error :message="form.errors.province_id" class="mt-2"/>
                         </div>

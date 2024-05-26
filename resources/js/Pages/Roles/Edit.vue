@@ -48,6 +48,16 @@
                                            />
                                 <jet-input-error :message="form.errors.group_email" class="mt-2"/>
                             </div>
+                            <div style="display: flex; align-items: center;">
+                                <jet-label for="can_reassign" value="Reassign loan application to role members?"/>
+                                <div>
+                                    <select id="can_reassign" v-model="form.can_reassign" class="ml-4" >
+                                        <option value="1">Yes</option>
+                                        <option value="0">No</option>
+                                    </select>
+                                    <jet-input-error :message="form.errors.can_reassign" class="mt-2"/>
+                                </div>
+                            </div>
                         </div>
                         <div class="grid grid-cols-1 mt-4">
                             <div v-for="(permissionCat,key) in permissions">
@@ -117,6 +127,7 @@ export default {
                 permissions: this.role.permissions,
                 send_email_to_role_members: this.role.send_email_to_role_members,
                 group_email: this.role.group_email,
+                can_reassign: this.role.can_reassign,
             }),
             pageTitle: "Edit Role",
             pageDescription: "Edit Role",

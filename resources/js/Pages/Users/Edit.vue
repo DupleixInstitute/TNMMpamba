@@ -86,6 +86,16 @@
                                 <jet-input-error :message="form.errors.group_email" class="mt-2"/>
 
                             </div>
+                            <div>
+                                <jet-label for="can_reassign" value="Can Reassign Applications to other users?"/>
+                                <select class="border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 rounded-md shadow-sm w-full"
+                                name="can_reassign" v-model="form.can_reassign" id="can_reassign">
+                                <option value="0">No</option>
+                                <option value="1">Yes</option>
+                            </select>
+                                <jet-input-error :message="form.errors.can_reassign" class="mt-2"/>
+
+                            </div>
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2">
                             <div>
@@ -203,6 +213,7 @@ export default {
                 photo: this.profile.photo,
                 active: this.profile.active,
                 roles: this.profile.selected_roles,
+                can_reassign : this.profile.can_reassign
             }),
             pageTitle: "Edit User",
             pageDescription: "Edit User",

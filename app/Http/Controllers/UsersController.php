@@ -143,6 +143,8 @@ class UsersController extends Controller
     public function store(Request $request)
     {
 
+        // dd($request->all());
+
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'gender' => ['required'],
@@ -152,6 +154,7 @@ class UsersController extends Controller
             'password' => ['required', 'confirmed'],
             'photo' => ['nullable', 'image', 'max:1024'],
             'group_email' => ['nullable', 'string', 'email', 'max:255'],
+            'can_reassign' =>['boolean','required']
         ]);
 
         $user = User::create([
@@ -170,6 +173,7 @@ class UsersController extends Controller
             'active' => $request->active,
             'password' => Hash::make($request->password),
             'group_email' => $request->group_email,
+            'can_reassign' => $request->can_reassign
         ]);
 
         foreach ($request->roles as $key) {
@@ -271,6 +275,7 @@ class UsersController extends Controller
 
     public function update(Request $request, User $user)
     {
+
         if (App::environment('demo') && $user->isDemoUser()) {
             return redirect()->back()->with('error', 'Updating the demo user is not allowed.');
         }
@@ -283,6 +288,7 @@ class UsersController extends Controller
             'password' => ['nullable', 'confirmed'],
             'photo' => ['nullable', 'image', 'max:1024'],
             'group_email' => ['nullable', 'string', 'email', 'max:255'],
+            'can_reassign' => ['required', 'boolean']
         ]);
         $user->update([
             'name' => $request->name,
@@ -299,6 +305,7 @@ class UsersController extends Controller
             'address' => $request->address,
             'active' => $request->active,
             'group_email' => $request->group_email,
+            'can_reassign' => $request->can_reassign,
         ]);
         if ($request->password) {
             $user->update(['password' => Hash::make($request->password)]);

@@ -17,6 +17,7 @@ class LoanApplicationLinkedApprovalStage extends Model
         'is_current' => 'boolean',
         'completed' => 'boolean',
     ];
+    protected $appends = ['was_sent_back'];
 
 
     public function application(): BelongsTo
@@ -86,4 +87,17 @@ class LoanApplicationLinkedApprovalStage extends Model
             ->logOnlyDirty();
     }
 
+    public function getWasSentBackAttribute()
+    {
+        $associatedHistory = LoanApplicationApprovalStageHistory::where('stage_id', $this->id)->first();
+        if ($associatedHistory) {
+            if ($associatedHistory->action == 'Reassign') {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
 }

@@ -51,6 +51,7 @@ class User extends Authenticatable
         'telegram_user_id',
         'member_id',
         'group_email',
+        'can_reassign'
     ];
 
     /**
