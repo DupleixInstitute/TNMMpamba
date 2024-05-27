@@ -258,6 +258,7 @@
                                     <td class="border-t px-6 py-4">
                                         <span class="text-sm">{{approval.description}}</span>
                                     </td>
+                                    {{ approval.was_sent_back }}
                                     <td class="border-t px-6 py-4">
                                         <div v-if=" approval.approver && approval.stage_finished_at == null && approval.status == 'pending' && $attrs.auth.user.can_reassign == true && canReassignViaRole && approval.was_sent_back == false">
                                             <button v-if="can('loans.applications.assign_approver')"

@@ -227,7 +227,7 @@ Route::group(['prefix' => 'loan_application', 'as' => 'loan_applications.'], fun
     Route::get('/create', [LoanApplicationsController::class, 'create'])->name('create');
     Route::post('/store', [LoanApplicationsController::class, 'store'])->name('store');
     Route::post('/{application}/change_status', [LoanApplicationsController::class, 'changeStatus'])->name('change_status');
-    Route::post('/{application}/assign_approver', [LoanApplicationsController::class, 'assignApprover'])->name('assign_approver');
+    Route::post('/{application}/assign_approver', [LoanApplicationsControlchange_statusler::class, 'assignApprover'])->name('assign_approver');
     Route::get('/{application}/show', [LoanApplicationsController::class, 'show'])->name('show');
     Route::get('/{application}/edit', [LoanApplicationsController::class, 'edit'])->name('edit');
     Route::put('/{application}/update', [LoanApplicationsController::class, 'update'])->name('update');

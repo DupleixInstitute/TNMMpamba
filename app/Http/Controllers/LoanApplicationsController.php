@@ -28,6 +28,7 @@ use App\Models\LoanApplicationScore;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use App\Events\LoanApplicationCreated;
+use App\Mail\LoanApplicationFinalised;
 use function React\Promise\Stream\first;
 use Illuminate\Database\Eloquent\Builder;
 use App\Models\LoanProductScoringAttribute;
@@ -796,6 +797,7 @@ class LoanApplicationsController extends Controller
 
     public function changeStatus(Request $request, LoanApplication $application)
     {
+        // dd($request->all());
 
         $application->load(['linkedStages']);
         $request->validate([
@@ -811,6 +813,23 @@ class LoanApplicationsController extends Controller
         if ($linkedStage->status === 'approved' || $linkedStage->status === 'rejected' || $linkedStage->status === 'recommend') {
             $linkedStage->status != 'recommend' ?  $linkedStage->completed = 1 : $linkedStage->completed = 0;
             $linkedStage->stage_finished_at = Carbon::now();
+
+            //sent an email for approved or rejected scenarios
+            if (in_array($linkedStage->status, ['approved', 'rejected'])) {
+                // Retrieve all previous stages for the loan application
+                $previousStages = LoanApplicationLinkedApprovalStage::where('loan_application_id', $application->id)->get();
+
+                // Extract approver IDs from previous stages and add the application creator ID
+                $approverIds = $previousStages->pluck('approver_id')->push($application->created_by_id);
+
+                // Retrieve the user records for all relevant approver IDs
+                $previousApprovers = User::whereIn('id', $approverIds)->get();
+
+                // Send notification emails to all previous approvers
+                foreach ($previousApprovers as $approver) {
+                    $this->sendApprovalNotificationEmail($application, $approver->email, $linkedStage->status, $approver->name);
+                }
+            }
         }
         if ($linkedStage->status === 'in_progress') {
             $linkedStage->stage_started_at = Carbon::now();
@@ -1004,4 +1023,17 @@ class LoanApplicationsController extends Controller
 
         return redirect()->route('loan_applications.show', $application->id)->with('success', 'Email sent successfully.');
     }
+
+    protected function sendApprovalNotificationEmail($application, $recipientEmail, $status, $recipientName)
+{
+    $mailData = [
+        'application' => $application,
+        'to' => $recipientEmail,
+        'status' => $status,
+        'recipientName' => $recipientName,
+    ];
+
+    // Send the email
+    Mail::to($recipientEmail)->send(new LoanApplicationFinalised($mailData));
+}
 }
