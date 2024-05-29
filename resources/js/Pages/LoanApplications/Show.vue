@@ -133,6 +133,19 @@
                                     </span>
                                 </div>
                             </div>
+                            <div class="grid grid-cols-2 ">
+                                <span class="font-medium">Created By</span>
+                                <span>
+
+                                    <inertia-link
+                                        class="px-6 py-4 flex items-center text-indigo-600 focus:text-indigo-500"
+                                        :href="route('users.show', application.created_by.id)"
+                                        v-if="application.client">
+                                        {{ application.created_by.name }}
+                            </inertia-link>
+                                </span>
+
+                            </div>
                         </div>
                     </div>
                     <div class="bg-white p-5 mt-5">
@@ -258,9 +271,10 @@
                                     <td class="border-t px-6 py-4">
                                         <span class="text-sm">{{approval.description}}</span>
                                     </td>
-                                    {{ approval.was_sent_back }}
+                                    <!-- {{ approval.was_sent_back }} -->
                                     <td class="border-t px-6 py-4">
-                                        <div v-if=" approval.approver && approval.stage_finished_at == null && approval.status == 'pending' && $attrs.auth.user.can_reassign == true && canReassignViaRole && approval.was_sent_back == false">
+                                        <div v-if=" approval.approver && approval.stage_finished_at == null && canReassignViaRole  && approval.approver_id || $attrs.auth.user.can_reassign == true && approval.approver_id && approval.stage_finished_at == null  && approval.approver ">
+                                            <!-- && approval.was_sent_back == false -->
                                             <button v-if="can('loans.applications.assign_approver')"
                                             @click="assignApproverAction(approval.id, 'Reassign')"
                                             type="button" class="btn btn-primary  py-1 px-2">

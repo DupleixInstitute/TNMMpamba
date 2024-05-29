@@ -406,7 +406,7 @@ class LoanApplicationsController extends Controller
      */
     public function show(LoanApplication $application)
     {
-        $application->load(['staff', 'client', 'client.shareholders', 'client.industryType', 'client.ratio', 'product', 'linkedStages', 'linkedStages.stage', 'linkedStages.approver', 'linkedStages.assignedBy', 'currentLinkedStage', 'currentLinkedStage.stage', 'currentLinkedStage.approver', 'currentLinkedStage.assignedBy']);
+        $application->load(['staff', 'client', 'client.shareholders', 'client.industryType', 'client.ratio', 'product', 'linkedStages', 'linkedStages.stage', 'linkedStages.approver', 'linkedStages.assignedBy', 'currentLinkedStage', 'currentLinkedStage.stage', 'currentLinkedStage.approver', 'currentLinkedStage.assignedBy', 'createdBy']);
         $error = '';
         $message = '';
         if ($application->client->type === 'corporate') {

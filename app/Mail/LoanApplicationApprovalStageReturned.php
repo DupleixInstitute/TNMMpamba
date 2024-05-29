@@ -33,7 +33,7 @@ class LoanApplicationApprovalStageReturned extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject:$this->mailData['subject'] ? $this->mailData['subject'] :  'Loan Application #'.$this->mailData['application']->id.' Has Been Returned',
+            subject:array_key_exists('subject', $this->mailData) ? $this->mailData['subject'] :  'Loan Application #'.$this->mailData['application']->id.' Has Been Returned',
             from: 'creditscoring@no_reply.com',
             to: $this->mailData['to'],
             cc: [],

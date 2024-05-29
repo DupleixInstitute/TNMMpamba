@@ -52,6 +52,8 @@
                 <table class="w-full whitespace-no-wrap table-auto">
                     <thead class="bg-gray-50">
                     <tr class="text-left font-bold">
+
+
                         <th class="px-6 pt-4 pb-4 font-medium text-gray-500">ID</th>
                         <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Client</th>
                         <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Product</th>
@@ -165,8 +167,8 @@
                                               tabindex="-1" class="text-indigo-600 hover:text-indigo-900" title="Edit">
                                     <font-awesome-icon icon="edit"/>
                                 </inertia-link>
-                                <inertia-link v-if="can('loans.applications.resend') && application.current_linked_stage?.status=='sent_back'"
 
+                                <inertia-link v-if="can('loans.applications.resend') && application.current_linked_stage?.status=='returned' && $attrs.user.id == application.created_by_id"
                                               :href="route('loan_applications.resend', application.id)"
                                               tabindex="-1" class="text-indigo-600 hover:text-indigo-900" title="Resend">
                                     <font-awesome-icon icon="share"/>
