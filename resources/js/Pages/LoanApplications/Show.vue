@@ -198,6 +198,15 @@
                                         <span v-if="approval.stage">{{ approval.stage.name }}</span>
                                     </td>
                                     <td class="border-t px-6 py-4">
+                                        <div v-if="application.current_linked_stage?.status=='returned' || application.current_linked_stage?.status=='sent_back' && application.was_resend &&  approval.approver">
+                                            <span class="ml-2 text-green-600"  title="Application resend"><font-awesome-icon icon="check-circle"/></span>
+                                        </div>
+                                        <div v-else-if="application.current_linked_stage?.status=='returned'  || application.current_linked_stage?.status=='sent_back' &&  !application.was_resend &&  approval.approver">
+                                                <span class="ml-2 text-red-600" title="Application not resend">
+                                            <font-awesome-icon icon="times-circle"/>
+                                        </span>
+                                        </div>
+
                                         <div v-if="approval.approver">
                                             <inertia-link :href="route('users.show', approval.approver.id)"
                                                           tabindex="-1" class="text-green-600 hover:text-green-900" title="View">

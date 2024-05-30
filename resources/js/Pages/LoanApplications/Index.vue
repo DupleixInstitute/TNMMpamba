@@ -168,7 +168,7 @@
                                     <font-awesome-icon icon="edit"/>
                                 </inertia-link>
 
-                                <inertia-link v-if="can('loans.applications.resend') && application.current_linked_stage?.status=='returned' && $attrs.user.id == application.created_by_id"
+                                <inertia-link v-if="can('loans.applications.resend') && application.current_linked_stage?.status=='returned' || application.current_linked_stage?.status=='sent_back' && $attrs.user.id == application.created_by_id"
                                               :href="route('loan_applications.resend', application.id)"
                                               tabindex="-1" class="text-indigo-600 hover:text-indigo-900" title="Resend">
                                     <font-awesome-icon icon="share"/>

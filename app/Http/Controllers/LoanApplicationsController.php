@@ -1005,6 +1005,8 @@ class LoanApplicationsController extends Controller
     {
        $application = LoanApplication::findOrfail($id);
 
+
+
         $application->load(['linkedStages']);
         $linkedStages = $application->linkedStages->pluck('approver_id');
 
@@ -1020,6 +1022,10 @@ class LoanApplicationsController extends Controller
                 Mail::to($user->email)->send(new LoanApplicationApprovalStageReturned($mailData));
             }
             //
+
+            $application->update([
+                'was_resend' => true
+            ]);
 
         return redirect()->route('loan_applications.show', $application->id)->with('success', 'Email sent successfully.');
     }
