@@ -267,6 +267,7 @@
                                         <span v-if="approval.stage_finished_at">{{
                                                 $filters.time(approval.stage_finished_at)
                                             }}</span>
+                                            
                                     </td>
                                     <td class="border-t px-6 py-4">
                                         <span class="text-sm">{{approval.description}}</span>
