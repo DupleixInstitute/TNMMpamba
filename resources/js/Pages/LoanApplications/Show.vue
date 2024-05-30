@@ -267,21 +267,22 @@
                                         <span v-if="approval.stage_finished_at">{{
                                                 $filters.time(approval.stage_finished_at)
                                             }}</span>
-                                            
+
                                     </td>
                                     <td class="border-t px-6 py-4">
                                         <span class="text-sm">{{approval.description}}</span>
                                     </td>
-                                    <!-- {{ approval.was_sent_back }} -->
+
+
                                     <td class="border-t px-6 py-4">
-                                        <div v-if=" approval.approver && approval.stage_finished_at == null && canReassignViaRole  && approval.approver_id || $attrs.auth.user.can_reassign == true && approval.approver_id && approval.stage_finished_at == null  && approval.approver ">
+                                        <div v-if=" approval.approver && approval.stage_finished_at == null && canReassignViaRole  && approval.approver_id &&  approval.has_same_role_as_approver  || $attrs.auth.user.can_reassign == true && approval.approver_id && approval.stage_finished_at == null  && approval.approver ">
                                             <!-- && approval.was_sent_back == false -->
                                             <button v-if="can('loans.applications.assign_approver')"
                                             @click="assignApproverAction(approval.id, 'Reassign')"
                                             type="button" class="btn btn-primary  py-1 px-2">
                                             <font-awesome-icon icon="edit"/>
                                             Reassign
-                                        </button>
+                                           </button>
                                         </div>
                                         <span   class="px-2 rounded-full bg-green-100 text-green-800" v-else-if="approval.was_sent_back== true">Reassigned</span>
                                         <span   class="px-2 rounded-full bg-red-100 text-red-800" v-else>No Actions</span>

@@ -17,7 +17,7 @@ class LoanApplicationLinkedApprovalStage extends Model
         'is_current' => 'boolean',
         'completed' => 'boolean',
     ];
-    protected $appends = ['was_sent_back'];
+    protected $appends = ['was_sent_back', 'has_same_role_as_approver'];
 
 
     public function application(): BelongsTo
@@ -100,4 +100,18 @@ class LoanApplicationLinkedApprovalStage extends Model
             return false;
         }
     }
+
+    //the role of the auntenticated user and comprate with the role of the approver
+    public function getHasSameRoleAsApproverAttribute()
+{
+    $userRoles = auth()->user()->roles->pluck('id')->toArray();
+    $approvalRoles = $this->approver?->roles->pluck('id')->toArray();
+
+    if (empty($userRoles) || empty($approvalRoles)) {
+        return false;
+    }
+
+    return !empty(array_intersect($userRoles, $approvalRoles));
+}
+
 }

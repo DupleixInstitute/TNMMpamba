@@ -87,7 +87,7 @@
 
                             </div>
                             <div>
-                                <jet-label for="can_reassign" value="Can Reassign Applications to other users?"/>
+                                <jet-label for="can_reassign" value="Can Reassign Applications to any other user in any role?"/>
                                 <select class="border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 rounded-md shadow-sm w-full"
                                 name="can_reassign" v-model="form.can_reassign" id="can_reassign">
                                 <option value="0">No</option>
