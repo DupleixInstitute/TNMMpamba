@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Branch;
 use Spatie\Activitylog\LogOptions;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -115,4 +116,9 @@ class LoanApplication extends Model
         $result = $this->currentLinkedStage?->status == 'approved' ? User::find($this->currentLinkedStage->approver_id)->name : 'Not Approved Yet';
         return $result;
     }
+
+
+
+
+
 }

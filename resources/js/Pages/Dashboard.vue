@@ -197,12 +197,32 @@
         </div>
 
         <!-- Loans Applied Modal -->
-        <!-- <jet-dialog-modal v-if="showModal === 'loansApplied'" @close="closeModal">
-            <div class="p-6 justify-center">
-              <h2 class="text-lg font-semibold mb-4">Loan Applications</h2>
-              <p>This is the content of the Loans Applied modal. You can display detailed information about loan applications here.</p>
+        <div class="mx-auto mt-4">
+            <h3 class="text-2xl font-semibold mb-4 flex items-center justify-center">
+                My Workspace
+            </h3>
+            <div class="grid sm:grid-cols-1 md:grid-cols-4 gap-2">
+                <div class="tooltip-wrapper">
+                    <inertia-link :href="route('dashboard.my-workspace')"
+                        class="relative flex flex-col min-w-0 break-words bg-white rounded mb-6 xl:mb-0 shadow-lg"
+                        title="Go to My Workspace">
+                        <div class="flex-auto p-4">
+                            <div class="flex flex-wrap">
+                                <div class="relative w-full pr-4 max-w-full flex-grow flex-1">
+                                    <h5 class="text-gray-500 uppercase font-bold text-xs">WORKSPACE</h5>
+                                    <span class="font-semibold text-xl text-gray-800">My Workspace</span>
+                                </div>
+                                <div class="relative w-auto pl-4 flex-initial">
+                                    <div class="text-white p-3 text-center inline-flex items-center justify-center w-12 h-12 shadow-lg rounded-full bg-purple-500">
+                                        <font-awesome-icon icon="desktop" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </inertia-link>
+                </div>
             </div>
-        </jet-dialog-modal> -->
+        </div>
 
 
         <teleport to="head">
