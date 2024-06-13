@@ -91,7 +91,7 @@
                             <div>
                                 <jet-label for="group_email" value="Group Email"/>
                                 <jet-input id="group_email" type="email" class="block w-full" v-model="form.group_email"
-                                           required/>
+                                           />
                                 <jet-input-error :message="form.errors.group_email" class="mt-2"/>
 
                             </div>

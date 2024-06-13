@@ -143,6 +143,11 @@ class LoanApplicationsController extends Controller
         if ($client->type === 'corporate' && empty($client->ratio)) {
             return redirect()->back()->with('error', 'No financial data entered for the chosen client. Ration analysis not found!');
         }
+
+        //check if client branch is set
+        if ($client->branch_id == null) {
+            return redirect()->back()->with('error', 'Client branch is not set. Please set the client branch before proceeding. Go To Clients > Edit Client');
+        }
         $product = LoanProduct::find($request->loan_product_id);
         $client->load(['shareholders', 'industryType', 'ratio']);
         $application = new LoanApplication();

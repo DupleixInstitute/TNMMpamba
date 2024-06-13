@@ -17,12 +17,12 @@ class LoanApplication extends Model
 
     ];
     protected $appends = ['approver_name'];
-    protected $fillable = ['current_loan_application_approval_stage_id', 'was_resend'];
+    protected $fillable = ['current_loan_application_approval_stage_id', 'was_resend', 'branch_id'];
 
 
     public function client()
     {
-        return $this->belongsTo(Client::class);
+    return $this->belongsTo(Client::class);
     }
 
     public function product()
@@ -115,6 +115,10 @@ class LoanApplication extends Model
     {
         $result = $this->currentLinkedStage?->status == 'approved' ? User::find($this->currentLinkedStage->approver_id)->name : 'Not Approved Yet';
         return $result;
+    }
+    public function reminders()
+    {
+        return $this->hasMany(LoanApplicationReminder::class);
     }
 
 

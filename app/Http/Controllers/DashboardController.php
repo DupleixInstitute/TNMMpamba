@@ -28,6 +28,7 @@ use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\LoanApplicationsExport;
 use App\Models\LoanApplicationLinkedApprovalStage;
+use App\Models\LoanApplicationReminder;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User as AuthUser;
@@ -665,13 +666,39 @@ class DashboardController extends Controller
     public function myWorkspace()
     {
 
-    //    $assignedToMeLoans = AuthUser::assignedToMeApplications;
-    //    dd($assignedToMeLoans);
-    $authenticatedUser = LoanApplicationLinkedApprovalStage::where('approver_id', Auth::id())->get();
-    dd($authenticatedUser);
+    $assignedToMeIds = LoanApplicationLinkedApprovalStage::where('approver_id', Auth::id())->pluck('loan_application_id')->toArray();
+    // dd($assignedToMeIds);
+    $query = LoanApplication::with(['staff', 'client', 'product', 'currentLinkedStage', 'currentLinkedStage.stage', 'currentLinkedStage.approver', 'currentLinkedStage.assignedBy','linkedStages', 'branch'])
+    ->whereIn('id', $assignedToMeIds);
+
+    $assignedToMeCount = $query->count();
+    $assignedToMeApplications = $query->orderBy('created_at', 'desc')
+        ->paginate(20);
+    $approvedByMeIds = LoanApplicationLinkedApprovalStage::where('approver_id', Auth::id())
+    ->where('status', 'approved')
+    ->pluck('loan_application_id')->toArray();
+
+    $approvedByMeCount = LoanApplication::whereIn('id', $approvedByMeIds)->count();
+    $approvedByMeApplications = LoanApplication::with(['staff', 'client', 'product', 'currentLinkedStage', 'currentLinkedStage.stage', 'currentLinkedStage.approver', 'currentLinkedStage.assignedBy','linkedStages', 'branch'])
+        ->whereIn('id', $approvedByMeIds)
+        ->orderBy('created_at', 'desc')
+        ->paginate(20);
+    $pendingToMeIds = LoanApplicationLinkedApprovalStage::where('approver_id', Auth::id())
+    ->where('stage_finished_at', null)
+    ->pluck('loan_application_id')->toArray();
+    $pendingToMeCount = LoanApplication::whereIn('id', $pendingToMeIds)->count();
+
+    $pendingToMeApplications = LoanApplication::with(['staff', 'client', 'product', 'currentLinkedStage', 'currentLinkedStage.stage', 'currentLinkedStage.approver', 'currentLinkedStage.assignedBy','linkedStages', 'branch'])
+        ->whereIn('id', $pendingToMeIds)
+        ->orderBy('created_at', 'desc')
+        ->paginate(20);
+
+        $myReminders = LoanApplicationReminder::where('user_id', Auth::id())->get();
+        // dd($myReminders);
+        $myRemindersCount = $myReminders->count();
 
 
-    LoanApplication::where('linkedStages')->get();
+    // LoanApplication::where('linkedStages')->get();
 
 
 
@@ -696,6 +723,14 @@ class DashboardController extends Controller
                     'label' => $item->name
                 ];
             }),
+            'assignedToMeApplications' => $assignedToMeApplications,
+            'assignedToMeCount' => $assignedToMeCount,
+            'approvedByMeApplications' => $approvedByMeApplications,
+            'approvedByMeCount' => $approvedByMeCount,
+            'pendingToMeApplications' => $pendingToMeApplications,
+            'pendingToMeCount' => $pendingToMeCount,
+            'myReminders' => $myReminders,
+            'myRemindersCount' => $myRemindersCount
         ]);
         // return Inertia::render('Dashboard/MyWorkspace', []);
     }

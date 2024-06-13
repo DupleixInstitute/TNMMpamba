@@ -395,12 +395,12 @@
         </jet-confirmation-modal>
         <jet-dialog-modal :show="showChangeStatusModal" @close="showChangeStatusModal = false">
             <template #title>
-                Change Status
+                Action Loan Application
             </template>
             <template #content>
                 <div class="grid grid-cols-1 gap-4 mt-4">
                     <div>
-                        <jet-label for="status" value="Status"/>
+                        <jet-label for="status" value="Select Action"/>
                         <select
                             class="border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 rounded-md shadow-sm w-full"
                             name="status" v-model="changeStatusForm.status" id="status"
@@ -415,7 +415,7 @@
                         <jet-input-error :message="changeStatusForm.errors.status" class="mt-2"/>
                     </div>
                     <div>
-                        <jet-label for="description" value="Approval Comments "/>
+                        <jet-label for="description" value="Comments "/>
                         <textarea-input id="description" class="mt-1 block w-full"
                                         v-model="changeStatusForm.description"/>
                         <jet-input-error :message="changeStatusForm.errors.description" class="mt-2"/>
