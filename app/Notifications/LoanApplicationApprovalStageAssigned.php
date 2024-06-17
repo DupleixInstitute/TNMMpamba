@@ -20,6 +20,7 @@ class LoanApplicationApprovalStageAssigned extends Notification implements Shoul
      */
     public function __construct(LoanApplicationLinkedApprovalStage $linkedStage)
     {
+        // dd($linkedStage);
         $this->linkedStage = $linkedStage;
     }
 
@@ -42,8 +43,6 @@ class LoanApplicationApprovalStageAssigned extends Notification implements Shoul
         //cc field preparation
         $ccField[]= $this->linkedStage->approver->group_email;
         $ccField[] = Role::whereName($this->linkedStage->approver->current_role)->first()->group_email;
-
-
 
 
         return (new MailMessage)

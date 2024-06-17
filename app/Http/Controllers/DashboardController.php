@@ -693,9 +693,10 @@ class DashboardController extends Controller
         ->orderBy('created_at', 'desc')
         ->paginate(20);
 
-        $myReminders = LoanApplicationReminder::where('user_id', Auth::id())->get();
+        $query = LoanApplicationReminder::where('user_id', Auth::id()) ->orderBy('created_at', 'desc');
+        $myReminders = $query->paginate(20);
         // dd($myReminders);
-        $myRemindersCount = $myReminders->count();
+        $myRemindersCount = $query->count();
 
 
     // LoanApplication::where('linkedStages')->get();
