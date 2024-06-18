@@ -83,6 +83,7 @@ Route::group(['prefix' => 'dashboard'], function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('{scope}/create-filter', [DashboardController::class, 'filter'])->name('dashboard.filter');
     Route::get('filter-results', [DashboardController::class, 'filterResults'])->name('dashboard.filter-results');
+    Route::get('my-workspace', [DashboardController::class, 'myWorkspace'])->name('dashboard.my-workspace');
 });
 //users
 Route::group(['prefix' => 'user'], function () {

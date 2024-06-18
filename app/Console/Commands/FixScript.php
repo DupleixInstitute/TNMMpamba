@@ -33,7 +33,7 @@ class FixScript extends Command
            //check related approval stages for that loan application
            $linkedStages = $application->linkedStages;
            //check the stage with is_current_stage = 1
-              $currentStage = $linkedStages->where('is_current', 1)->first();
+              $currentStage = $linkedStages->where('completed', 1)->first();
                 if($currentStage){
                     if($application->current_loan_application_approval_stage_id != $currentStage->id){
                         Log::info('Loan application with id '.$application->id.' has a mismatch in the current stage');
@@ -41,13 +41,46 @@ class FixScript extends Command
                         $application->update([
                             'current_loan_application_approval_stage_id' => $currentStage->id
                         ]);
+                        //remove is current from the stage tha has it currently
+                        $currentStage->update([
+                            'is_current' => 1
+                        ]);
+
+                        //other stages should be updated to is_current = 0
+                        $otherStages = $linkedStages->where('id', '!=', $currentStage->id);
+                        foreach ($otherStages as $otherStage) {
+                            $otherStage->update([
+                                'is_current' => 0
+                            ]);
+                        }
+
                      }
 
                 }
             //check the loan current stage column in the loan application table
 
+
+
           //check the current stage
 
        }
+
+
+       ///FIX BRANCH
+
+            //FIX BRANCH ISSUES
+            $loansWithoutBranch = LoanApplication::whereNull('branch_id')->get();
+            // dd($loansWithoutBranch);
+            foreach ($loansWithoutBranch as $loan) {
+                Log::info('Loan application with id '.$loan->id.' has no branch');
+                $branchId = $loan->client->branch_id;
+                Log::info($branchId);
+                if($branchId){
+                    $loan->update([
+                        'branch_id' => $branchId
+                    ]);
+                }
+                // Log::info('Loan application with id '.$loan->id.' has been assigned branch id ');
+            }
     }
 }

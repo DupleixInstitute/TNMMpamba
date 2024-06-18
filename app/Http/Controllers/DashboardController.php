@@ -27,8 +27,11 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\LoanApplicationsExport;
+use App\Models\LoanApplicationLinkedApprovalStage;
+use App\Models\LoanApplicationReminder;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User as AuthUser;
 
 class DashboardController extends Controller
 {
@@ -658,5 +661,78 @@ class DashboardController extends Controller
 
     // Use Laravel Excel to export data
     return Excel::download($export, 'loan_applications.xlsx');
+    }
+
+    public function myWorkspace()
+    {
+
+    $assignedToMeIds = LoanApplicationLinkedApprovalStage::where('approver_id', Auth::id())->pluck('loan_application_id')->toArray();
+    // dd($assignedToMeIds);
+    $query = LoanApplication::with(['staff', 'client', 'product', 'currentLinkedStage', 'currentLinkedStage.stage', 'currentLinkedStage.approver', 'currentLinkedStage.assignedBy','linkedStages', 'branch'])
+    ->whereIn('id', $assignedToMeIds);
+
+    $assignedToMeCount = $query->count();
+    $assignedToMeApplications = $query->orderBy('created_at', 'desc')
+        ->paginate(20);
+    $approvedByMeIds = LoanApplicationLinkedApprovalStage::where('approver_id', Auth::id())
+    ->where('status', 'approved')
+    ->pluck('loan_application_id')->toArray();
+
+    $approvedByMeCount = LoanApplication::whereIn('id', $approvedByMeIds)->count();
+    $approvedByMeApplications = LoanApplication::with(['staff', 'client', 'product', 'currentLinkedStage', 'currentLinkedStage.stage', 'currentLinkedStage.approver', 'currentLinkedStage.assignedBy','linkedStages', 'branch'])
+        ->whereIn('id', $approvedByMeIds)
+        ->orderBy('created_at', 'desc')
+        ->paginate(20);
+    $pendingToMeIds = LoanApplicationLinkedApprovalStage::where('approver_id', Auth::id())
+    ->where('stage_finished_at', null)
+    ->pluck('loan_application_id')->toArray();
+    $pendingToMeCount = LoanApplication::whereIn('id', $pendingToMeIds)->count();
+
+    $pendingToMeApplications = LoanApplication::with(['staff', 'client', 'product', 'currentLinkedStage', 'currentLinkedStage.stage', 'currentLinkedStage.approver', 'currentLinkedStage.assignedBy','linkedStages', 'branch'])
+        ->whereIn('id', $pendingToMeIds)
+        ->orderBy('created_at', 'desc')
+        ->paginate(20);
+
+        $query = LoanApplicationReminder::where('user_id', Auth::id()) ->orderBy('created_at', 'desc');
+        $myReminders = $query->paginate(20);
+        // dd($myReminders);
+        $myRemindersCount = $query->count();
+
+
+    // LoanApplication::where('linkedStages')->get();
+
+
+
+        $applications = LoanApplication::with(['staff', 'client', 'product', 'currentLinkedStage', 'currentLinkedStage.stage', 'currentLinkedStage.approver', 'currentLinkedStage.assignedBy','linkedStages', 'branch'])
+            ->filter(\request()->only('search', 'client_id', 'loan_product_id', 'province_id', 'branch_id', 'district_id', 'ward_id', 'date_range', 'village_id', 'staff_id', 'status'))
+            ->orderBy('created_at', 'desc')
+            ->paginate(20);
+        // dd($applications);
+
+        return Inertia::render('Dashboard/MyWorkspace', [
+            'filters' => \request()->all('search', 'client_id', 'loan_product_id', 'province_id', 'branch_id', 'district_id', 'ward_id', 'date_range', 'village_id', 'staff_id', 'status'),
+            'applications' => $applications,
+            'products' => LoanProduct::get()->map(function ($item) {
+                return [
+                    'value' => $item->id,
+                    'label' => $item->name
+                ];
+            }),
+            'branches' => Branch::get()->map(function ($item) {
+                return [
+                    'value' => $item->id,
+                    'label' => $item->name
+                ];
+            }),
+            'assignedToMeApplications' => $assignedToMeApplications,
+            'assignedToMeCount' => $assignedToMeCount,
+            'approvedByMeApplications' => $approvedByMeApplications,
+            'approvedByMeCount' => $approvedByMeCount,
+            'pendingToMeApplications' => $pendingToMeApplications,
+            'pendingToMeCount' => $pendingToMeCount,
+            'myReminders' => $myReminders,
+            'myRemindersCount' => $myRemindersCount
+        ]);
+        // return Inertia::render('Dashboard/MyWorkspace', []);
     }
 }

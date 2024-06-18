@@ -2,19 +2,23 @@
 
 namespace App\Providers;
 
-use App\Models\Setting;
 use Carbon\Carbon;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
-use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Pagination\UrlWindow;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\Request;
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\ServiceProvider;
+use App\Models\Client;
+use App\Models\Setting;
 use Laravel\Sanctum\Sanctum;
 use Laravel\Telescope\Telescope;
+use App\Observers\ClientObserver;
+use Illuminate\Support\Collection;
+use Illuminate\Pagination\UrlWindow;
+use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Request;
+use Illuminate\Support\ServiceProvider;
+use Illuminate\Pagination\LengthAwarePaginator;
+use App\Models\LoanApplicationLinkedApprovalStage;
+use App\Observers\LoanApplicationLinkedApprovalStageObserver;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -67,6 +71,8 @@ class AppServiceProvider extends ServiceProvider
 
             }
         }
+        Client::observe(ClientObserver::class);
+        LoanApplicationLinkedApprovalStage::observe(LoanApplicationLinkedApprovalStageObserver::class);
     }
 
     protected function registerLengthAwarePaginator()

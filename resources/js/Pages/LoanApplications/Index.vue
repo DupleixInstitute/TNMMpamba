@@ -137,7 +137,7 @@
                                     </span>
                                 <span v-if="application.current_linked_stage.status=='sent_back'"
                                       class="px-2 rounded-full bg-yellow-100 text-yellow-800">
-                                        sent back
+                                        pending,was sent back
                                     </span>
                                 <span v-if="application.current_linked_stage.status=='rejected'"
                                       class="px-2 rounded-full bg-red-100 text-red-800">
