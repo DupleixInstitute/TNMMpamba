@@ -683,8 +683,10 @@ class DashboardController extends Controller
         ->whereIn('id', $approvedByMeIds)
         ->orderBy('created_at', 'desc')
         ->paginate(20);
+
     $pendingToMeIds = LoanApplicationLinkedApprovalStage::where('approver_id', Auth::id())
     ->where('stage_finished_at', null)
+    ->where('is_current', 1)
     ->pluck('loan_application_id')->toArray();
     $pendingToMeCount = LoanApplication::whereIn('id', $pendingToMeIds)->count();
 
