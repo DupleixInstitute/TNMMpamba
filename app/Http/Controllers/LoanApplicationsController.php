@@ -940,6 +940,7 @@ class LoanApplicationsController extends Controller
             $linkedStage->save();
             $application->save();
             if ($linkedStage->wasChanged('approver_id')) {
+                // dd('approver changed');
                 $linkedStage->approver->notify(new LoanApplicationApprovalStageAssigned($linkedStage));
 
             }
