@@ -117,6 +117,7 @@ class LoanApplicationsController extends Controller
             });
             $product->form_attributes = $groups;
         });
+        // dd($products);
         return Inertia::render('LoanApplications/Create', [
             'products' => $products,
         ]);
@@ -140,6 +141,7 @@ class LoanApplicationsController extends Controller
 
         $attributes = $request->json('attributes');
         $client = Client::find($request->client_id);
+
         if ($client->type === 'corporate' && empty($client->ratio)) {
             return redirect()->back()->with('error', 'No financial data entered for the chosen client. Ration analysis not found!');
         }
@@ -149,6 +151,9 @@ class LoanApplicationsController extends Controller
             return redirect()->back()->with('error', 'Client branch is not set. Please set the client branch before proceeding. Go To Clients > Edit Client');
         }
         $product = LoanProduct::find($request->loan_product_id);
+       if($product->loan_product_category_id == 2 and $client->type == 'individual'){
+           return redirect()->back()->with('error', 'Individual clients cannot apply for corporate loans');
+         }
         $client->load(['shareholders', 'industryType', 'ratio']);
         $application = new LoanApplication();
         $application->created_by_id = Auth::id();
@@ -423,6 +428,7 @@ class LoanApplicationsController extends Controller
             }
         }
         $groups = LoanProductScoringAttribute::where('is_group', 1)->where('loan_product_id', $application->product->id)->get();
+        // dd($groups);
         $groups->transform(function ($group) use ($application) {
             $attributes = LoanProductScoringAttribute::with(['attribute'])->where('is_group', 0)->where('scoring_attribute_group_id', $group->scoring_attribute_group_id)->where('loan_product_id', $application->product->id)->orderBy('order_position')->get();
 
