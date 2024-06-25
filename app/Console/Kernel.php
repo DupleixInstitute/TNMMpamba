@@ -27,7 +27,7 @@ class Kernel extends ConsoleKernel
 
         $schedule->command('campaigns:process-recurring')->daily();
         $schedule->command('campaigns:process-scheduled')->everyFiveMinutes();
-        $schedule->command('reminders:loan-applications')->everyFiveMinutes();
+        $schedule->command('reminders:loan-applications')->everyTwoMinutes();
     }
 
     /**

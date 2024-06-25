@@ -3,14 +3,16 @@
 namespace App\Console\Commands;
 
 use Carbon\Carbon;
-use App\Models\LoanApplication;
-use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Auth;
 use App\Models\LoanApplicationReminder;
 use App\Models\LoanApplicationLinkedApprovalStage;
+use Illuminate\Console\Command;
+// use Illuminate\Bus\Queueable;
+
 
 class SendLoanApplicationReminders extends Command
 {
+    // use Queueable;
+
     /**
      * The name and signature of the console command.
      *

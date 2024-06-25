@@ -28,7 +28,11 @@ class ClientRatioAnalysisController extends Controller
     public function index(Client $client)
     {
 
-        $client->load(['industryType']);
+        $client = $client->load(['industryType']);
+        //check if has a industry type
+        if (empty($client->industryType)) {
+            return back()->with('error', 'Please select an industry type for this client. Go to client page to update client industry type.');
+        }
         $sheets = BalanceSheet::where('client_id', $client->id)
             ->orderBy('year')
             ->groupBy('year')
@@ -36,6 +40,7 @@ class ClientRatioAnalysisController extends Controller
         $data = [
         ];
         foreach ($sheets as $sheet) {
+            // dd($sheet);
             $incomeStatement = IncomeStatement::where('year', $sheet->year)->first();
             if (empty($incomeStatement)) {
                 return redirect()->back()->with('error', 'No income statement for year ' . $sheet->year);
@@ -81,6 +86,7 @@ class ClientRatioAnalysisController extends Controller
                 'total_assets_turnover' => round($incomeStatement->total_sales / $sheet->total_assets, 2),
                 'fixed_assets_turn_over' => round($incomeStatement->total_sales / $sheet->total_fixed_assets, 2),
             ];
+            // dd($data);
         }
         $ratio = RatioAnalysis::where('client_id', $client->id)->first();
         if (empty($ratio)) {

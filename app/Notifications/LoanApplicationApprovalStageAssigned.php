@@ -23,7 +23,7 @@ class LoanApplicationApprovalStageAssigned extends Notification implements Shoul
     public function __construct(LoanApplicationLinkedApprovalStage $linkedStage)
     {
         $this->linkedStage = $linkedStage;
-      
+
 
         $baseUrl = config('app.url');
         //use route helper function to generate the url
@@ -65,7 +65,7 @@ class LoanApplicationApprovalStageAssigned extends Notification implements Shoul
 
         return (new MailMessage)
             ->subject('Loan Application Approval Assigned')
-            ->line('You have been assigned a loan application to approve.')
+            ->line('You have been assigned a loan application'. ' '. '#'.$this->linkedStage->loan_application_id. ' for approval.')
             ->line('Stage: ' . $this->linkedStage->stage->name)
             ->action('View Applicationt', $this->url)
             ->line('Thank you for using our application!')
