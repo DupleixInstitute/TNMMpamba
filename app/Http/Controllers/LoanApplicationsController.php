@@ -926,6 +926,8 @@ class LoanApplicationsController extends Controller
             'action' => ['required'],
             'additional_notes' => ['nullable'],
         ]);
+        //check if the the previous stage is completed first
+
         try {
             DB::beginTransaction();
 
@@ -934,6 +936,13 @@ class LoanApplicationsController extends Controller
             $linkedStage->assigned_by_id = Auth::id();
             $linkedStage->stage_received_at = Carbon::now();
             $linkedStage->stage_started_at = Carbon::now();
+
+            //check if the previous stage is completed first
+            $previousStage = LoanApplicationLinkedApprovalStage::where('loan_application_id', $application->id)->where('id', '<', $linkedStage->id)->orderBy('id', 'desc')->first();
+            if (!empty($previousStage) && !$previousStage->stage_finished_at) {
+                abort(422, ' Loan cannot be sent to the next stage until the previous stage is actioned');
+
+            }
 
             //check if we have current stage
             if (empty($application->currentLinkedStage)) {

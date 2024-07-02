@@ -116,12 +116,23 @@ class ClientsController extends Controller
 
     public function store(Request $request)
     {
+        // dd($request->all());
         $request->validate([
             'name' => ['required', 'string'],
             'type' => ['required', 'string', 'max:255'],
             //'dob' => ['required'],
             'photo' => ['nullable', 'image', 'max:1024'],
         ]);
+
+        if($request->type == 'corporate'){
+            //check if industry_type_id is set
+
+            $request->validate([
+                'industry_type_id' => ['required'],
+            ], [
+                'industry_type_id.required' => 'The Industrial Sector field is required.',
+            ]);
+        }
         $client = new Client();
         $client->created_by_id = Auth::id();
         $client->province_id = $request->province_id;

@@ -278,11 +278,10 @@
                                             }}</span>
 
                                     </td>
-                                    <td class="border-t px-6 py-4">
-                                        <span class="text-sm">{{approval.description}}</span>
+                                    <td class="border-t px-6 py-4 notes-column">
+                                        <span class="text-sm short-description">{{approval.description ? approval.description.substring(0, 18) + '...' : '__' }}</span>
+                                        <span class="text-sm full-description">{{ approval.description }}</span>
                                     </td>
-
-
                                     <td class="border-t px-6 py-4">
                                         <div v-if=" approval.approver && approval.stage_finished_at == null && canReassignViaRole  && approval.approver_id &&  approval.has_same_role_as_approver  || $attrs.auth.user.can_reassign == true && approval.approver_id && approval.stage_finished_at == null  && approval.approver ">
                                             <!-- && approval.was_sent_back == false -->
@@ -674,6 +673,34 @@ export default {
 }
 </script>
 <style scoped>
+.notes-column {
+    position: relative;
+    cursor: pointer; /* Indicates the text is clickable */
+}
+
+.short-description {
+    display: inline-block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.full-description {
+    display: none;
+    position: absolute;
+    background: #fff;
+    border: 1px solid #ddd;
+    padding: 5px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    z-index: 10;
+    max-width: 200px; /* Adjust as needed */
+    white-space: normal;
+    word-wrap: break-word;
+}
+
+.notes-column:hover .full-description {
+    display: block;
+}
 
 
 </style>
