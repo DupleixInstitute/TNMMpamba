@@ -481,6 +481,8 @@ Route::group(['prefix' => 'setting'], function () {
     Route::post('/other/update', [SettingsController::class, 'otherUpdate'])->name('settings.other.update');
     Route::get('/billing', [SettingsController::class, 'billing'])->name('settings.billing');
     Route::post('/update', [SettingsController::class, 'update'])->name('settings.update');
+    Route::get('/loan-bands', [SettingsController::class, 'loanBands'])->name('settings.loan_bands');
+    Route::post('/store-loan-bands', [SettingsController::class, 'storeLoanBands'])->name('settings.other.store-bands');
 });
 //reports
 Route::group(['prefix' => 'report'], function () {

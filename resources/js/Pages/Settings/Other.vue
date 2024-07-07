@@ -8,20 +8,13 @@
             </h2>
         </template>
         <div class=" mx-auto">
-            <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg p-4">
-                <form @submit.prevent="submit" enctype="multipart/form-data">
-                    <div class="grid grid-cols-1 gap-4">
-
-                    </div>
-
-                    <div class="flex items-center justify-end mt-4">
-
-                        <jet-button class="ml-4" :class="{ 'opacity-25': form.processing }"
-                                    :disabled="form.processing">
-                            Save
-                        </jet-button>
-                    </div>
-                </form>
+            <div class="bg-white rounded shadow overflow-x-auto">
+                <inertia-link
+                              class="w-full border-t-2 border-gray-100 font-medium text-gray-600 py-2 px-4 w-full block hover:bg-gray-100 transition duration-150"
+                              :href="route('settings.loan_bands')">
+                    <font-awesome-icon icon="cogs" class="w-4 h-4 mr-2"></font-awesome-icon>
+                    Loan Application Score Bands
+                </inertia-link>
             </div>
         </div>
         <teleport to="head">
@@ -85,7 +78,7 @@ export default {
     },
     methods: {
         submit() {
-            this.form.post(this.route('settings.other.update'), {})
+            this.form.post(this.route('settings.other.store-bands'), {})
         },
     },
 }

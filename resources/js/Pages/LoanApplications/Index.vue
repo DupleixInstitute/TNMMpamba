@@ -103,9 +103,10 @@
                         </td>
                         <td class="border-t">
                             <span class="px-6 py-4 flex items-center">
-                                 {{
-                                    $filters.formatNumber(application.score)
-                                }} ({{ $filters.formatNumber(application.score_percentage) }}%)
+                                {{ $filters.formatNumber(application.score) }} ({{ $filters.formatNumber(application.score_percentage) }}%)
+                            </span>
+                            <span class="px-6 py-4 inline-block text-sm font-semibold text-green-800 bg-green-200 rounded-full">
+                                {{ application.loan_application_band }}
                             </span>
                         </td>
                         <td class="border-t px-6 py-4">

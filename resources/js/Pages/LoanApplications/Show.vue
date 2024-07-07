@@ -7,6 +7,9 @@
                 </inertia-link>
                 <span class="text-indigo-400 font-medium">/</span>
                 #{{ application.id }}
+                <span class="px-6 py-4 inline-block text-sm font-semibold text-green-800 bg-green-200 rounded-full">
+                    {{ application.loan_application_band }}
+                </span>
             </h2>
         </template>
         <div class=" mx-auto">

@@ -684,6 +684,12 @@ class PermissionsTableSeeder extends Seeder
                 'display_name' => 'Access Dashboard',
                 'guard_name' => 'web',
             ],
+            [
+                'name' => 'settings.loan_application_bands',
+                'module' => 'Settings',
+                'display_name' => 'Access Loan Application Scoring Bands',
+                'guard_name' => 'web',
+            ]
 
 
         ];

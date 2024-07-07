@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Currency;
-use App\Models\Setting;
-use App\Models\SmsGateway;
-use App\Models\Timezone;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
+use App\Models\Setting;
+use App\Models\Currency;
+use App\Models\Timezone;
+use App\Models\SmsGateway;
+use Illuminate\Http\Request;
+use App\Models\LoanApplicationBand;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 class SettingsController extends Controller
 {
@@ -151,5 +154,52 @@ class SettingsController extends Controller
     {
         return Inertia::render('Settings/Billing', [
         ]);
+    }
+    public function loanBands()
+    {
+        $loanApplicationBands = LoanApplicationBand::all();
+        return Inertia::render('Settings/LoanBands', [
+            'loanApplicationBands' => $loanApplicationBands,
+        ]);
+    }
+    public function storeLoanBands(Request $request)
+    {
+        $bands = $request->all();
+
+        foreach ($bands as $band) {
+            $validator = Validator::make($band, [
+                'min' => 'required|integer|min:0|max:1000',
+                'max' => 'required|integer|min:0|max:1000',
+                'name' => 'required|string',
+            ]);
+            if ($validator->fails()) {
+                //retun back with error message
+                return redirect()->back()->withErrors($validator)->withInput();
+            }
+        }
+
+        // Check for overlapping bands
+        for ($i = 0; $i < count($bands); $i++) {
+            for ($j = $i + 1; $j < count($bands); $j++) {
+                if ($this->bandsOverlap($bands[$i], $bands[$j])) {
+                    return redirect()->back()->with('error', 'Bands must not overlap')->withInput();
+                }
+            }
+        }
+
+        // Save bands
+        LoanApplicationBand::truncate(); // Remove existing bands
+        foreach ($bands as $band) {
+            //add user id to the band
+            $band['created_by'] = Auth::id();
+            LoanApplicationBand::create($band);
+        }
+
+        return redirect()->route('settings.loan_bands')->with('success', 'Bands saved successfully!');
+
+    }
+     private function bandsOverlap($band1, $band2)
+    {
+        return $band1['min'] <= $band2['max'] && $band1['max'] >= $band2['min'];
     }
 }

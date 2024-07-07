@@ -13,16 +13,14 @@ class LoanApplication extends Model
 {
     use LogsActivity, HasFactory;
 
-    protected $casts = [
-
-    ];
-    protected $appends = ['approver_name'];
+    protected $casts = [];
+    protected $appends = ['approver_name', 'loan_application_band'];
     protected $fillable = ['current_loan_application_approval_stage_id', 'was_resend', 'branch_id'];
 
 
     public function client()
     {
-    return $this->belongsTo(Client::class);
+        return $this->belongsTo(Client::class);
     }
 
     public function product()
@@ -108,7 +106,8 @@ class LoanApplication extends Model
         return $this->belongsTo(Branch::class);
     }
 
-    public function createdBy(){
+    public function createdBy()
+    {
         return $this->belongsTo(User::class, 'created_by_id');
     }
     public function getApproverNameAttribute()
@@ -120,9 +119,14 @@ class LoanApplication extends Model
     {
         return $this->hasMany(LoanApplicationReminder::class);
     }
+    public function getLoanApplicationBandAttribute()
+    {
+        $score = (float)$this->score;
 
+        $band = LoanApplicationBand::where('min', '<=', $score)
+            ->where('max', '>=', $score)
+            ->first();
 
-
-
-
+        return $band ? $band->name : null;
+    }
 }
