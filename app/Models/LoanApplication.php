@@ -121,8 +121,8 @@ class LoanApplication extends Model
     }
     public function getLoanApplicationBandAttribute()
     {
-        $score = (float)$this->score;
-
+        $score = (float)$this->score_percentage;
+        
         $band = LoanApplicationBand::where('min', '<=', $score)
             ->where('max', '>=', $score)
             ->first();

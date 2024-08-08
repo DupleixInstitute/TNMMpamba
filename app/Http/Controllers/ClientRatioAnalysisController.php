@@ -2,17 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\ChartOfAccount;
-use App\Models\Client;
-use App\Models\BalanceSheet;
-use App\Models\BalanceSheetData;
-use App\Models\IncomeStatement;
-use App\Models\RatioAnalysis;
-use App\Models\Setting;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
+use App\Models\Client;
+use App\Models\Setting;
+use App\Models\BalanceSheet;
+use Illuminate\Http\Request;
+use App\Models\RatioAnalysis;
+use App\Models\ChartOfAccount;
+use App\Models\IncomeStatement;
+use App\Models\BalanceSheetData;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 
 class ClientRatioAnalysisController extends Controller
 {
@@ -40,7 +41,7 @@ class ClientRatioAnalysisController extends Controller
         $data = [
         ];
         foreach ($sheets as $sheet) {
-            // dd($sheet);
+          Log::info($sheet->total_fixed_assets);
             $incomeStatement = IncomeStatement::where('year', $sheet->year)->first();
             if (empty($incomeStatement)) {
                 return redirect()->back()->with('error', 'No income statement for year ' . $sheet->year);
@@ -54,6 +55,7 @@ class ClientRatioAnalysisController extends Controller
             $ebitTotalAssets =( $sheet->total_assets>0)? round($incomeStatement->total_operating_profit / $sheet->total_assets, 2):0;
             $equityTotalLiabilities = ($sheet->total_liabilities>0)?round($sheet->total_equity / $sheet->total_liabilities, 2):0;
             $salesTotalAssets =($sheet->total_assets>0)? round($incomeStatement->total_sales / $sheet->total_assets, 2):0;
+            // dd($sheet->total_fixed_assets);
             $data[] = [
                 'year' => $sheet->year,
                 'working_capital_total_assets' => $workingCapitalTotalAssets,
@@ -84,10 +86,11 @@ class ClientRatioAnalysisController extends Controller
                 'interest_cover' => ($incomeStatement->total_net_finance_costs>0) ? round($incomeStatement->total_operating_profit / $incomeStatement->total_net_finance_costs, 2) : 0,
                 'gross_interest_debts' => ($sheet->total_long_term_liabilities>0) ? round(($incomeStatement->total_cost_of_goods_sold_depreciation + $incomeStatement->total_depreciation_property_plant_equipment + $incomeStatement->total_amortisation) / $sheet->total_long_term_liabilities, 2) : 0,
                 'total_assets_turnover' => round($incomeStatement->total_sales / $sheet->total_assets, 2),
-                'fixed_assets_turn_over' => round($incomeStatement->total_sales / $sheet->total_fixed_assets, 2),
+                'fixed_assets_turn_over' => $sheet->total_fixed_assets != 0 ? round($incomeStatement->total_sales / $sheet->total_fixed_assets, 2) : 0,
             ];
-            // dd($data);
         }
+        // dd($data);
+
         $ratio = RatioAnalysis::where('client_id', $client->id)->first();
         if (empty($ratio)) {
             $ratio = new RatioAnalysis();
@@ -165,6 +168,7 @@ class ClientRatioAnalysisController extends Controller
             $weightedFixedAssetsTurnOver += $key['fixed_assets_turn_over'] * $weighting[$i] / 100;
             $i++;
         }
+        // dd($weightedZScore);
         //todo:move the save code to save method
         $ratio->working_capital_total_assets = round($weightedWorkingCapitalTotalAssets, 2);
         $ratio->retained_earnings_total_assets = round($weightedRetainedEarningsTotalAssets, 2);

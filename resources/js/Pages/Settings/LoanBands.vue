@@ -23,8 +23,12 @@
                     <thead class="bg-gray-50">
                         <tr>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Band Name/Code</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Min Score</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Max Score</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Min Score
+                                (%)
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Max Score
+                                (%)
+                            </th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
@@ -93,8 +97,8 @@ export default {
     data() {
         return {
             bands: [
-                { min: 0, max: 100, name: 'A' },
-                { min: 101, max: 200, name: 'B' },
+                { min: 0, max: 10, name: 'A' },
+                { min: 11, max: 20, name: 'B' },
             ],
             errors: [],
             pageTitle: "Setup Loan Bands",
@@ -124,8 +128,8 @@ export default {
         },
         validateBands() {
             this.errors = this.bands.map((band, index) => {
-                if (band.min < 0 || band.max > 1000) {
-                    return "Values must be between 0 and 1000";
+                if (band.min < 0 || band.max > 100) {
+                    return "Values must be between 0 and 100";
                 }
                 if (band.min >= band.max) {
                     return "Min value must be less than Max value";
