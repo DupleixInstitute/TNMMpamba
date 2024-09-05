@@ -15,6 +15,7 @@ use App\Events\LoanCreated;
 use App\Models\InvoiceItem;
 use App\Models\LoanProduct;
 use Illuminate\Http\Request;
+use App\Models\RatioAnalysis;
 use App\Models\LoanApplication;
 use App\Events\LoanStatusChanged;
 use App\Models\LoanApprovalStage;
@@ -141,10 +142,16 @@ class LoanApplicationsController extends Controller
 
         $attributes = $request->json('attributes');
         $client = Client::find($request->client_id);
+        // dd($client);
+        $ratioAnalysis = RatioAnalysis::where('client_id', $client->id)->first();
+        // dd($ratioAnalysis);
+
+
 
         if ($client->type === 'corporate' && empty($client->ratio)) {
-            return redirect()->back()->with('error', 'No financial data entered for the chosen client. Ration analysis not found!');
+            return redirect()->back()->with('error', 'No financial data entered for the chosen client. Ratio analysis not found!');
         }
+
 
         //check if client branch is set
         if ($client->branch_id == null) {
