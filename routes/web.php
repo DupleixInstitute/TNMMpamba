@@ -236,6 +236,7 @@ Route::group(['prefix' => 'loan_application', 'as' => 'loan_applications.'], fun
     Route::get('/{application}/comments', [LoanApplicationsController::class, 'showComments'])->name('show_comments');
     Route::get('fixing',  [LoanApplicationsController::class, 'fixing'])->name('fixing');
     Route::get('resend-email/{id}',  [LoanApplicationsController::class, 'resendEmail'])->name('resend');
+    Route::get('view-log-history/{id}',  [LoanApplicationsController::class, 'viewLogHistory'])->name('view-log-history');
 
     //files
     Route::get('{loan}/file', [LoanFilesController::class, 'index'])->name('files.index');

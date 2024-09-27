@@ -1071,4 +1071,14 @@ class LoanApplicationsController extends Controller
     // Send the email
     Mail::to($recipientEmail)->send(new LoanApplicationFinalised($mailData));
 }
+
+public function viewLogHistory($id)
+{
+    $application = LoanApplication::findOrfail($id);
+    $loanHistories = $application->linkedStages;
+    return Inertia::render('LoanApplications/LoanHistory', [
+        'application' => $application,
+        'loanHistories' => $loanHistories
+    ]);
+}
 }

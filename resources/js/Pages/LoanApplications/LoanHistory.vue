@@ -2,50 +2,35 @@
     <app-layout>
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                <inertia-link class="text-indigo-400 hover:text-indigo-600" :href="route('clients.index')">Clients
-                </inertia-link>
-                <span class="text-indigo-400 font-medium">/</span> {{ client.name }}
+                <inertia-link class="text-indigo-400 hover:text-indigo-600" :href="route('loan_applications.show', application.id)">Loan Application {{ application.id }} </inertia-link>
+
             </h2>
         </template>
         <div class="mx-auto">
             <div class="md:flex md:items-start">
-                <div class="bg-white relative shadow-xl mb-4 mt-20 w-full md:w-3/12">
-                    <div class="col-span-12 lg:col-span-4 xxl:col-span-3 flex lg:block flex-col-reverse">
-                        <div class="intro-y box mt-5 lg:mt-0">
-                            <client-menu :client="client"></client-menu>
-                        </div>
-                    </div>
 
-                </div>
                 <div class="w-full md:w-9/12 p-4 md:ml-4 bg-white sm:mt-4">
-                    <div class="flex justify-between ">
-                        <h2 class="font-semibold text-xl text-gray-800 leading-tight">Loans</h2>
-                        <inertia-link class="btn btn-blue" v-if="can('loans.applications.create')"
-                                      :href="route('loan_applications.create',{client_id:client.id})">
-                            <span>Create </span>
-                            <span class="hidden md:inline">Loan</span>
-                        </inertia-link>
-                    </div>
+
                     <div class="mt-4 relative overflow-x-auto">
                         <table class="w-full whitespace-no-wrap table-auto">
                             <thead class="bg-gray-50">
                             <tr class="text-left font-bold">
-                                <th class="px-6 pt-4 pb-4 font-medium text-gray-500">ID</th>
-                                <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Product</th>
-                                <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Amount</th>
-                                <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Score</th>
-                                <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Status</th>
-                                <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Date</th>
+                                <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Loan Stage</th>
+                                <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Approved By</th>
+                                <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Assigned By</th>
+                                <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Started At</th>
+                                <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Finished At</th>
                                 <th class="px-6 pt-4 pb-4 font-medium text-gray-500">Action</th>
                             </tr>
                             </thead>
+                           
                             <tbody>
-                            <tr v-if="!applications.data.length">
+                            <!-- <tr v-if="!loanHistories.data.length">
                                 <td colspan="7" class="px-6 py-4 text-center">
                                     No applications yet
                                 </td>
-                            </tr>
-                            <tr v-for="application in applications.data" :key="application.id"
+                            </tr> -->
+                            <tr v-for="history in loanHistories.data" :key="history.id"
                                 class="hover:bg-gray-100 focus-within:bg-gray-100">
                                 <td class="border-t">
                                     <inertia-link class="px-6 py-4 flex items-center" :href="route('loan_applications.show', application.id)"
@@ -128,7 +113,7 @@
                             </tbody>
                         </table>
                     </div>
-                    <pagination v-if="applications.data.length" :links="applications.links"/>
+                    <!-- <pagination v-if="loanHistories.data.length" :links="loanHistories.links"/> -->
                 </div>
             </div>
         </div>
@@ -190,8 +175,8 @@ export default {
         ClientMenu,
     },
     props: {
-        client: Object,
-        applications: Object,
+        application: Object,
+        loanHistories: Object,
 
     },
     data() {
