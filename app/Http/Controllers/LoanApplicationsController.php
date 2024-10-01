@@ -844,9 +844,9 @@ class LoanApplicationsController extends Controller
                 $previousApprovers = User::whereIn('id', $approverIds)->get();
 
                 // Send notification emails to all previous approvers
-                foreach ($previousApprovers as $approver) {
-                    $this->sendApprovalNotificationEmail($application, $approver->email, $linkedStage->status, $approver->name);
-                }
+                // foreach ($previousApprovers as $approver) {
+                //     $this->sendApprovalNotificationEmail($application, $approver->email, $linkedStage->status, $approver->name);
+                // }
             }
         }
         if ($linkedStage->status === 'in_progress') {
