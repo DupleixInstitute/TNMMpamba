@@ -17,6 +17,33 @@ class Client extends Model
     use LogsActivity, HasFactory;
     use SoftDeletes;
 
+    protected $fillable = [
+        'customer_id',
+        'name',
+        'phone',
+        'email',
+        'trading_name',
+        'external_id',
+        'id_number',
+        'gender',
+        'dob',
+        'profile_photo_path',
+        'province_id',
+        'district_id',
+        'ward_id',
+        'village_id',
+        'branch_id',
+        'created_by_id',
+        'country_id',
+        'registration_country_id',
+        'main_bank_id',
+        'second_bank_id',
+        'third_bank_id',
+        'industry_type_id',
+        'legal_type_id',
+        'mobile'
+    ];
+
     protected $appends = [
         'profile_photo_url',
         'age',

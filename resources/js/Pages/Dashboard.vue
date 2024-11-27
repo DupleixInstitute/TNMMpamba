@@ -203,7 +203,14 @@
             </h3>
             <div class="grid sm:grid-cols-1 md:grid-cols-4 gap-2">
                 <div class="tooltip-wrapper">
-                    <inertia-link :href="route('dashboard.my-workspace')"
+                    <!-- Spinner shown when loading -->
+                    <div v-if="loading" class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
+                        <div class="loader ease-linear rounded-full border-8 border-t-8 border-gray-200 h-64 w-64"></div>
+                        <p class="text-white text-xl font-semibold mt-4">Please wait...</p>
+                    </div>
+
+                    <!-- Link -->
+                    <inertia-link @click.prevent="navigateToDashboard"
                         class="relative flex flex-col min-w-0 break-words bg-white rounded mb-6 xl:mb-0 shadow-lg"
                         title="Go to My Workspace">
                         <div class="flex-auto p-4">
@@ -221,6 +228,7 @@
                         </div>
                     </inertia-link>
                 </div>
+
             </div>
         </div>
 
@@ -282,6 +290,7 @@ export default {
             showModal: null, // Initialize showModal property
             showAddWidgetModal: false,
             itemsLayout: this.layout,
+            loading: false, // Ensure 'loading' is defined here
 
         }
     },
@@ -303,6 +312,20 @@ export default {
         hideTooltip(event) {
             // Remove tooltip when mouse out
             event.target.removeAttribute('data-tooltip');
+        },
+        navigateToDashboard() {
+            this.loading = true;
+            //show a spinner
+            
+
+            this.$inertia.visit(this.route('dashboard.my-workspace'), {
+            onFinish: () => {
+                this.loading = false;
+            },
+            onCancelToken: () => {
+                this.loading = false; // In case of cancellation
+            }
+            });
         }
 
     },
@@ -362,4 +385,29 @@ export default {
         transform: translateY(-5px);
     }
 }
+/* Spinner CSS */
+.loader {
+    border-top-color: #3490dc;
+    -webkit-animation: spinner 1.5s linear infinite;
+    animation: spinner 1.5s linear infinite;
+  }
+
+  @-webkit-keyframes spinner {
+    0% {
+      -webkit-transform: rotate(0deg);
+    }
+    100% {
+      -webkit-transform: rotate(360deg);
+    }
+  }
+
+  @keyframes spinner {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
 </style>

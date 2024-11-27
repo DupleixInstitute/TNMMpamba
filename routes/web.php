@@ -9,6 +9,7 @@ use App\Http\Controllers\RolesController;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\WardsController;
 use App\Http\Controllers\ClientsController;
+use App\Http\Controllers\CommentController;
 use App\Http\Controllers\CoursesController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\LicenseController;
@@ -42,8 +43,9 @@ use App\Http\Controllers\ChartOfAccountController;
 use App\Http\Controllers\LoanGuarantorsController;
 use App\Http\Controllers\CourseMaterialsController;
 use App\Http\Controllers\EventCategoriesController;
-use App\Http\Controllers\FinancialPeriodController;
+use App\Http\Controllers\ClientImportController;
 
+use App\Http\Controllers\FinancialPeriodController;
 use App\Http\Controllers\CommunicationLogController;
 use App\Http\Controllers\CourseCategoriesController;
 use App\Http\Controllers\LoanApplicationsController;
@@ -68,6 +70,7 @@ use App\Http\Controllers\MemberPortal\MemberPortalLoanNotesController;
 use App\Http\Controllers\MemberPortal\MemberPortalLoanGuarantorsController;
 use App\Http\Controllers\MemberPortal\MemberPortalCourseMaterialsController;
 use App\Http\Controllers\MemberPortal\MemberPortalCourseRegistrationsController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -153,6 +156,8 @@ Route::group(['prefix' => 'client', 'as' => 'clients.'], function () {
     Route::get('/{client}/edit', [ClientsController::class, 'edit'])->name('edit');
     Route::put('/{client}/update', [ClientsController::class, 'update'])->name('update');
     Route::delete('/{client}/destroy', [ClientsController::class, 'destroy'])->name('destroy');
+    Route::post('/import', [ClientImportController::class, 'import'])->name('import');
+
     //loans
     Route::get('{client}/loan_application', [ClientsController::class, 'loanApplication'])->name('loan_applications.index');
     Route::get('{client}/course', [ClientsController::class, 'courses'])->name('courses.index');
@@ -237,6 +242,11 @@ Route::group(['prefix' => 'loan_application', 'as' => 'loan_applications.'], fun
     Route::get('fixing',  [LoanApplicationsController::class, 'fixing'])->name('fixing');
     Route::get('resend-email/{id}',  [LoanApplicationsController::class, 'resendEmail'])->name('resend');
     Route::get('view-log-history/{id}',  [LoanApplicationsController::class, 'viewLogHistory'])->name('view-log-history');
+   
+    Route::post('loan-applications/save-comment', [CommentController::class, 'saveComment'])
+    ->name('save-comment');
+    Route::post('loan-applications/save-reply', [CommentController::class, 'saveReply'])
+    ->name('save-reply');
 
     //files
     Route::get('{loan}/file', [LoanFilesController::class, 'index'])->name('files.index');

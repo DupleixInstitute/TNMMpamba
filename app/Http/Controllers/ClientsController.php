@@ -25,165 +25,70 @@ class ClientsController extends Controller
     {
         $this->middleware('auth');
         $this->middleware(['permission:clients.index'])->only(['index', 'show']);
-        $this->middleware(['permission:clients.create'])->only(['create', 'store']);
+        $this->middleware(['permission:clients.create'])->only(['create', 'store', 'import']);
         $this->middleware(['permission:clients.update'])->only(['edit', 'update']);
         $this->middleware(['permission:clients.destroy'])->only(['destroy']);
     }
 
-    public function index()
+    public function index(Request $request)
     {
-
-        $clients = Client::with(['country', 'province', 'district', 'ward', 'village', 'branch'])
-            ->filter(\request()->only('search', 'province_id', 'gender', 'branch_id', 'district_id', 'ward_id', 'village_id', 'industry_type_id', 'type'))
-            ->orderBy('created_at', 'desc')
-            ->paginate(20);
         return Inertia::render('Clients/Index', [
-            'filters' => \request()->all('search', 'province_id', 'gender', 'branch_id', 'district_id', 'ward_id', 'village_id', 'industry_type_id', 'type'),
-            'clients' => $clients,
-            'countries' => Country::get()->map(function ($item) {
-                return [
-                    'value' => $item->id,
-                    'label' => $item->name
-                ];
-            }),
+            'filters' => $request->all('search', 'trashed'),
+            'can' => [
+                'create' => Auth::user()->can('clients.create'),
+                'edit' => Auth::user()->can('clients.update'),
+                'delete' => Auth::user()->can('clients.destroy'),
+            ],
+            'clients' => Client::query()
+                ->when($request->input('search'), function ($query, $search) {
+                    $query->where(function ($query) use ($search) {
+                        $query->where('external_id', 'like', "%{$search}%")
+                            ->orWhere('name', 'like', "%{$search}%")
+                            ->orWhere('mobile', 'like', "%{$search}%");
+                    });
+                })
+                ->paginate(10)
+                ->withQueryString()
+                ->through(fn ($client) => [
+                    'id' => $client->id,
+                    'external_id' => $client->external_id,
+                    'name' => $client->name,
+                    'mobile' => $client->mobile,
+                    'deleted_at' => $client->deleted_at,
+                ]),
         ]);
     }
 
     public function create()
     {
-
-        return Inertia::render('Clients/Create', [
-            'countries' => Country::all()->transform(function ($country) {
-                return [
-                    'value' => $country->id,
-                    'label' => $country->name,
-                ];
-            }),
-            'branches' => Branch::get()->map(function ($item) {
-                return [
-                    'value' => $item->id,
-                    'label' => $item->name
-                ];
-            }),
-            'provinces' => Province::get()->transform(function ($item) {
-                return [
-                    'country_id' => $item->country_id,
-                    'value' => $item->id,
-                    'label' => $item->name,
-                ];
-            }),
-            'districts' => District::get()->transform(function ($item) {
-                return [
-                    'value' => $item->id,
-                    'label' => $item->name,
-                    'province_id' => $item->province_id,
-                ];
-            }),
-            'wards' => Ward::get()->transform(function ($item) {
-                return [
-                    'value' => $item->id,
-                    'label' => $item->name,
-                    'district_id' => $item->district_id,
-                ];
-            }),
-            'villages' => Village::get()->transform(function ($item) {
-                return [
-                    'value' => $item->id,
-                    'label' => $item->name,
-                    'ward_id' => $item->ward_id,
-                ];
-            }),
-            'industryTypes' => IndustryType::get()->transform(function ($item) {
-                return [
-                    'value' => $item->id,
-                    'label' => $item->name,
-                ];
-            }),
-            'legalTypes' => LegalType::get()->transform(function ($item) {
-                return [
-                    'value' => $item->id,
-                    'label' => $item->name,
-                ];
-            }),
-            'banks' => Bank::get()->transform(function ($item) {
-                return [
-                    'value' => $item->id,
-                    'label' => $item->name,
-                ];
-            }),
-        ]);
+        return Inertia::render('Clients/Create');
     }
 
     public function store(Request $request)
     {
-        // dd($request->all());
         $request->validate([
             'name' => ['required', 'string'],
-            'type' => ['required', 'string', 'max:255'],
-            //'dob' => ['required'],
-            'photo' => ['nullable', 'image', 'max:1024'],
+            'external_id' => ['required', 'string'],
+            'mobile' => ['required', 'string', 'regex:/^07\d{8}$/'],
+        ], [
+            'mobile.regex' => 'Phone number must be 10 digits starting with 07',
         ]);
 
-        if($request->type == 'corporate'){
-            //check if industry_type_id is set
-
-            $request->validate([
-                'industry_type_id' => ['required'],
-            ], [
-                'industry_type_id.required' => 'The Industrial Sector field is required.',
-            ]);
-        }
         $client = new Client();
         $client->created_by_id = Auth::id();
-        $client->province_id = $request->province_id;
-        $client->district_id = $request->branch_id;
-        $client->ward_id = $request->ward_id;
-        $client->village_id = $request->village_id;
-        $client->branch_id = $request->branch_id;
         $client->name = $request->name;
-        $client->type = $request->type;
-        $client->country_id = $request->country_id;
-        $client->title_id = $request->title_id;
-        $client->nationality_id = $request->nationality_id;
-        $client->gender = $request->gender;
-        $client->email = $request->email;
-        $client->mobile = $request->mobile;
-        $client->tel = $request->tel;
-        $client->zip = $request->zip;
         $client->external_id = $request->external_id;
-        $client->address = $request->address;
-        $client->postal_address = $request->postal_address;
-        $client->id_type = $request->id_type;
-        $client->id_number = $request->id_number;
-        $client->dob = $request->dob;
-        $client->marital_status = $request->marital_status;
-        $client->occupation = $request->occupation;
-        $client->employer_name = $request->employer_name;
-        $client->employer_address = $request->employer_address;
-        $client->description = $request->description;
-        $client->status = $request->status;
-        $client->industry_type_id = $request->industry_type_id;
-        $client->registration_country_id = $request->registration_country_id;
-        $client->main_bank_id = $request->main_bank_id;
-        $client->second_bank_id = $request->second_bank_id;
-        $client->third_bank_id = $request->third_bank_id;
-        $client->legal_type_id = $request->legal_type_id;
-        $client->registration_year = $request->registration_year;
-        $client->registration_number = $request->registration_number;
-        $client->years_in_business = $request->years_in_business;
-        $client->trading_name = $request->trading_name;
-        $client->audit_status = $request->audit_status;
-        $client->real_annual_inflation_rate = $request->real_annual_inflation_rate;
-        $client->nominal_annual_inflation_rate = $request->nominal_annual_inflation_rate;
-        $client->years_at_present_address = $request->years_at_present_address;
+        $client->mobile = $request->mobile;
+        $client->type = 'individual';
+        $client->status = 'active';
         $client->save();
+
         event(new ClientCreated($client));
-        if ($request->file('photo')) {
-            $client->updateProfilePhoto($request->file('photo'));
-        }
+        
         activity()
             ->performedOn($client)
             ->log('Create Client');
+
         return redirect()->route('clients.index')->with('success', 'Client created successfully.');
     }
 
@@ -197,127 +102,30 @@ class ClientsController extends Controller
 
     public function edit(Client $client)
     {
-
         return Inertia::render('Clients/Edit', [
             'client' => $client,
-            'countries' => Country::all()->transform(function ($country) {
-                return [
-                    'value' => $country->id,
-                    'label' => $country->name,
-                ];
-            }),
-            'branches' => Branch::get()->map(function ($item) {
-                return [
-
-                    'value' => $item->id,
-                    'label' => $item->name
-                ];
-            }),
-            'provinces' => Province::get()->transform(function ($item) {
-                return [
-                    'country_id' => $item->country_id,
-                    'value' => $item->id,
-                    'label' => $item->name,
-                ];
-            }),
-            'districts' => District::get()->transform(function ($item) {
-                return [
-                    'value' => $item->id,
-                    'label' => $item->name,
-                    'province_id' => $item->province_id,
-                ];
-            }),
-            'wards' => Ward::get()->transform(function ($item) {
-                return [
-                    'value' => $item->id,
-                    'label' => $item->name,
-                    'district_id' => $item->district_id,
-                ];
-            }),
-            'villages' => Village::get()->transform(function ($item) {
-                return [
-                    'value' => $item->id,
-                    'label' => $item->name,
-                    'ward_id' => $item->ward_id,
-                ];
-            }),
-            'industryTypes' => IndustryType::get()->transform(function ($item) {
-                return [
-                    'value' => $item->id,
-                    'label' => $item->name,
-                ];
-            }),
-            'legalTypes' => LegalType::get()->transform(function ($item) {
-                return [
-                    'value' => $item->id,
-                    'label' => $item->name,
-                ];
-            }),
-            'banks' => Bank::get()->transform(function ($item) {
-                return [
-                    'value' => $item->id,
-                    'label' => $item->name,
-                ];
-            }),
         ]);
     }
 
     public function update(Request $request, Client $client)
     {
-
         $request->validate([
             'name' => ['required', 'string'],
-            'type' => ['required', 'string', 'max:255'],
-            'photo' => ['nullable', 'image', 'max:1024'],
+            'external_id' => ['required', 'string'],
+            'mobile' => ['required', 'string', 'regex:/^07\d{8}$/'],
         ]);
-        $client->province_id = $request->province_id;
-        $client->district_id = $request->branch_id;
-        $client->ward_id = $request->ward_id;
-        $client->village_id = $request->village_id;
-        $client->branch_id = $request->branch_id;
+
         $client->name = $request->name;
-        $client->type = $request->type;
-        $client->country_id = $request->country_id;
-        $client->title_id = $request->title_id;
-        $client->nationality_id = $request->nationality_id;
-        $client->gender = $request->gender;
-        $client->email = $request->email;
-        $client->mobile = $request->mobile;
-        $client->tel = $request->tel;
-        $client->zip = $request->zip;
         $client->external_id = $request->external_id;
-        $client->address = $request->address;
-        $client->postal_address = $request->postal_address;
-        $client->id_type = $request->id_type;
-        $client->id_number = $request->id_number;
-        $client->dob = $request->dob;
-        $client->marital_status = $request->marital_status;
-        $client->occupation = $request->occupation;
-        $client->employer_name = $request->employer_name;
-        $client->employer_address = $request->employer_address;
-        $client->description = $request->description;
-        $client->status = $request->status;
-        $client->industry_type_id = $request->industry_type_id;
-        $client->registration_country_id = $request->registration_country_id;
-        $client->main_bank_id = $request->main_bank_id;
-        $client->second_bank_id = $request->second_bank_id;
-        $client->third_bank_id = $request->third_bank_id;
-        $client->legal_type_id = $request->legal_type_id;
-        $client->registration_year = $request->registration_year;
-        $client->registration_number = $request->registration_number;
-        $client->years_in_business = $request->years_in_business;
-        $client->trading_name = $request->trading_name;
-        $client->audit_status = $request->audit_status;
-        $client->real_annual_inflation_rate = $request->real_annual_inflation_rate;
-        $client->nominal_annual_inflation_rate = $request->nominal_annual_inflation_rate;
-        $client->years_at_present_address = $request->years_at_present_address;
+        $client->mobile = $request->mobile;
+        $client->type = 'individual';
+        $client->status = 'active';
         $client->save();
-        if ($request->file('photo')) {
-            $client->updateProfilePhoto($request->file('photo'));
-        }
+
         activity()
             ->performedOn($client)
             ->log('Update Client');
+
         return redirect()->route('clients.index')->with('success', 'Client updated successfully.');
     }
 
@@ -337,11 +145,11 @@ class ClientsController extends Controller
         $id = $request->id;
         $branchID = $request->branch_id;
         $data = Client::with(['country', 'province', 'branch', 'district', 'ward', 'village'])->where(function ($query) use ($search) {
-            $query->where('name', 'like', "%$search%");
-            $query->orWhere('email', 'like', "%$search%");
-            $query->orWhere('id', 'like', "%$search%");
-            $query->orWhere('id_number', 'like', "%$search%");
-            $query->orWhere('external_id', 'like', "%$search%");
+            $query->where('external_id', 'like', "%$search%")
+                ->orWhere('name', 'like', "%$search%")
+                ->orWhere('email', 'like', "%$search%")
+                ->orWhere('id_number', 'like', "%$search%")
+                ->orWhere('mobile', 'like', "%$search%");
         })->when($id, function ($query) use ($id) {
             return $query->where('id', $id);
         })->when($branchID, function ($query) use ($branchID) {
@@ -359,7 +167,6 @@ class ClientsController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate(20);
 
-
         return Inertia::render('Clients/LoanApplications/Index', [
             'client' => $client,
             'applications' => $applications,
@@ -376,6 +183,52 @@ class ClientsController extends Controller
         return Inertia::render('Clients/Courses/Index', [
             'client' => $client,
             'registrations' => $registrations,
+        ]);
+    }
+
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => ['required', 'file', 'mimes:txt,csv', 'max:10240'],
+        ]);
+
+        $file = $request->file('file');
+        $lines = file($file->getPathname(), FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        $successCount = 0;
+        $errorCount = 0;
+        $errors = [];
+
+        foreach ($lines as $line) {
+            try {
+                if (preg_match('/^(\S+)\s+(\S+)-(.+)$/', $line, $matches)) {
+                    $customerId = $matches[1];
+                    $phone = $matches[2];
+                    $publicName = trim($matches[3]);
+
+                    Client::updateOrCreate(
+                        ['external_id' => $customerId],
+                        [
+                            'name' => $publicName,
+                            'mobile' => $phone,
+                            'created_by_id' => Auth::id(),
+                        ]
+                    );
+
+                    $successCount++;
+                } else {
+                    $errorCount++;
+                    $errors[] = "Invalid format in line: {$line}";
+                }
+            } catch (\Exception $e) {
+                $errorCount++;
+                $errors[] = "Error processing line: {$line}. Error: {$e->getMessage()}";
+            }
+        }
+
+        return back()->with([
+            'success' => "{$successCount} clients imported successfully.",
+            'error' => $errorCount > 0 ? "{$errorCount} errors occurred during import." : null,
+            'errors' => $errors,
         ]);
     }
 }

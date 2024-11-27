@@ -28,12 +28,16 @@ use Illuminate\Support\Facades\Log;
 use App\Models\LoanApplicationScore;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
+use App\Models\ScoringAttributeGroup;
 use App\Events\LoanApplicationCreated;
 use App\Mail\LoanApplicationFinalised;
+use App\Models\LoanApplicationComment;
+use Illuminate\Support\Facades\Storage;
 use function React\Promise\Stream\first;
 use Illuminate\Database\Eloquent\Builder;
 use App\Models\LoanProductScoringAttribute;
 use App\Events\LoanApplicationStatusChanged;
+use App\Models\LoanApplicationReviewerComment;
 use App\Mail\LoanApplicationApprovalStageReturned;
 use App\Models\LoanApplicationLinkedApprovalStage;
 use App\Models\LoanApplicationApprovalStageHistory;
@@ -501,16 +505,16 @@ class LoanApplicationsController extends Controller
 
        $currentUserRoles =  $auth_roles = Auth::user()->roles->pluck('can_reassign')->toArray();
        $canReassignViaRole = in_array(1, $currentUserRoles);
-
-
-
+       $reviewerCommentsCount = LoanApplicationComment::where('loan_application_id', $application->id)->count();
+    //    dd($reviewerCommentsCount);
 
 
         return Inertia::render('LoanApplications/Show', [
             'application' => $application,
             'recommenderAccessRight' => $recommenderAccessRight,
             'approverAccessRight' => $approverAccessRight,
-            'canReassignViaRole' =>$canReassignViaRole
+            'canReassignViaRole' =>$canReassignViaRole,
+            'reviewerCommentsCount' => $reviewerCommentsCount
 
         ]);
     }
@@ -815,113 +819,112 @@ class LoanApplicationsController extends Controller
 
     public function changeStatus(Request $request, LoanApplication $application)
     {
-        // dd($request->all());
-
+        // Load necessary relationships
         $application->load(['linkedStages']);
+
+        // Validate request data
         $request->validate([
             'status' => ['required'],
             'stage_id' => ['required'],
-            'description' => ['required']
+            'description' => ['required'],
+            'attachment' => ['nullable', 'file', 'mimes:pdf,doc,docx,jpg,jpeg,png', 'max:2048'],
         ]);
-        $linkedStage = LoanApplicationLinkedApprovalStage::find($request->stage_id);
-        $linkedStage->status = $request->status;
-        // $linkedStage->stage_started_at = Carbon::now();
 
-        $linkedStage->description = $request->description ?: $linkedStage->description;
-        if ($linkedStage->status === 'approved' || $linkedStage->status === 'rejected' || $linkedStage->status === 'recommend') {
-            $linkedStage->status != 'recommend' ?  $linkedStage->completed = 1 : $linkedStage->completed = 0;
-            $linkedStage->stage_finished_at = Carbon::now();
+        DB::transaction(function () use ($request, $application) {
+            $linkedStage = LoanApplicationLinkedApprovalStage::find($request->stage_id);
+            $linkedStage->status = $request->status;
 
-            //sent an email for approved or rejected scenarios
-            if (in_array($linkedStage->status, ['approved', 'rejected'])) {
-                // Retrieve all previous stages for the loan application
-                $previousStages = LoanApplicationLinkedApprovalStage::where('loan_application_id', $application->id)->get();
+            // Update descriptions
+            $linkedStage->previous_description = $linkedStage->description ?: $request->description;
+            $linkedStage->description = $request->description ?: $linkedStage->description;
 
-                // Extract approver IDs from previous stages and add the application creator ID
-                $approverIds = $previousStages->pluck('approver_id')->push($application->created_by_id);
-
-                // Retrieve the user records for all relevant approver IDs
-                $previousApprovers = User::whereIn('id', $approverIds)->get();
-
-                // Send notification emails to all previous approvers
-                // foreach ($previousApprovers as $approver) {
-                //     $this->sendApprovalNotificationEmail($application, $approver->email, $linkedStage->status, $approver->name);
-                // }
-            }
-        }
-        if ($linkedStage->status === 'in_progress') {
-            $linkedStage->stage_started_at = Carbon::now();
-        }
-        $linkedStage->save();
-        $linkedStage->load(['application', 'application.linkedStages']);
-        if ($linkedStage->status === 'sent_back') {
-            // dd('sent back');
-
-            // dd($application->current_loan_application_approval_stage_id);
-
-
-            $nextStage = $application->linkedStages->where('id', '<', $linkedStage->id)->last();
-            // dd($nextStage);
-
-            if (!empty($nextStage)) {
-                $nextStage->is_current = 1;
-                $nextStage->completed = 0;
-                $nextStage->status = 'returned';
-                $nextStage->save();
-                $application->current_loan_application_approval_stage_id = $nextStage->id;
-                $application->save();
-                $linkedStage->is_current = 0;
-                $linkedStage->completed = 0;
-                $linkedStage->save();
-
-                //get the user to send email to him/her
-
-                // //create a mailable object
-
-            }
-            // $previousStages = $application->linkedStages->where('id', '<', $linkedStage->id)->get();
-            $previousStages = LoanApplicationLinkedApprovalStage::where('loan_application_id', $application->id)->where('id', '<', $linkedStage->id)->get();
-            $array =  $previousStages->pluck('approver_id');
-            //push created by id to the array
-            $array->push($application->created_by_id);
-            $previousApprovers = User::whereIn('id', $array)->get();
-            foreach ($previousApprovers as $user) {
-                $mailData = [
-                    'application' => $application,
-                    'to' => $user->email,
-                    'message' => 'A loan application has been returned  for further review. Please login to the system to review the application and take the necessary action.'
-                ];
-                //send the email
-                Mail::to($user->email)->send(new LoanApplicationApprovalStageReturned($mailData));
-            }
-        }
-        if ($linkedStage->status === 'approved' || $linkedStage->status === 'recommend') {
-            $nextStage = $application->linkedStages->where('id', '>', $linkedStage->id)->first();
-
-            //if the status is approved , update the application status to approved and   there is no need to send the application to the next stage
-            if ($linkedStage->status === 'approved') {
-                $linkedStage->completed = 1;
-                $linkedStage->save();
-                $application->current_loan_application_approval_stage_id = $linkedStage->id;
-                $application->save();
-            } elseif (!empty($nextStage) and $linkedStage->status === 'recommend') {
-                $nextStage->is_current = 1;
-                $nextStage->save();
-                $application->current_loan_application_approval_stage_id = $nextStage->id;
-                $application->save();
-                $linkedStage->is_current = 0;
-                $linkedStage->save();
-            } else {
-                //if we don't have a next stage, then the application is complete
-                //if status selected is recommend and its the last stage, update the application status to approved
-                if ($linkedStage->status === 'recommend') {
-                    $linkedStage->status = 'approved';
+            // Handle attachment
+            try {
+                if ($request->hasFile("attachment")) {
+                    $attachment = $request->file("attachment");
+                    $filename = $linkedStage->id . '_' . $attachment->getClientOriginalName();
+                    $attachmentPath = $attachment->storeAs('LoanAttachments', $filename, 'public');
+                    if (!$attachmentPath) {
+                        throw new \Exception("File could not be stored.");
+                    }
+                    $linkedStage->attachment_path = $attachmentPath;
                 }
-                $linkedStage->completed = 1;
-                $linkedStage->save();
+            } catch (\Exception $e) {
+                // Log the error for further inspection
+                Log::error("File upload error: " . $e->getMessage());
+                return back()->withErrors('There was an issue uploading the file.');
             }
-        }
-        event(new LoanApplicationStatusChanged($linkedStage));
+
+            // Handle status changes
+            if (in_array($linkedStage->status, ['approved', 'rejected', 'recommend'])) {
+                $linkedStage->completed = $linkedStage->status !== 'recommend';
+                $linkedStage->stage_finished_at = Carbon::now();
+
+                if (in_array($linkedStage->status, ['approved', 'rejected'])) {
+                    $previousStages = LoanApplicationLinkedApprovalStage::where('loan_application_id', $application->id)->get();
+                    $approverIds = $previousStages->pluck('approver_id')->push($application->created_by_id);
+                    $previousApprovers = User::whereIn('id', $approverIds)->get();
+
+                    foreach ($previousApprovers as $approver) {
+                        // Send notification email (assuming sendApprovalNotificationEmail is defined elsewhere)
+                        $this->sendApprovalNotificationEmail($application, $approver->email, $linkedStage->status, $approver->name);
+                    }
+                }
+            }
+
+            if ($linkedStage->status === 'in_progress') {
+                $linkedStage->stage_started_at = Carbon::now();
+            }
+
+            $linkedStage->save();
+
+            // Handle "sent back" status
+            if ($linkedStage->status === 'sent_back') {
+                $nextStage = $application->linkedStages->where('id', '<', $linkedStage->id)->last();
+
+                if (!empty($nextStage)) {
+                    $nextStage->update(['is_current' => 1, 'completed' => 0, 'status' => 'returned']);
+                    $application->update(['current_loan_application_approval_stage_id' => $nextStage->id]);
+                    $linkedStage->update(['is_current' => 0, 'completed' => 0]);
+
+                    $previousStages = LoanApplicationLinkedApprovalStage::where('loan_application_id', $application->id)->where('id', '<', $linkedStage->id)->get();
+                    $array = $previousStages->pluck('approver_id')->push($application->created_by_id);
+                    $previousApprovers = User::whereIn('id', $array)->get();
+
+                    foreach ($previousApprovers as $user) {
+                        $mailData = [
+                            'application' => $application,
+                            'to' => $user->email,
+                            'message' => 'A loan application has been returned for further review. Please log in to the system to review and take action.'
+                        ];
+                        Mail::to($user->email)->send(new LoanApplicationApprovalStageReturned($mailData));
+                    }
+                }
+            }
+
+            // Handle "approved" or "recommend" status
+            if (in_array($linkedStage->status, ['approved', 'recommend'])) {
+                $nextStage = $application->linkedStages->where('id', '>', $linkedStage->id)->first();
+
+                if ($linkedStage->status === 'approved') {
+                    $linkedStage->completed = 1;
+                    $application->update(['current_loan_application_approval_stage_id' => $linkedStage->id]);
+                } elseif (!empty($nextStage) && $linkedStage->status === 'recommend') {
+                    $nextStage->update(['is_current' => 1]);
+                    $application->update(['current_loan_application_approval_stage_id' => $nextStage->id]);
+                    $linkedStage->update(['is_current' => 0]);
+                } else {
+                    if ($linkedStage->status === 'recommend') {
+                        $linkedStage->status = 'approved';
+                    }
+                    $linkedStage->completed = 1;
+                }
+            }
+
+            event(new LoanApplicationStatusChanged($linkedStage));
+        });
+
+        // Redirect to loan application page with success message
         return redirect()->route('loan_applications.show', $application->id)->with('success', 'Loan updated successfully.');
     }
 
@@ -1001,9 +1004,25 @@ class LoanApplicationsController extends Controller
         return redirect()->route('loan_applications.index')->with('success', 'Loan deleted successfully.');
     }
 
-    public function showComments()
+    public function showComments($id)
     {
-        dd('show comments');
+
+        $comments = LoanApplicationComment::with(['loanApplication', 'user', 'commentSection', 'replies', 'replies.user', 'attachments'])
+            ->where('loan_application_id', $id)
+            ->filter(\request()->only('comment_date', 'comment_type', 'comment_section', 'comment'))
+            ->orderBy('created_at', 'desc')
+            ->paginate(20);
+         $attributeGroups = ScoringAttributeGroup::get(['id', 'name']);
+        //  dd($attributeGroups);
+
+
+
+        return Inertia::render('LoanApplications/ReviewerComments', [
+            'filters' => \request()->all('search', 'client_id', 'loan_product_id', 'province_id', 'branch_id', 'district_id', 'ward_id', 'date_range', 'village_id', 'staff_id', 'status'),
+            'comments' => $comments,
+            'loanApplicationId' =>$id,
+            'attributeGroups' => $attributeGroups
+        ]);
     }
 
     public function fixing()

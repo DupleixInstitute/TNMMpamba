@@ -159,14 +159,18 @@
                         <div class="mt-4">{{ application.description }}</div>
                     </div>
 
-                    <inertia-link :href="route('loan_applications.show_comments', application.id)">
-                        <div class="bg-white p-5 mt-5">
+                    <inertia-link :href="route('loan_applications.show_comments', application.id)" class="block">
+                        <div class="bg-white p-5 mt-5 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200">
                             <div class="flex items-center">
-                                <i class="fas fa-comments mr-2"></i>
-                                <div class="font-medium text-lg">Reviewer Comments</div>
+                                <i class="fas fa-comments text-blue-500 text-2xl mr-4"></i>
+                                <div class="text-gray-800 font-semibold text-lg">
+                                    Reviewer Comments
+                                    <span class="badge">{{ reviewerCommentsCount }}</span>
+                                </div>
                             </div>
                         </div>
                     </inertia-link>
+
 
 
 
@@ -260,7 +264,7 @@
                                         rejected
                                     </span>
                                         <button class="ml-2 bg-blue-600 text-white p-1 rounded"
-                                                @click="changeStatusAction(approval.id)"
+                                                @click="changeStatusAction(approval.id, approval.description)"
                                                 v-if="approval.approver_id===$attrs.auth.user.id && approval.is_current && !approval.completed">
                                             <font-awesome-icon icon="edit"/>
                                         </button>
@@ -281,10 +285,14 @@
                                             }}</span>
 
                                     </td>
-                                    <td class="border-t px-6 py-4 notes-column">
-                                        <span class="text-sm short-description">{{approval.description ? approval.description.substring(0, 18) + '...' : '__' }}</span>
-                                        <span class="text-sm full-description">{{ approval.description }}</span>
-                                    </td>
+                                    <expandable-notes
+                                    :description="approval.description"
+                                    :previous-description="approval.previous_description"
+                                    />
+
+
+
+
                                     <td class="border-t px-6 py-4">
                                         <div v-if=" approval.approver && approval.stage_finished_at == null && canReassignViaRole  && approval.approver_id &&  approval.has_same_role_as_approver  || $attrs.auth.user.can_reassign == true && approval.approver_id && approval.stage_finished_at == null  && approval.approver ">
                                             <!-- && approval.was_sent_back == false -->
@@ -297,6 +305,14 @@
                                         </div>
                                         <span   class="px-2 rounded-full bg-green-100 text-green-800" v-else-if="approval.was_sent_back== true">Reassigned</span>
                                         <span   class="px-2 rounded-full bg-red-100 text-red-800" v-else>No Actions</span>
+
+
+                                         <!-- Check if the approval has an attachment -->
+                                         <a v-if="approval.attachment_path" :href="getDownloadUrl(approval.attachment_path)" class="btn btn-link">
+                                            <font-awesome-icon icon="download" :style="{ fontSize: '0.90em', marginTop: '10px' }" />
+                                          </a>
+
+
                                     </td>
                                 </tr>
                                 </tbody>
@@ -409,10 +425,10 @@
                             required>
                             <option value="pending">Pending</option>
                             <option value="in_progress">In Progress</option>
-                             <option v-if="recommenderAccessRight" value="recommend">Recommend</option>
-                            <option  v-if="approverAccessRight" value="approved">Approved</option>
+                            <option v-if="recommenderAccessRight" value="recommend">Recommend</option>
+                            <option v-if="approverAccessRight" value="approved">Approved</option>
                             <option value="sent_back">Send Back To Last Stage</option>
-                            <option  v-if="approverAccessRight" value="rejected">Rejected</option>
+                            <option v-if="approverAccessRight" value="rejected">Rejected</option>
                         </select>
                         <jet-input-error :message="changeStatusForm.errors.status" class="mt-2"/>
                     </div>
@@ -421,7 +437,23 @@
                         <textarea-input id="description" class="mt-1 block w-full"
                                         v-model="changeStatusForm.description"/>
                         <jet-input-error :message="changeStatusForm.errors.description" class="mt-2"/>
+                    </div>
+                    <div>
+                        <jet-label for="attachment" value="Attach File (optional)"/>
+                        <input
+                            type="file"
+                            name="attachment"
+                            id="attachment"
+                            class="mt-1 block w-full border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                            @change="handleFileUpload"/>
+                        <jet-input-error :message="changeStatusForm.errors.attachment" class="mt-2"/>
 
+                        <!-- Display attachment name and remove option if set -->
+                        <div v-if="changeStatusForm.attachment">
+                            <jet-secondary-button @click="removeAttachment" class="mt-2">
+                                Remove Attachment
+                            </jet-secondary-button>
+                        </div>
                     </div>
                 </div>
             </template>
@@ -438,6 +470,7 @@
                 </jet-success-button>
             </template>
         </jet-dialog-modal>
+
         <jet-dialog-modal :show="showAssignApproverModal" @close="showAssignApproverModal = false">
             <template #title>
                 {{assignOrReassignActionName}} Approver
@@ -500,6 +533,7 @@ import JetConfirmationModal from '@/Jetstream/ConfirmationModal.vue'
 import JetDangerButton from '@/Jetstream/DangerButton.vue'
 import Button from "../../Jetstream/Button.vue";
 import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
+import ExpandableNotes from './ExpandableNotes.vue'
 
 export default {
     props: {
@@ -508,6 +542,7 @@ export default {
         approverAccessRight: Boolean,
         recommenderAccessRight: Boolean,
         canReassignViaRole : Boolean,
+        reviewerCommentsCount: Number,
 
 
     },
@@ -530,6 +565,7 @@ export default {
         JetSuccessButton,
         JetConfirmationModal,
         JetDangerButton,
+        ExpandableNotes
 
     },
     data() {
@@ -553,6 +589,7 @@ export default {
                 status: '',
                 stage_id: '',
                 description: '',
+                attachment: null,
             }),
             approvers: [],
             readyToSave: false,
@@ -616,14 +653,18 @@ export default {
             })
             this.showAssignApproverModal = false
         },
-        changeStatusAction(id) {
+        changeStatusAction(id, description) {
             this.showChangeStatusModal = true
             this.changeStatusForm.stage_id = id
+            this.changeStatusForm.description = description
         },
         changeStatus() {
             console.log(this.changeStatusForm)
             this.changeStatusForm.post(this.route('loan_applications.change_status', this.application.id), {
                 preserveState: false,
+                    headers: {
+                    'Content-Type': 'multipart/form-data'
+                  },
             })
         },
         deleteAction(id) {
@@ -640,6 +681,22 @@ export default {
             this.confirmingDeletion = false
             window.location = route('loan_applications.index')
         },
+        handleFileUpload(event) {
+        const file = event.target.files[0]; // Get the first selected file
+        if (file) {
+            // Store the file in your form data or handle it as needed
+            this.changeStatusForm.attachment = file;
+        }
+    },
+    removeAttachment() {
+        this.changeStatusForm.attachment = null; // Clear the attachment
+        const fileInput = document.getElementById('attachment');
+        fileInput.value = ''; // Reset the file input value
+    },
+    getDownloadUrl(attachment) {
+        // Generate the correct URL to access the file
+        return `/storage/app/public/${attachment}`;  // This will map to public/storage/loan_applications/
+    }
 
 
 
@@ -704,6 +761,59 @@ export default {
 .notes-column:hover .full-description {
     display: block;
 }
+.hoverable {
+    text-decoration: none;
+    transition: color 0.3s ease, text-decoration 0.3s ease;
+}
+
+.hoverable:hover {
+    color: #1E90FF; /* Blue color */
+    text-decoration: underline;
+    text-decoration-color: #1E90FF; /* Blue underline */
+}
+.hoverable {
+    color: #1E90FF; /* Subtle blue color */
+    text-decoration: underline;
+    text-decoration-color: rgba(30, 144, 255, 0.4); /* Light blue underline */
+    transition: color 0.3s ease, text-decoration-color 0.3s ease;
+}
+
+.hoverable:hover {
+    color: #1E90FF; /* Stronger blue */
+    text-decoration-color: #1E90FF; /* Darker blue underline */
+}
+.hoverable {
+    color: #1E90FF; /* Subtle blue color */
+    text-decoration: underline;
+    text-decoration-color: rgba(30, 144, 255, 0.4); /* Light blue underline */
+    transition: color 0.3s ease, text-decoration-color 0.3s ease;
+}
+
+.hoverable:hover {
+    color: #1E90FF; /* Stronger blue */
+    text-decoration-color: #1E90FF; /* Darker blue underline */
+}
+
+.previous-description {
+    font-style: italic; /* Italicize to differentiate it */
+    color: #6B7280; /* Gray color for previous description */
+}
+.badge {
+    background-color: #ff0000;
+    color: #fff;
+    border-radius: 12px;
+    padding: 2px 8px;
+    font-size: 12px;
+    font-weight: bold;
+    position: absolute;
+    /* Position the badge absolutely */
+   
+
+    /* Adjust position to look better */
+}
+
+
+
 
 
 </style>

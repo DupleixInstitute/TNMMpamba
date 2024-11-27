@@ -11,12 +11,31 @@ return [
             'order' => 0,
         ],
         [
-            'name' => 'Clients',
+            'name' => 'Names File',
             'icon' => 'users',
             'route' => 'clients.index',
             'permissions' => 'clients',
-            'dropdown' => false,
-            'children' => [],
+            'dropdown' => true,
+            'children' => [
+                [
+                    'name' => 'View Names File',
+                    'icon' => 'circle',
+                    'route' => 'clients.index',
+                    'permissions' => 'clients',
+                    'dropdown' => false,
+                    'children' => [],
+                    'order' => 0,
+                ],
+                [
+                    'name' => 'Import Names File',
+                    'icon' => 'circle',
+                    'route' => 'clients.import',
+                    'permissions' => 'clients.import',
+                    'dropdown' => false,
+                    'children' => [],
+                    'order' => 1,
+                ],
+            ],
             'order' => 1,
         ],
         [
@@ -123,7 +142,6 @@ return [
             ],
             'order' => 6,
         ],
-
         [
             'name' => 'Reports',
             'icon' => 'chart-bar',
